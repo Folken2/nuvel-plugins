@@ -1,0 +1,14 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "chief-of-staff",
+  "version": "0.1.0",
+  "description": "Your AI chief of staff. Sweeps email, calendar, chat and tasks every two hours and keeps a living Markdown registry in Google Drive, OneDrive, SharePoint or a local folder — with morning briefs, meeting prep and weekly reviews. Read-only on your sources; vendor-agnostic.",
+  "author": {
+    "name": "nuvel",
+    "url": "https://github.com/Folken2/nuvel"
+  },
+  "homepage": "https://github.com/Folken2/nuvel-plugins/tree/main/plugins/chief-of-staff",
+  "repository": "https://github.com/Folken2/nuvel-plugins",
+  "license": "MIT",
+  "keywords": ["chief-of-staff", "executive-assistant", "radar", "briefing", "email", "calendar", "productivity", "google-drive", "onedrive", "sharepoint", "routines", "nuvel"]
+}

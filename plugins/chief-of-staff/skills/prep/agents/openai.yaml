@@ -1,0 +1,5 @@
+interface:
+  display_name: "Meeting prep"
+  short_description: "Context and goals for an upcoming meeting"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $prep to prep me for my next meeting."

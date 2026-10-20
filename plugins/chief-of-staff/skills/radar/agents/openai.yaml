@@ -1,0 +1,5 @@
+interface:
+  display_name: "Radar"
+  short_description: "Sweep email, calendar and chat; refresh context"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $radar to catch me up on what I missed."

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Set up chief of staff"
+  short_description: "Onboard, connect sources, schedule routines"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $setup to set up my chief of staff."

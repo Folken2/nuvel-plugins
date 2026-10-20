@@ -1,0 +1,5 @@
+interface:
+  display_name: "Weekly review"
+  short_description: "Progress, loops and next week's plan"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $weekly-review to review my week."

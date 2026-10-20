@@ -1,0 +1,17 @@
+{
+  "description": "Chief of Staff: at session start, give the main agent a short summary of what the scheduled routines recorded in the registry.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

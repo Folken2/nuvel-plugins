@@ -1,0 +1,5 @@
+interface:
+  display_name: "Recall"
+  short_description: "Ask what your chief of staff saw; leave notes for its routines"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $recall to tell me what my chief of staff saw today."

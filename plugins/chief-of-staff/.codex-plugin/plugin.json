@@ -1,0 +1,29 @@
+{
+  "name": "chief-of-staff",
+  "version": "0.1.0",
+  "description": "Your AI chief of staff. Sweeps email, calendar, chat and tasks every two hours and keeps a living Markdown registry in Google Drive, OneDrive, SharePoint or a local folder — with morning briefs, meeting prep and weekly reviews. Read-only on your sources; vendor-agnostic.",
+  "author": {
+    "name": "nuvel",
+    "url": "https://github.com/Folken2/nuvel"
+  },
+  "homepage": "https://github.com/Folken2/nuvel-plugins/tree/main/plugins/chief-of-staff",
+  "repository": "https://github.com/Folken2/nuvel-plugins",
+  "license": "MIT",
+  "keywords": ["chief-of-staff", "executive-assistant", "radar", "briefing", "email", "calendar", "productivity", "google-drive", "onedrive", "sharepoint", "routines", "nuvel"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Chief of Staff",
+    "shortDescription": "Keeps you on top of email, calendar and chat",
+    "longDescription": "Chief of Staff watches your email, calendar, chat and tasks on a schedule and keeps a living Markdown registry in your own Google Drive, OneDrive, SharePoint or local folder: what needs you now, today's meetings with context, open loops, and notes on people and projects. It writes morning briefs, preps you for meetings and runs a weekly review. It only reads your sources — it never sends, replies to, archives or deletes anything.",
+    "developerName": "nuvel",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://github.com/Folken2/nuvel-plugins",
+    "defaultPrompt": [
+      "Set up my chief of staff",
+      "Run radar: what did I miss?",
+      "Brief me on today"
+    ],
+    "brandColor": "#4F46E5"
+  }
+}
