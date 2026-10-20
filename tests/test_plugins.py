@@ -99,8 +99,8 @@ def test_references_cited_by_name_exist(plugin: Path) -> None:
     names = {p.name for p in refs.iterdir()}
     for doc in refs.glob("*.md"):
         for cited in re.findall(r"`([a-z-]+\.md)`", doc.read_text(encoding="utf-8")):
-            if cited in {"README.md", "CONTEXT.md", "config.md", "loops.md", "handoff.md"}:
-                continue  # registry files, not reference docs
+            if cited in {"README.md"}:
+                continue  # the registry README, not a reference doc
             assert cited in names, f"{doc.name} cites missing reference {cited}"
 
 

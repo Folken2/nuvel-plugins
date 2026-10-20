@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "nuvel",
-  "description": "Official nuvel plugins for Claude: agents that run your day-to-day, built on nuvel's skills.",
+  "description": "Official nuvel plugins for Claude and Cowork (also Codex): agents that run your day-to-day.",
   "owner": {
     "name": "nuvel",
     "url": "https://github.com/Folken2/nuvel"
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "chief-of-staff",
-      "description": "Your AI chief of staff: sweeps email, calendar, chat and tasks every two hours and keeps a living Markdown registry in Google Drive, OneDrive, SharePoint or a local folder. Morning briefs, meeting prep, weekly reviews. Read-only on your sources.",
+      "description": "Your AI chief of staff for Claude and Cowork: sweeps email and calendar every two hours and keeps an append-only registry in Google Drive, OneDrive, SharePoint or a local folder. Morning briefs, meeting prep, weekly reviews. Read-only on your sources.",
       "author": {
         "name": "nuvel"
       },

@@ -2,6 +2,35 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.2.0 - 2026-10-20
+
+Refined from a first end-to-end run in the Claude app with Gmail, Google
+Calendar and Google Drive connectors (`docs/test-runs/2026-10-20-cowork-e2e.md`).
+
+### Changed
+
+- **Append-only registry:** every run writes one new document; the newest
+  `config` and the newest `radar` are the current state. Works with storage
+  connectors that can't edit files (the Google Drive connector), never
+  conflicts, and keeps full history. Replaces `CONTEXT.md`, `loops.md`,
+  `handoff.md`, `log/`, `people/`, `projects/` and `.state/`.
+- Google Drive storage uses Google Docs (the connector reads `.md` uploads back
+  empty); no YAML frontmatter anywhere — `- key: value` bullets instead.
+- Radar: new `## Decide` section for unsolicited inbound (cold proposals,
+  offers, invitations) instead of *I owe*; dated notices (renewals, invoices,
+  expiries) go to *Watching* with date and amount; `seen` stores opaque source
+  IDs instead of hashes; explicit allow-list of read-only tools.
+- Scheduling targets Claude and Cowork: Cowork scheduled tasks, cloud routines
+  (pointing at this public repo), desktop tasks; first sweep via **Run now** to
+  pre-approve read-only tools.
+- Setup asks for the registry language separately from the chat language and
+  proves a write + read round trip on the storage connector.
+
+### Removed
+
+- The Claude Code `SessionStart` hook (the plugin targets Claude and Cowork;
+  `recall` covers reading the registry from any conversation).
+
 ## chief-of-staff 0.1.0 - 2026-10-20
 
 ### Added

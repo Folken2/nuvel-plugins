@@ -1,8 +1,8 @@
 # Registry layout
 
-The registry is a plain folder of Markdown files that lives wherever the user
-keeps their work: Google Drive, OneDrive, SharePoint, or a local folder. It is
-the chief of staff's only memory **and** its logbook.
+The registry is a folder in the user's own storage (Google Drive, OneDrive,
+SharePoint, or a local/synced folder). It is the chief of staff's only memory
+**and** its logbook.
 
 ## Why it exists: two kinds of session that never share context
 
@@ -10,169 +10,221 @@ the chief of staff's only memory **and** its logbook.
    brand-new session with no memory of previous runs and no access to the
    project the user is working in. Everything a routine knows comes from the
    registry; everything it learns goes back into it before it ends.
-2. **The main agent** — the Claude or Codex session in whatever project the
-   user is working on. It never saw the routines run. When it needs to know what
-   happened ("did Ana answer?", "what's on today?"), it reads the registry: the
-   `recall` skill answers from it, and in Claude a session-start hook announces
-   the registry (counts only, never its text).
+2. **The main agent** — the Claude / Cowork (or Codex) conversation where the
+   user is working. It never saw the routines run. When it needs to know what
+   happened ("did Ana answer?", "what's on today?"), it reads the registry
+   through the `recall` skill.
 
 The registry is the only bridge between them, in both directions:
-routines → main agent through `CONTEXT.md`, `loops.md` and `log/`;
-main agent → routines through `handoff.md`. So every file must make sense to a
-reader with zero prior context.
+routines → main agent through `runs/`; main agent → routines through `handoff/`.
+Every document must make sense to a reader with zero prior context.
 
-Default root folder name: `Chief of Staff/` (the user may rename it during setup;
-the real path is stored in `config.md`).
+## The one rule: every run writes one new document; the newest wins
+
+Storage connectors (e.g. the Google Drive connector) can create files but often
+cannot edit them. So the registry is **append-only**: nothing is ever edited in
+place. Each skill run creates exactly one new document; "the current X" is
+always the newest document of that kind. This also means concurrent runs never
+conflict and the full history comes for free.
 
 ```
 Chief of Staff/
-├── README.md              # what this folder is, for humans (from templates/README.md)
-├── config.md              # who the user is + which sources, storage and routines are on
-├── CONTEXT.md             # the living snapshot — rewritten by every radar run
-├── loops.md               # open commitments: what I owe, what I'm waiting on
-├── handoff.md             # notes from the main agent / the user to the next routine runs
-├── log/
-│   └── YYYY/MM/YYYY-MM-DD.md   # append-only journal: one section per routine run
-├── briefs/YYYY-MM-DD.md   # morning briefs
-├── prep/YYYY-MM-DD-<meeting-slug>.md   # meeting prep notes
-├── reviews/YYYY-Www.md    # weekly reviews (ISO week)
-├── people/<person-slug>.md    # one note per recurring person
-├── projects/<project-slug>.md # one note per active project / deal / thread
-└── .state/
-    └── radar.json         # cursors, so sweeps are incremental and idempotent
+├── LLEGEIX-ME / README      # for humans, written once by setup (in owner.language)
+├── config/
+│   └── 2026-10-20 1935 config            # newest = configuration in force
+├── runs/
+│   ├── 2026-10-20 1940 radar             # journal of that run + full state snapshot
+│   ├── 2026-10-21 0730 brief
+│   ├── 2026-10-21 1100 prep acme-qbr
+│   └── 2026-10-24 1600 weekly-review
+└── handoff/
+    └── 2026-10-20 1945 handoff           # one instruction from the main agent / user
 ```
 
-Create folders lazily: `setup` creates the root, `README.md`, `config.md`,
-`CONTEXT.md`, `loops.md`, `handoff.md` and `.state/`. The other folders appear the first time a
-skill needs them.
+Folder names (`config`, `runs`, `handoff`) are fixed and in English so every
+skill finds them; document **content** is in `owner.language`.
+
+### Document names
+
+`YYYY-MM-DD HHMM <kind>[ <slug>]`, in the owner's timezone, 24 h. Names sort
+chronologically, so the newest is the greatest name. `<kind>` is one of
+`config`, `radar`, `brief`, `prep`, `weekly-review`, `recall`, `setup`,
+`handoff`.
+
+### Formats by storage
+
+| Storage | Document type | Why |
+|---|---|---|
+| Google Drive connector | **Google Doc** (upload Markdown with conversion on) | The connector reads Docs as text; plain `.md` files come back empty or as base64. |
+| OneDrive / SharePoint connector | `.md` if the connector reads it back as text, else `.docx` — check with one write + read at setup | Same reason. |
+| Synced or local folder | `.md` | Plain files. |
+
+Google Docs mangle YAML frontmatter, so **no document uses frontmatter**:
+structured data is written as `- key: value` bullet lists (see `config`).
 
 ## Finding the registry
 
-Scheduled runs start in a clean session with no memory, so every skill locates
-the registry the same way, stopping at the first hit:
+Every skill locates it the same way, stopping at the first hit:
 
 1. **The prompt.** Routines created by `setup` always end with
-   `Registry: <storage.kind> <storage.root>` — use it.
-2. **The pointer file** `~/.chief-of-staff.json` on this computer
-   (`{"kind": "...", "root": "..."}`), written by `setup`. Absent in cloud runs.
+   `Registry: <storage.kind> <folder id or path>` — use it.
+2. **Search the storage** for a folder titled `Chief of Staff` (Drive:
+   `title = 'Chief of Staff' and mimeType = 'application/vnd.google-apps.folder'`)
+   that contains a `config` folder. On a computer, `~/.chief-of-staff.json`
+   (`{"kind": "...", "root": "..."}`) may also point to it.
 3. **Ask the user** — only in an interactive session. In an unattended run,
-   stop and report that the registry could not be found; never create a new one.
+   stop and report that the registry could not be found; never create one.
 
-Then read `config.md` and treat it as the source of truth (it may say the
-registry moved).
+Then resolve the subfolder IDs (`config`, `runs`, `handoff`) — they are listed
+in the newest `config` under `storage.folders`.
 
-## File contracts
+## Finding "the newest"
 
-### `config.md`
+List the folder restricted to a recent window and take the greatest name, e.g.
+on Drive: `parentId = '<runs id>' and title contains 'radar' and createdTime > '<now − 3 days, RFC 3339>'`.
+If nothing comes back, widen the window (14 days, then no limit). Never rely on
+the order a search returns.
 
-YAML frontmatter is the machine-readable part; the body is free text the user can
-edit. Start from `templates/config.md`. Required keys:
+## Document contracts
 
-| Key | Meaning |
-|---|---|
-| `version` | Registry format version. Currently `1`. |
-| `owner.name`, `owner.role`, `owner.timezone` | Who this chief of staff serves. Timezone is IANA (`Europe/Madrid`). |
-| `owner.language` | Language every note and brief is written in. |
-| `storage.kind` | `synced-folder` \| `google-drive` \| `onedrive` \| `sharepoint` \| `local` (see `storage.md`). |
-| `storage.root` | Absolute path (synced/local) or the folder ID/URL (connector). |
-| `sources` | List of `{kind, via, scope}` — e.g. `{kind: email, via: gmail-connector, scope: "inbox, last 2h"}`. |
-| `vips` | People whose messages are always surfaced. |
-| `priorities` | The 3–5 things that matter this quarter. Radar ranks everything against these. |
-| `routines` | What is scheduled, where, and its ID in that scheduler (so it can be changed later). |
-| `quiet_hours` | When radar should log but never notify. |
-
-### `CONTEXT.md`
-
-The single page the user (or any agent) reads to know "what is going on right
-now". **Rewritten in full** on every radar run, never appended to. Sections, in
-this order, each kept short:
-
-1. `Updated:` timestamp + which sources were swept (and which failed).
-2. `## Needs you now` — at most 5 items, each with why + link to the source.
-3. `## Today` — remaining meetings with one-line context each.
-4. `## Open loops` — top items from `loops.md` that are due or overdue.
-5. `## Moving` — what changed since the last sweep, grouped by project.
-6. `## Watching` — slow signals: a thread going quiet, a deadline approaching.
-
-### `loops.md`
-
-Two tables — `## I owe` and `## Waiting on` — with columns
-`| what | who | due | source | since |`. Radar adds, updates and closes rows; a
-closed row moves to `## Closed (last 14 days)` and is dropped after 14 days.
-Every row links to its source (email permalink, event link, message link).
-
-### `log/YYYY/MM/YYYY-MM-DD.md` — the journal
-
-Append-only, shared by **every** skill run (scheduled or interactive), so the
-main agent can reconstruct what happened and why. One section per run:
+### `config` — the configuration in force
 
 ```markdown
-## 10:02 radar · scheduled · claude — ok (chat ✗ auth expired)
-- Swept: 14 emails (3 relevant), 2 calendar changes, chat skipped.
-- [project-x] Ana confirmed the pilot start for 03/11 → loops: closed "confirm pilot date".
-- [hiring] New candidate packet from recruiting, interview Thu 16:00.
-- Handoff: "watch for Acme's reply" — not yet, kept open.
+# Chief of staff configuration
+
+- version: 1
+- paused: false
+- owner.name: …
+- owner.role: …
+- owner.timezone: Europe/Madrid
+- owner.language: ca
+- owner.working_hours: 09:00-19:00 Mon-Fri
+- storage.kind: google-drive
+- storage.root: <folder id or path>
+- storage.folders: config=<id>, runs=<id>, handoff=<id>
+- quiet_hours: 20:00-08:00
+- notify: needs-you-now
+
+## Priorities
+1. …
+
+## VIPs
+- <name> <email> — <why>        (or "none yet")
+
+## Sources
+- email: <tool/connector> — <scope>
+- calendar: …
+
+## Routines
+- radar: <mechanism> — <schedule> — <id or "manual">
+
+## How I work
+<free text>
 ```
 
-Heading format: `## HH:MM <skill> · <scheduled|interactive> · <claude|codex|other> — <ok|partial|failed> (<short note>)`.
-Then bullets: what was read, what changed in which file, what was handed back
-(`handoff.md` items done or still open), and errors. A run that changes
-nothing still writes its heading with `— ok (nothing new)`.
+Headings and keys stay in English (skills parse them); values and free text are
+in `owner.language`. Changing anything = writing a new `config` document with
+the full content (copy the previous one, change what's needed).
 
-Never rewrite earlier sections. If a run fails half-way, the next run appends its
-own section; the cursors in `.state/radar.json` make that safe.
+### `radar` run — journal + state snapshot
 
-### `handoff.md`
-
-The channel from the main agent (or the user) to future routine runs. Each item
-is a checkbox with who/when/until:
+The newest `radar` run **is** the current picture. It always carries the full
+state forward, even when nothing changed.
 
 ```markdown
-## Open
-- [ ] Watch for Acme's reply on the pricing proposal; flag it in Needs you now. — main agent, 2026-10-20, until 2026-10-24
-- [ ] Ignore the "Q4 offsite" thread, it's handled. — user, 2026-10-20
+# Radar · 2026-10-20 19:40 · scheduled · claude — ok
 
-## Done
-- [x] Tell me when the contract is signed. — done 2026-10-21 10:02 radar (signed by Luis)
+## Journal
+- Window: email since 2026-10-20 17:40 · calendar today + 2 working days
+- Read: 14 emails (3 relevant), 2 calendar changes.
+- [nuvel-0.5] … what changed, with link.
+- Handoff: "watch for Acme's reply" — not yet.
+- Errors: none.
+
+## Needs you now
+- <what> — <why it matters> — <link>        (max 5)
+
+## Decide
+- <unsolicited proposal / invitation / opportunity> — <who> — <why it may matter> — <link> — since <date>
+
+## Today
+- 11:00 <meeting> — <one-line context>
+
+## Open loops
+### I owe
+- <what> — <who> — due <date> — <link> — since <date>
+### Waiting on
+- …
+### Closed (last 14 days)
+- <what> — <who> — closed <date>
+
+## Moving
+- [project] <what changed recently>
+
+## Watching
+- <slow signals; dated notices with their date/amount: renewals, expiries, invoices>
+
+## Handoff
+- open: <handoff doc name> — <instruction>
+- done: <handoff doc name> — <outcome> (<date>)
+
+## Cursors
+- email: 2026-10-20T19:39:00+02:00 — ok
+- calendar: 2026-10-20T19:39:10+02:00 — ok
+- seen: <opaque source ids logged in the last ~3 runs, comma-separated>
 ```
 
-Every routine reads `## Open` before working and applies it. Items with a past
-`until` date are moved to `## Done` as expired. A routine marks an item done
-only when it has actually happened, and logs that in the journal. Keep `## Done`
-to the last 14 days.
+Rules:
+- Section headings stay in English (other skills and runs parse them); the
+  bullets are in `owner.language`.
+- `Cursors`: a failed source keeps its previous cursor (copied from the
+  previous radar) with `— error: <reason>`.
+- `seen` holds raw opaque item IDs (e.g. Gmail thread IDs) — never subjects,
+  names or addresses — so overlapping windows don't log an item twice.
+- `Closed` keeps 14 days; older items drop off the snapshot (they stay in history).
+- `I owe` is only for real commitments: something the user promised, or a
+  direct ask from someone they work with. Inbound the user never asked for
+  (cold proposals, partnership offers, invitations) goes to `Decide`; items
+  there drop off after 14 days without action (they stay in history).
 
-### `people/<slug>.md` and `projects/<slug>.md`
+### Other runs (`brief`, `prep`, `weekly-review`, `recall`, `setup`)
 
-Short, factual, dated bullets under `## Timeline`, newest first, plus a
-`## Now` paragraph that radar keeps current. Slugs are lowercase-hyphenated
-(`ana-garcia`, `project-x`). Only create a note for a person or project that
-shows up in at least two sweeps or is a VIP/priority — not for every sender.
+```markdown
+# Brief · 2026-10-21 07:30 · scheduled · claude — ok
 
-### `.state/radar.json`
+## Journal
+- Based on: radar 2026-10-21 0600. Read: calendar today.
+- Notes: <anything missing or odd>
 
-```json
-{
-  "version": 1,
-  "last_run": "2026-10-20T10:02:00+02:00",
-  "sources": {
-    "email":    {"cursor": "2026-10-20T10:01:40+02:00", "status": "ok"},
-    "calendar": {"cursor": "2026-10-20T10:01:52+02:00", "status": "ok"},
-    "chat":     {"cursor": "2026-10-20T08:00:11+02:00", "status": "error", "error": "auth expired"}
-  },
-  "seen": ["<sha1 of source id>", "..."]
-}
+<the brief / prep / review itself>
 ```
 
-- `cursor` per source: only advance it after that source's findings are written.
-- `seen`: hashes of the last ~500 item IDs, so overlapping windows never log an
-  item twice. Store hashes, not raw IDs or subjects.
-- A source in `error` keeps its old cursor, so the next run retries the gap.
+They don't carry state; the newest `radar` stays the current picture.
+
+### `handoff` — instructions to future runs
+
+```markdown
+# Handoff · 2026-10-20 19:45
+
+- instruction: Watch for Acme's reply on the pricing proposal; put it in Needs you now.
+- from: main agent (on behalf of the user)
+- until: 2026-10-24
+```
+
+A handoff is open until a `radar` run lists it under `## Handoff` as `done`
+(or `until` has passed — then `done: expired`). Handoffs may only ask routines
+to **watch, rank, ignore or remind** — never to send, reply, accept or delete.
+
+## Searching history
+
+History is all of `runs/`. To answer "what happened with X", search the runs
+folder's full text (Drive: `parentId = '<runs id>' and fullText contains 'Acme'`)
+and quote the matching run's name as the "when".
 
 ## Writing rules
 
-- Write in `owner.language`. Dates as `YYYY-MM-DD`, times in `owner.timezone`.
-- Link to the source instead of copying it. Quote at most one line from any email.
+- Write in `owner.language`. Dates `YYYY-MM-DD`, times in `owner.timezone`.
+- Link to the source instead of copying it. Quote at most one line of any email.
 - Never write secrets, one-time codes, passwords, bank or ID numbers, or health
-  details into the registry, even when they appear in a source. See `safety.md`.
-- Keep every file small enough to read in one go: `CONTEXT.md` under ~150 lines,
-  person/project notes under ~100 lines (summarise older timeline entries).
+  details, even when they appear in a source. See `safety.md`.
+- Keep a radar snapshot under ~150 lines: summarise, link, drop stale items.

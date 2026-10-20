@@ -1,18 +1,23 @@
 # Chief of Staff
 
-This folder is the working memory of your AI chief of staff (the `chief-of-staff`
-plugin from nuvel, for Claude and Codex). It is updated automatically by the
-routines you set up.
+This folder is the working memory of your AI chief of staff (the nuvel
+`chief-of-staff` plugin for Claude and Cowork). Your scheduled routines update
+it on their own. Setup writes this page in your registry language.
 
-- **Start here:** `CONTEXT.md` — what needs you now, today's meetings, open loops.
-- `loops.md` — what you owe people and what you're waiting on.
-- `briefs/` — morning briefs. `reviews/` — weekly reviews. `prep/` — meeting prep.
-- `log/` — the journal: one entry per routine run, so you (or your agent) can see what happened and why.
-- `handoff.md` — notes for the next routine runs ("watch for X", "ignore Y"). Write here, or ask your agent to.
-- `people/`, `projects/` — running notes on recurring people and projects.
-- `config.md` — your profile, sources and schedule. Edit it freely; the next run picks it up.
+## How to read it
 
-The assistant only **reads** your email, calendar and chat. It never sends,
-replies, archives or deletes anything; the only place it writes is this folder.
-To pause it, ask your assistant to "pause the chief-of-staff routines", or delete
-the scheduled routines listed in `config.md`.
+- **What matters now:** open the newest document in `runs/` whose name ends in
+  "radar". It has what needs you now, decisions waiting, today's meetings and
+  open loops.
+- **runs/** — one document per run (radar, brief, prep, weekly review). It is
+  both the journal and the history: nothing is ever deleted.
+- **handoff/** — instructions for the next runs ("watch for Acme's reply",
+  "ignore that thread"). Ask your assistant from any conversation.
+- **config/** — your profile, priorities, sources and routines. The newest one
+  is in force; to change anything, ask your assistant and it writes a new version.
+
+## What it does and doesn't do
+
+Your assistant only **reads** your email, calendar and files. It never sends,
+replies, archives, deletes or shares anything; the only thing it does is add
+new documents to this folder. To pause it, ask "pause my chief of staff".

@@ -1,54 +1,62 @@
 # Chief of Staff
 
-An AI chief of staff for **Claude** and **Codex**. It watches your email,
-calendar, chat and tasks on a schedule and keeps a living Markdown registry in
-*your* storage — Google Drive, OneDrive, SharePoint or a local folder — so you
-(and any agent you work with) always know what needs you.
+An AI chief of staff for **Claude and Cowork** (also works in Codex). It watches
+your email, calendar and other sources on a schedule and keeps a living
+registry in *your* storage — Google Drive, OneDrive, SharePoint or a local
+folder — so you, and any conversation you open, always know what needs you.
 
-It only **reads** your sources. It never sends, replies, archives, accepts or
-deletes anything; the only place it writes is its own folder.
+It only **reads** your sources. It never sends, replies, archives, accepts,
+deletes or shares anything; the only thing it does is add new documents to its
+own folder.
 
 ## How it works
 
 ```
- scheduled routines (fresh session each run)          your main agent (any project)
+ scheduled routines (fresh session each run)          any conversation with Claude
  ┌────────────────────────────────────────┐          ┌──────────────────────────────┐
  │ radar      every 2 h, working hours     │          │ "what did I miss?"  → recall │
  │ brief      07:30 weekdays               │          │ "watch for Acme's reply"     │
- │ weekly-review  Friday 16:00             │          │        → handoff.md          │
+ │ weekly-review  Friday 16:00             │          │        → handoff/            │
  └──────────────┬─────────────────────────┘          └──────────────┬───────────────┘
-                │ read: config, handoff, state                       │ read: CONTEXT, loops,
-                │ write: CONTEXT, loops, log, notes                  │ log, notes · write: handoff
+                │ read: newest config, newest radar, handoffs        │ read: runs/
+                │ write: ONE new document in runs/                   │ write: handoff/, config/
                 ▼                                                    ▼
-       ┌──────────────────────── Chief of Staff/ (your drive) ───────────────────────┐
-       │ CONTEXT.md · loops.md · handoff.md · log/ · people/ · projects/ · briefs/ … │
-       └──────────────────────────────────────────────────────────────────────────────┘
+          ┌───────────────── Chief of Staff/ (your drive) ─────────────────┐
+          │ config/ (newest wins) · runs/ (journal + state) · handoff/       │
+          └──────────────────────────────────────────────────────────────────┘
 ```
 
-Routines run in clean sessions with no memory and no access to the project
-you're working in. The registry is the bridge: routines leave everything there
-(including a journal entry for every run), and your main agent reads it. In
-Claude, a session-start hook tells every session where the registry is and how
-many items need you — counts only, never the text, so third-party email can't
-steer a coding session.
+- **Routines run in clean sessions** with no memory. The registry is the bridge:
+  each run reads the newest `config` and the newest `radar`, then writes one
+  new document.
+- **Append-only, newest wins.** Nothing is ever edited — which is why it works
+  with storage connectors that can only create files, never conflicts between
+  runs, and keeps the full history.
+- **The newest radar is the current picture:** *Needs you now*, *Decide*,
+  *Today*, *Open loops*, *Watching*, plus the run's journal. All earlier runs
+  are searchable history.
 
 ## Skills
 
-| Skill | Claude | Codex | What it does |
-|---|---|---|---|
-| setup | `/chief-of-staff:setup` | `$setup` | Guided onboarding: profile, sources, storage, routines, first sweep. Also reconfigure / pause / remove. |
-| radar | `/chief-of-staff:radar` | `$radar` | Incremental sweep of all sources since the last run; refreshes `CONTEXT.md`, `loops.md`, notes and the journal. |
-| brief | `/chief-of-staff:brief` | `$brief` | Morning brief: focus, meetings with context, due loops, free blocks. |
-| prep | `/chief-of-staff:prep` | `$prep` | Prep for an upcoming meeting: who, history, open loops, agenda. |
-| weekly-review | `/chief-of-staff:weekly-review` | `$weekly-review` | Week vs. priorities, loops, next week's plan; tidies the registry. |
-| recall | `/chief-of-staff:recall` | `$recall` | From any project: answer from the registry, or leave instructions for the routines. |
+| Skill | What it does |
+|---|---|
+| setup | Guided onboarding: profile, sources, storage, routines, first sweep. Also reconfigure / pause / remove. |
+| radar | Sweep of all sources since the last run; writes a new radar document (journal + full state). |
+| brief | Morning brief: focus, meetings with context, due loops, free blocks. |
+| prep | Prep for an upcoming meeting: who, history, open loops, agenda. |
+| weekly-review | The week vs. priorities, loops, decisions pending, next week's plan. |
+| recall | From any conversation: answer from the registry, or leave instructions for the routines. |
 
+In Claude they appear as `/chief-of-staff:<skill>`; in Codex as `$<skill>`.
 Plain language works too: "set up my chief of staff", "what did I miss?",
 "prep me for my 3pm".
 
 ## Install
 
-**Claude Code**
+**Claude / Cowork:** *Customize → Plugins → Add marketplace* →
+`https://github.com/Folken2/nuvel-plugins`, then install **chief-of-staff**.
+
+**Claude Code:**
 
 ```bash
 claude plugin marketplace add Folken2/nuvel-plugins
@@ -58,7 +66,7 @@ claude plugin marketplace add Folken2/nuvel-plugins
 claude plugin install chief-of-staff@nuvel
 ```
 
-**Codex**
+**Codex:**
 
 ```bash
 codex plugin marketplace add Folken2/nuvel-plugins
@@ -72,30 +80,27 @@ Then ask: *"Set up my chief of staff."*
 
 ## What you need
 
-- At least an **email** and a **calendar** tool in your host (built-in
-  connectors, an MCP server, or Composio). Chat, tasks and meeting notes are
-  optional. Setup checks what you have and tells you what's missing.
-- A place for the registry: a synced Google Drive / OneDrive / SharePoint folder
-  (best when routines run on your computer), a Drive/SharePoint connector (needed
-  for cloud routines), or any local folder.
-- A scheduler: Claude scheduled tasks or routines, Codex automations, or — as a
-  fallback — cron / launchd / Task Scheduler. Setup picks one with you.
+- An **email** and a **calendar** connector (e.g. Gmail + Google Calendar, or
+  Microsoft 365). Chat, tasks and meeting notes are optional.
+- A **storage** connector (Google Drive, OneDrive / SharePoint) — or a synced
+  or local folder if everything runs on one computer.
+- A scheduler: Cowork scheduled tasks, cloud routines (claude.ai/code/routines),
+  or desktop scheduled tasks. Setup picks one with you and has you press
+  **Run now** once to approve the read-only tools.
 
 ## Privacy and safety
 
-- Read-only on every source; writes only inside the registry folder.
-- Email and chat content is treated as data, never as instructions — suspected
-  prompt-injection is flagged to you, not obeyed.
+- Read-only on every source; the only write is creating documents in the registry.
+- Email and document content is treated as data, never as instructions —
+  suspected prompt-injection is flagged to you, not obeyed.
 - Never stores passwords, codes, financial or ID numbers, or full email bodies;
   it summarises and links.
 - Notifies only for *Needs you now*, never in quiet hours.
-- The session-start hook can be turned off with `CHIEF_OF_STAFF_HOOK=off`.
 
 Full rules: [`references/safety.md`](references/safety.md). Registry format:
 [`references/registry-layout.md`](references/registry-layout.md).
 
 ## Part of nuvel
 
-This plugin is built on [nuvel](https://github.com/Folken2/nuvel)'s skills
-format and also loads in nuvel's agent-plugins registry
-(`nuvel plugins load plugins/chief-of-staff`).
+Built on [nuvel](https://github.com/Folken2/nuvel)'s skills format; also loads
+in nuvel's agent-plugins registry (`nuvel plugins load plugins/chief-of-staff`).

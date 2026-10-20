@@ -1,7 +1,7 @@
 {
   "name": "chief-of-staff",
-  "version": "0.1.0",
-  "description": "Your AI chief of staff. Sweeps email, calendar, chat and tasks every two hours and keeps a living Markdown registry in Google Drive, OneDrive, SharePoint or a local folder — with morning briefs, meeting prep and weekly reviews. Read-only on your sources; vendor-agnostic.",
+  "version": "0.2.0",
+  "description": "Your AI chief of staff for Claude and Cowork. Sweeps email, calendar and other sources every two hours and keeps an append-only registry in Google Drive, OneDrive, SharePoint or a local folder — what needs you now, decisions waiting, open loops — plus morning briefs, meeting prep and weekly reviews. Read-only on your sources.",
   "author": {
     "name": "nuvel",
     "url": "https://github.com/Folken2/nuvel"
@@ -9,6 +9,19 @@
   "homepage": "https://github.com/Folken2/nuvel-plugins/tree/main/plugins/chief-of-staff",
   "repository": "https://github.com/Folken2/nuvel-plugins",
   "license": "MIT",
-  "keywords": ["chief-of-staff", "executive-assistant", "radar", "briefing", "email", "calendar", "productivity", "google-drive", "onedrive", "sharepoint", "routines", "nuvel"],
+  "keywords": [
+    "chief-of-staff",
+    "executive-assistant",
+    "radar",
+    "briefing",
+    "email",
+    "calendar",
+    "productivity",
+    "google-drive",
+    "onedrive",
+    "sharepoint",
+    "routines",
+    "nuvel"
+  ],
   "skills": "./skills/"
 }
