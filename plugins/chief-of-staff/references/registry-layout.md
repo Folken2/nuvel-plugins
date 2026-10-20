@@ -13,8 +13,8 @@ the chief of staff's only memory **and** its logbook.
 2. **The main agent** — the Claude or Codex session in whatever project the
    user is working on. It never saw the routines run. When it needs to know what
    happened ("did Ana answer?", "what's on today?"), it reads the registry: the
-   `recall` skill answers from it, and in Claude a session-start hook injects a
-   short summary automatically.
+   `recall` skill answers from it, and in Claude a session-start hook announces
+   the registry (counts only, never its text).
 
 The registry is the only bridge between them, in both directions:
 routines → main agent through `CONTEXT.md`, `loops.md` and `log/`;

@@ -13,4 +13,5 @@ All notable changes to the plugins in this repo. Versions are per plugin.
 - Vendor-agnostic Markdown registry in Google Drive, OneDrive, SharePoint
   (synced folder or connector) or a local folder, with a shared journal
   (`log/`) and a `handoff.md` channel between routines and the main agent.
-- Claude `SessionStart` hook that injects a short *Needs you now* summary.
+- Claude `SessionStart` hook that tells each session where the registry is and
+  how many items need the user (metadata only, never registry text).

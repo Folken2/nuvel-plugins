@@ -27,8 +27,10 @@ deletes anything; the only place it writes is its own folder.
 
 Routines run in clean sessions with no memory and no access to the project
 you're working in. The registry is the bridge: routines leave everything there
-(including a journal entry for every run), and your main agent reads it — in
-Claude, a session-start hook even injects a short *Needs you now* summary.
+(including a journal entry for every run), and your main agent reads it. In
+Claude, a session-start hook tells every session where the registry is and how
+many items need you — counts only, never the text, so third-party email can't
+steer a coding session.
 
 ## Skills
 
