@@ -9,8 +9,13 @@ Rules: `../../references/safety.md`. Registry: `../../references/registry-layout
 
 ## Tools you may use
 
-Read/search/list on email, calendar and docs; create one new document in the
-registry's `runs/` folder. No replies, drafts or calendar changes.
+Read/search/list on email, calendar, chat and docs: Outlook mail search,
+Outlook calendar list events, Teams chat read, OneDrive search / list / read
+file, or the Gmail, Google Calendar and Drive equivalents (discover Microsoft
+tools by function, `sources.md` *Microsoft 365*). Create one new document in the
+registry's `runs/` folder. Never send mail, create drafts, reply, create /
+update / delete / respond-to calendar events, post Teams messages, or change
+files outside the registry.
 
 ## Steps
 
@@ -24,9 +29,11 @@ registry's `runs/` folder. No replies, drafts or calendar changes.
    2. Full-text search of `runs/` for attendee names, their company and the topic.
    3. Open handoffs about them.
    4. Recent email threads with the attendees (last 30 days; metadata first,
-      open only the 3–5 most relevant).
+      open only the 3–5 most relevant). Outlook: search by attendee address and
+      `receivedDateTime`; Gmail: `from:`/`to:` with `newer_than:30d`. Teams DMs
+      or chats with them, if the chat source is Teams.
    5. Notes or transcripts from the previous meeting in the series, if a meetings
-      source is connected.
+      source is connected (Teams recordings, OneDrive or Drive notes included).
 4. Create `runs/YYYY-MM-DD HHMM prep <meeting-slug>` (in the registry language)
    with the *Other runs* journal header, then:
 

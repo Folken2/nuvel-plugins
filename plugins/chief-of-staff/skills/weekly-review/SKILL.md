@@ -9,14 +9,17 @@ Rules: `../../references/safety.md`. Registry: `../../references/registry-layout
 
 ## Tools you may use
 
-Read/search/list on the registry and calendar; create one new document in the
-registry's `runs/` folder. Nothing else.
+Read/search/list on the registry and the calendar (Outlook calendar list events
+or Google Calendar; OneDrive or Drive for the registry; discover Microsoft tools
+by function, `sources.md` *Microsoft 365*). Create one new document in the
+registry's `runs/` folder. Nothing else: no sending mail, drafts, calendar event
+changes, Teams messages, or file changes outside the registry.
 
 ## Steps
 
 1. Find the registry and read the newest `config` (stop if `paused: true`).
 2. Read this ISO week's runs in `runs/` (radars, briefs, preps), the newest radar,
-   open handoffs, and next week's calendar.
+   open handoffs, and next week's calendar (Outlook or Google).
 3. Create `runs/YYYY-MM-DD HHMM weekly-review` (in the registry language) with
    the *Other runs* journal header, then:
 
