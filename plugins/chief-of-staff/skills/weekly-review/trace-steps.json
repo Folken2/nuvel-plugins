@@ -4,6 +4,7 @@
     "weekly-review.load-state",
     "weekly-review.read-runs",
     "weekly-review.read-calendar",
+    "weekly-review.merge-lessons",
     "weekly-review.write"
   ],
   "counts": [
@@ -12,7 +13,10 @@
     "loops_open",
     "overdue",
     "decide_pending",
-    "priorities_at_risk"
+    "priorities_at_risk",
+    "lessons_merged",
+    "lessons_learned",
+    "recipes_changed"
   ],
   "routing": []
 }

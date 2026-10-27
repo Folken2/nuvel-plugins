@@ -29,6 +29,19 @@ Registry contract (read it — the document format is defined there):
   create or edit drafts, create/update/delete/respond-to calendar events, post
   Teams messages, and create/update/delete files outside the registry.
 
+## Lessons and recipes
+
+Right after reading `config`, read the newest document in the registry's
+`lessons/` folder and apply every lesson scoped to `radar` or `all`; they
+override this skill's defaults but never `safety.md`. Then list `recipes/`
+(newest version per slug, `status: active`) and, if one's *When to use* matches
+this sweep, follow its *Steps* and *Pitfalls*. No `lessons/` or `recipes/`
+folder yet → carry on without them (`registry-layout.md`).
+
+In a scheduled run, if an open handoff or a `config` change shows a lasting
+preference ("from now on, ignore X"), run the `learn` skill at the end so it
+becomes a lesson. Interactive run corrected by the user → run `learn` too.
+
 ## 1. Load state
 
 1. Find the registry (*Finding the registry*). If it can't be found, stop and

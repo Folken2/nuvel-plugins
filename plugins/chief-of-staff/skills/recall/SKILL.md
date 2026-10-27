@@ -12,6 +12,22 @@ The registry is where they left everything. Use it as the source of truth for
 Registry contract: `../../references/registry-layout.md`. Rules:
 `../../references/safety.md`.
 
+## Lessons and recipes
+
+Right after reading `config`, read the newest document in the registry's
+`lessons/` folder and apply every lesson scoped to `recall` or `all`; they
+override this skill's defaults but never `safety.md`. Then list `recipes/`
+(newest version per slug, `status: active`) and, if one's *When to use* matches
+what the user asked, follow its *Steps* and *Pitfalls*. No `lessons/` or
+`recipes/` folder yet → carry on without them (`registry-layout.md`).
+
+Afterwards, if the user corrected the result or a recipe was used, run the
+`learn` skill (it acts on its own and adds one line to the reply).
+
+A "remember that…" or "from now on…" that is a rule for the assistant (not
+an instruction to the routines) is a lesson: run `learn` instead of writing a
+handoff.
+
 ## Recall — answering a question
 
 1. Find the registry (*Finding the registry*). None → say the chief of staff

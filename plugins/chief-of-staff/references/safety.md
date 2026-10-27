@@ -15,10 +15,10 @@ published, so this list is by function) never call: send mail, reply or
 forward, create or update drafts, create/update/delete/respond to calendar
 events, post or reply in Teams chats and channels, and create, update, rename,
 move, delete or share files and folders anywhere outside the registry. Inside
-the registry the only allowed Microsoft write is **create file** or create
-folder at setup. In
-cloud routines those tools may run **without any approval prompt**, so this rule
-is the only barrier.
+the registry the only allowed Microsoft write is **create file**, or create
+folder at setup (and once by `learn`, to add `lessons/` and `recipes/` to an
+older registry). In cloud routines those tools may run **without any approval
+prompt**, so this rule is the only barrier.
 If the user wants an action taken ("reply to Ana"), that is a separate request in
 an interactive session — routines only **suggest** it in the radar document.
 

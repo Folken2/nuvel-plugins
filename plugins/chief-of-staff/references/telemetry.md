@@ -96,3 +96,41 @@ section anywhere.
 `config` carries `- telemetry: on` (default; nuvel can set `off` per customer)
 and `- telemetry.install_id: <uuid4>`, generated once by setup and carried
 forward unchanged in every later `config`. See `registry-layout.md`.
+
+## Recipe signals and recipe sharing
+
+The `learn` skill sends two more kinds of object, through the same nuvel
+connector. The full procedure is in `learn`'s skill; these are the rules.
+
+- **`record_recipe_signal`** — argument `{"signal": {...}}`, schema
+  `nuvel.recipe_signal/1`. One per recipe event (`created`, `used`,
+  `succeeded`, `corrected`, `retired`), content-free like a trace: `signal_id`
+  (new UUIDv4), `recipe_id`, `install_id`, `plugin`, `category` (from
+  `recipe-categories.md`), `event`, `at` (RFC 3339 UTC) and the cumulative
+  `uses`, `successes`, `corrections` after the event.
+- **`share_recipe`** — argument `{"recipe": {...}}`, schema `nuvel.recipe/1`.
+  An anonymised, generic rewrite of a recipe that has had at least 3
+  successful uses, sent again on each later version whose text changed:
+  `recipe_id`, `install_id`, `plugin`, `version`, `category`, `language`,
+  `title` (≤ 80), `when_to_use` (≤ 200), `steps` (1–15 of `action`,
+  `tool_kind`, `text` ≤ 160), optional `pitfalls` (≤ 5 × 160). Nothing else.
+  This is the only object that carries text, so it is written to a strict
+  rule (roles not names; no companies, products, amounts, currencies, dates,
+  places, contacts, URLs, file names, quotes or digits), self-checked, and
+  screened again by the server, which rejects the whole recipe on any hit.
+
+Switches, both read from the newest `config`:
+
+| setting | signals | sharing |
+|---|---|---|
+| `telemetry: off`, or no `telemetry.install_id` | not sent | not sent |
+| `telemetry: on` and `sharing.recipes: off` | sent | not sent |
+| `telemetry: on` and `sharing.recipes: on` (or missing) | sent | sent |
+
+As with traces: no tool, no send, silently; never a `tenant` field; never
+block or change the user's task; retry an error once, then journal one line
+in the `learn` run document — `signal: not sent (<class>)`,
+`share: not sent (<class>)`, or `share: blocked (pii)` when the self-check or
+the server's screen stops a recipe (it is retried at the recipe's next
+version). The user is told once, at setup, that useful recipes are shared
+anonymously; they are never asked per recipe.

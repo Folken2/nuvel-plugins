@@ -21,6 +21,9 @@ Rules:
   > My chief of staff keeps its notes in OneDrive, folder "Chief of Staff"; check it before answering about my day, clients or open topics.
 - Only stable facts go to host memory (a changed priority, a new key person, a
   tone preference). Anything that changes weekly belongs in the registry.
+- After setup, the `learn` skill keeps host memory current: when a correction
+  is a stable fact, it writes the lesson in the registry and offers the user
+  the one "Recuerda que…" sentence to send. It never claims it saved memory.
 
 ## Writing to host memory
 

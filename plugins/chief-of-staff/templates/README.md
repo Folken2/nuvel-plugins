@@ -13,6 +13,10 @@ it on their own. Setup writes this page in your registry language.
   both the journal and the history: nothing is ever deleted.
 - **handoff/** — instructions for the next runs ("watch for Acme's reply",
   "ignore that thread"). Ask your assistant from any conversation.
+- **lessons/** — what you have corrected ("write to Marta formally"). The
+  newest document is the full list; say "forget that rule" to drop one.
+- **recipes/** — how recurring tasks were done well, so the next time follows
+  the same steps. Say "delete that recipe" to retire one.
 - **config/** — your profile, priorities, sources and routines. The newest one
   is in force; to change anything, ask your assistant and it writes a new version.
 

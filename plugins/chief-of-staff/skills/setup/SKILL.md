@@ -35,7 +35,14 @@ newest `config`, summarise the setup in 3–4 plain lines, and ask what to chang
 about them, their sources, where notes live, the schedule, pause, or remove.
 Jump to the matching step below, then write a new `config`. If the newest
 `config` lacks `telemetry` or `telemetry.install_id` (an older install), add
-`- telemetry: on` and a new `telemetry.install_id` in that new `config`.
+`- telemetry: on` and a new `telemetry.install_id` in that new `config`; if it
+lacks `sharing.recipes`, add `- sharing.recipes: on`; if `storage.folders` has
+no `lessons` or `recipes`, create those folders and list them.
+
+Also read the newest document in `lessons/`, if any, and apply the lessons
+scoped to `setup` or `all` (`registry-layout.md` *`lessons`*). When the user
+corrects setup's work in a way that should stick, run the `learn` skill
+afterwards.
 
 ## 1. Detect
 
@@ -91,7 +98,7 @@ called "Chief of Staff" in OneDrive, or in Drive when Google is the ecosystem;
 a synced local folder only if everything runs on one computer. Ask only if the
 user objects or the place is shared with others.
 
-1. Create `config/`, `runs/`, `handoff/` inside it.
+1. Create `config/`, `runs/`, `handoff/`, `lessons/` and `recipes/` inside it.
 2. Prove it works: save a small test note, read it back, remove the test note.
    Pick the document type from the result (`storage.md`).
 3. Write the human README from `../../templates/README.md`, in the notes
@@ -168,7 +175,10 @@ At most 6 lines, business language: where the notes folder is and which note to
 open (the newest radar); when the routines run and that they only interrupt for
 what needs them now; that it never sends or changes anything; that from any
 conversation they can ask "¿qué vio mi chief of staff hoy?" or "dile al repaso
-que vigile X"; and that setup can change anything later.
+que vigile X"; that it learns from their corrections and remembers how
+recurring tasks are done; and that setup can change anything later. Add the
+two one-line notices from *Trace* below (anonymous counts, anonymous recipe
+sharing); they do not count toward the 6 lines.
 
 Write one `runs/YYYY-MM-DD HHMM setup` document with the technical journal of
 what was configured.
@@ -196,8 +206,12 @@ local folder or the chat. Resume from step 3 when the user says "continúa".
 Telemetry is part of setup. When writing the first `config`, add
 `- telemetry: on` and `- telemetry.install_id: <a new random UUIDv4>`; on any
 later `config`, carry both forward unchanged (add them if an older `config`
-lacks them). Mention it once, in plain words, in the wrap-up: "Se envían solo
-recuentos anónimos de cómo funciona, nunca contenido; se puede apagar."
+lacks them). Add `- sharing.recipes: on` to the first `config` too, and carry
+it forward. Mention both once, in plain words, in the wrap-up:
+
+> Se envían solo recuentos anónimos de cómo funciono, nunca contenido; se puede apagar.
+
+> Las recetas útiles se comparten de forma anónima con nuvel para mejorar el servicio.
 
 Last, follow `../../references/telemetry.md`: if `record_run_trace` is available
 and `telemetry` is on, send one content-free trace right before saving the

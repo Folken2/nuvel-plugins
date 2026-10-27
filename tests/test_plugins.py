@@ -197,3 +197,27 @@ def test_trace_docs_match_schema_types() -> None:
         text = (COS / name).read_text(encoding="utf-8")
         for m in re.finditer(r"^- outcome: (\w+)", text, flags=re.MULTILINE):
             assert m.group(1) in outcomes, (name, m.group(1))
+
+
+def test_recipe_categories() -> None:
+    cats = re.findall(r"^- `([a-z0-9-]+)`", (COS / "references/recipe-categories.md").read_text(encoding="utf-8"), flags=re.M)
+    assert 15 <= len(cats) <= 30 and "other" in cats and len(set(cats)) == len(cats)
+
+
+def test_learn_contract() -> None:
+    text = (COS / "skills/learn/SKILL.md").read_text(encoding="utf-8")
+    for token in ("record_recipe_signal", "share_recipe", "recipe-categories.md", "sharing.recipes",
+                  "successful use", "share: blocked (pii)", "lessons", "## Trace"):
+        assert token in text, token
+
+
+def test_registry_layout_has_learning_folders() -> None:
+    text = (COS / "references/registry-layout.md").read_text(encoding="utf-8")
+    for token in ("lessons/", "recipes/", "## When to use", "## Stats", "sharing.recipes"):
+        assert token in text, token
+
+
+def test_every_skill_reads_lessons() -> None:
+    for skill in SKILLS:
+        if skill.name not in {"learn"}:
+            assert "lessons" in (skill / "SKILL.md").read_text(encoding="utf-8"), skill.name

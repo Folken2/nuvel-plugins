@@ -17,6 +17,18 @@ registry's `runs/` folder. Never send mail, create drafts, reply, create /
 update / delete / respond-to calendar events, post Teams messages, or change
 files outside the registry.
 
+## Lessons and recipes
+
+Right after reading `config`, read the newest document in the registry's
+`lessons/` folder and apply every lesson scoped to `prep` or `all`; they
+override this skill's defaults but never `safety.md`. Then list `recipes/`
+(newest version per slug, `status: active`) and, if one's *When to use* matches
+this preparation, follow its *Steps* and *Pitfalls*. No `lessons/` or `recipes/`
+folder yet → carry on without them (`registry-layout.md`).
+
+Afterwards, if the user corrected the result or a recipe was used, run the
+`learn` skill (it acts on its own and adds one line to the reply).
+
 ## Steps
 
 1. Find the registry and read the newest `config`.
