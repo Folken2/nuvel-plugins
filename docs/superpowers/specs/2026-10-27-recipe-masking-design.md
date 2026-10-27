@@ -165,6 +165,16 @@ functions with no I/O.
    words of ≤ 4 letters that are in the lexicon as abbreviations (a tiny,
    reviewed list such as `CEO`, `IVA`, `CRM`).
 6. Everything else becomes `{?}`. Consecutive `{?}` collapse into one.
+7. *(Amendment, implementation review.)* The text between words is also
+   deny-by-default. Only whitespace and a closed punctuation set pass; any
+   other character (emoji, flags, symbol letters, braille) becomes a counted
+   `{?}`.
+   - Hyphen-joined parts need at least two letters each. A run of three or
+     more single letters is masked, to stop names being spelled out.
+   - The typed regexes run with the IBAN and amount patterns before phone and
+     digit-run. This changes only the labels: every digit is still replaced.
+   - `mask_recipe` builds its output from the schema's known keys only, and
+     the invariant check scans every string in the output.
 
 #### 4.2 Lexicons
 
