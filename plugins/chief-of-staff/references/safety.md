@@ -9,7 +9,14 @@ Never send, reply, forward, draft-and-send, accept/decline invites, move, label,
 archive, mark read, or delete anything in email, calendar, chat, tasks or docs.
 The only place this plugin writes is the registry folder (`storage.root`), and
 only by **creating** new documents there. Many connectors expose write tools
-(send, reply, forward, trash, share, create/update events) — never call them. In
+(send, reply, forward, trash, share, create/update events) — never call them.
+On Microsoft 365 (**Unverified (no tenant yet)**: tool names are not
+published, so this list is by function) never call: send mail, reply or
+forward, create or update drafts, create/update/delete/respond to calendar
+events, post or reply in Teams chats and channels, and create, update, rename,
+move, delete or share files and folders anywhere outside the registry. Inside
+the registry the only allowed Microsoft write is **create file** or create
+folder at setup. In
 cloud routines those tools may run **without any approval prompt**, so this rule
 is the only barrier.
 If the user wants an action taken ("reply to Ana"), that is a separate request in

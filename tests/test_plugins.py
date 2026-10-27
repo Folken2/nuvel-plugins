@@ -14,6 +14,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
+COS = ROOT / "plugins/chief-of-staff"
 PLUGINS = sorted(p for p in (ROOT / "plugins").iterdir() if p.is_dir())
 MANIFESTS = (".claude-plugin/plugin.json", ".codex-plugin/plugin.json", "plugin.json")
 AGENT_PLUGINS_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
@@ -109,3 +110,25 @@ def test_no_stray_skill_dirs(plugin: Path) -> None:
     """Every folder under skills/ must be a real skill — hosts list them all."""
     stray = [p.name for p in (plugin / "skills").iterdir() if p.is_dir() and not (p / "SKILL.md").is_file()]
     assert not stray, f"folders without SKILL.md: {stray}"
+
+
+def test_sources_lists_microsoft_first() -> None:
+    text = (COS / "references/sources.md").read_text(encoding="utf-8")
+    for kind in ("`email`", "`calendar`", "`chat`", "`docs`"):
+        row = next(l for l in text.splitlines() if l.startswith(f"| {kind}"))
+        assert "Microsoft 365" in row, kind
+        if "Google" in row:
+            assert row.index("Microsoft 365") < row.index("Google"), kind
+
+
+def test_composio_not_in_user_flow() -> None:
+    for path in [*(COS / "skills").glob("*/SKILL.md"), *(COS / "references").glob("*.md")]:
+        text = path.read_text(encoding="utf-8")
+        hits = [l for l in text.splitlines() if "omposio" in l and "builder" not in l.lower()]
+        assert not hits, f"{path.name}: {hits}"
+
+
+def test_microsoft_sections_marked_unverified() -> None:
+    for name in ("sources.md", "storage.md", "registry-layout.md"):
+        text = (COS / "references" / name).read_text(encoding="utf-8")
+        assert "**Unverified (no tenant yet)**" in text, name

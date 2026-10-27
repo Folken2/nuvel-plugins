@@ -69,8 +69,9 @@ Every skill locates it the same way, stopping at the first hit:
 1. **The prompt.** Routines created by `setup` always end with
    `Registry: <storage.kind> <folder id or path>` — use it.
 2. **Search the storage** for a folder titled `Chief of Staff` (Drive:
-   `title = 'Chief of Staff' and mimeType = 'application/vnd.google-apps.folder'`)
-   that contains a `config` folder. On a computer, `~/.chief-of-staff.json`
+   `title = 'Chief of Staff' and mimeType = 'application/vnd.google-apps.folder'`;
+   OneDrive: list the children of the drive root and match the folder name
+   `Chief of Staff`) that contains a `config` folder. On a computer, `~/.chief-of-staff.json`
    (`{"kind": "...", "root": "..."}`) may also point to it.
 3. **Ask the user** — only in an interactive session. In an unattended run,
    stop and report that the registry could not be found; never create one.
@@ -78,10 +79,21 @@ Every skill locates it the same way, stopping at the first hit:
 Then resolve the subfolder IDs (`config`, `runs`, `handoff`) — they are listed
 in the newest `config` under `storage.folders`.
 
+**Unverified (no tenant yet)**: on Microsoft 365 use whatever the connector
+offers by function ("OneDrive search by name", "list folder children"); no
+Drive query syntax applies. Listing the children of a known folder is the
+most dependable path.
+
 ## Finding "the newest"
 
 List the folder restricted to a recent window and take the greatest name, e.g.
 on Drive: `parentId = '<runs id>' and title contains 'radar' and createdTime > '<now − 3 days, RFC 3339>'`.
+On OneDrive / SharePoint, **list the children** of the target folder (for
+`runs`, a flat folder), keep the names that contain the kind (`radar`), and take
+the greatest name. Sort by name yourself; never by the order returned, by
+modified time, or by a search ranking. **Unverified (no tenant yet)**: paging
+and filter options of the Microsoft listing are unconfirmed, so page until the
+list is exhausted when a window is not available.
 If nothing comes back, widen the window (14 days, then no limit). Never rely on
 the order a search returns.
 

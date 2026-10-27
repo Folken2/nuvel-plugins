@@ -10,9 +10,8 @@ below work, including connectors that cannot edit files.
 
 ## 1. Storage connector (default for Claude, Cowork and cloud routines)
 
-Use the storage connector the user already has: Google Drive, Microsoft 365 /
-OneDrive / SharePoint, or a Composio toolkit (`googledrive`, `one_drive`,
-`share_point`). It works from chat, Cowork, scheduled tasks and cloud routines
+Use the storage connector the user already has: Microsoft 365 (OneDrive /
+SharePoint) first, or Google Drive. It works from chat, Cowork, scheduled tasks and cloud routines
 alike, and doesn't depend on any one computer.
 
 At setup:
@@ -29,10 +28,34 @@ At setup:
      `read_file_content` and as base64 from `download_file_content`. Docs
      render Markdown headings, lists, links and tables, but mangle YAML
      frontmatter — so documents never use frontmatter.
-   - **OneDrive / SharePoint connectors:** use `.md` if it reads back as text;
-     otherwise `.docx`.
+   - **OneDrive / SharePoint (Microsoft 365 connector):** see the next
+     section.
 3. Never change sharing. If the chosen place is shared with other people, warn
    and suggest a private one.
+
+### OneDrive / SharePoint (Microsoft 365 connector)
+
+**Unverified (no tenant yet)**: exact tool names are not published and no
+tenant has run this. Use tools by function ("OneDrive create file", "list
+folder children", "read file content"). The Microsoft 365 connector can write
+files since 2026-07-07, but only after a Global or Application Administrator
+re-consents the write scopes; if file creation is refused, tell the user that
+one sentence ("this is enabled by whoever manages Microsoft 365 / Claude at
+your company") and stop.
+
+1. Create the folder `Chief of Staff` at the **OneDrive root** (SharePoint only
+   if the user asks for a team library), then `config`, `runs`, `handoff`
+   inside it. Record every folder ID (or drive item ID).
+2. Create the test document as `.md` plain text. Read it back and compare the
+   text. If it reads back as text, every registry document is `.md`; otherwise
+   fall back to `.docx`. Record the choice in the `config` document.
+3. Round trip done: the setup test document is the only thing ever removed
+   (`safety.md` §1). If delete is unavailable, leave it and name it in the
+   journal.
+4. The registry stays append-only even though OneDrive could edit in place:
+   one code path on every backend, history for free, safe concurrent runs.
+5. Never change sharing or permissions. A OneDrive folder is private by
+   default; if the user picked a shared place, warn and suggest a private one.
 
 Known connector limits to plan around:
 
@@ -54,12 +77,12 @@ scheduled tasks, Claude Code, Codex app); invisible to cloud routines.
 | SharePoint library | `~/Library/CloudStorage/<Org>/<Site> - <Library>/` | `%USERPROFILE%\<Org>\<Site> - <Library>\` |
 
 Show the user what you found and let them choose; never pick silently.
-Documents are `.md` files. `storage.kind: synced-folder`.
+Documents are `.md` files. `storage.kind: synced-folder`. This is a fallback: do not bring it up during the normal flow unless the connector round trip failed.
 
 ## 3. Local folder (fallback)
 
 `~/Chief of Staff/` (or an Obsidian vault, a private git repo).
-`storage.kind: local`. Say plainly that nothing syncs off this machine and cloud
+`storage.kind: local`. Also a fallback, not part of the normal flow. Say plainly that nothing syncs off this machine and cloud
 routines can't reach it.
 
 ## Rules for every storage kind
