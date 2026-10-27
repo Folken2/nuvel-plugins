@@ -200,6 +200,18 @@ which is not shipped:
   "presupuesto", "invoice" or "onboarding".
 - Attribution goes in `nuvel_mcp/lexicon/SOURCES.md`.
 
+*(Amendment, implementation.)*
+- Name, place and brand subtraction compares folded forms, and uses
+  per-source count thresholds chosen on `tune/` only. Subtracting every label
+  in an open knowledge base would remove most of the language. The thresholds
+  are confirmed by zero leaks on `holdout/`.
+- Lone number words are masked as `{number}`, except the indefinite article
+  (es `un`/`una`, en `a`). Exact counts are treated as identifying, so
+  "dos opciones" becomes "{number} opciones".
+- Standalone single-letter words are allowed per language: es a/y/o/e/u,
+  en a, ca a/i/o/e. A one-letter word followed by "." and another word is a
+  name initial and is masked.
+
 #### 4.3 Other languages
 
 If `language` has no lexicon, every free-text field is dropped (§4.4) and the
