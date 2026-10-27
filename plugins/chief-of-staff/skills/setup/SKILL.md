@@ -145,23 +145,20 @@ text and schedule to paste, and record `manual`.
 
 ## 6. First radar
 
-Run the first radar now so they see value before the setup ends. Preferred:
-ask them to press **Run now** once on the repaso routine, because that is the
-real test from a fresh session. Tell them to approve reading and "create file"
-in their notes folder, and to reject anything that sends, deletes, shares or
-changes meetings:
-
-> Pulsa «Ejecutar ahora». Aprueba lo que sea leer o «crear archivo» en tu carpeta; rechaza cualquier cosa que envíe, borre o cambie algo.
-
-If there is no routine to run, run the radar skill here, live. Either way the
-first radar looks back 7 days.
-
-Walk through *Needs you now* and *Decide* with the user ("Necesita tu atención"
-and "Decidir") and ask:
+Run the first radar now, live in this conversation, so they see value before the
+setup ends. It looks back 7 days and does not depend on the routines. Use the
+radar skill here, then walk through *Needs you now* and *Decide* ("Necesita tu
+atención" and "Decidir") with the user and ask:
 
 > ¿Hay algo equivocado o que falte?
 
 Turn corrections into a new `config` (priorities, key people, "How I work").
+
+Then offer one short, optional step; setup is complete without it:
+
+> Si quieres, pulsa «Ejecutar ahora» una vez en el repaso programado. Así las próximas veces no se quedará esperando tu aprobación. Aprueba lo que sea leer o «crear archivo» en tu carpeta; rechaza cualquier cosa que envíe o borre algo.
+
+If they skip it, carry on to the wrap-up.
 
 ## 7. Wrap-up
 
