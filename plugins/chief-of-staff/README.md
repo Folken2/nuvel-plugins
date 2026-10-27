@@ -23,7 +23,8 @@ waiting for you, today's meetings with context, and promises still open.
   first-class path in 0.3.0 (not yet verified on a real tenant, see the
   changelog).
 - About **15 minutes** for setup: a guided conversation of at most six
-  questions. Then you press **Run now** once to approve read-only access.
+  questions. Optionally you then press **Run now** once on the scheduled
+  review, so later runs do not wait for your approval.
 
 ## What it never does
 
@@ -35,8 +36,8 @@ email bodies, and it treats email text as data, never as instructions.
 ## Privacy and what is shared with nuvel
 
 - Your notes stay in your own storage.
-- nuvel receives **anonymous usage signals** (that a recipe was used or
-  corrected, no content) and **anonymised recipes** (the steps of a task with
+- nuvel receives **anonymous usage signals** (counts of how each run went, and
+  that a recipe was used or corrected; never any content) and **anonymised recipes** (the steps of a task with
   names, companies, amounts, addresses and dates removed; a recipe that fails
   the check is not sent).
 - This is **on by default**: you are told at setup, not asked. nuvel can switch
@@ -87,6 +88,7 @@ codex plugin add chief-of-staff@nuvel
                 ▼                                                    ▼
           ┌───────────────── Chief of Staff/ (your drive) ─────────────────┐
           │ config/ (newest wins) · runs/ (journal + state) · handoff/       │
+          │ lessons/ (your corrections) · recipes/ (how repeated tasks go)   │
           └──────────────────────────────────────────────────────────────────┘
 ```
 

@@ -35,7 +35,9 @@ newest `config`, summarise the setup in 3–4 plain lines, and ask what to chang
 about them, their sources, where notes live, the schedule, pause, or remove.
 Jump to the matching step below, then write a new `config`. If the newest
 `config` lacks `telemetry` or `telemetry.install_id` (an older install), add
-`- telemetry: on` and a new `telemetry.install_id` in that new `config`; if it
+`- telemetry: on` and a new `telemetry.install_id` in that new `config`; if its
+`telemetry.install_id` is not in the format in `telemetry.md` *Formats* (lowercase
+UUIDv4), replace it with a new valid one; if it
 lacks `sharing.recipes`, add `- sharing.recipes: on`; if `storage.folders` has
 no `lessons` or `recipes`, create those folders and list them.
 
@@ -103,9 +105,9 @@ user objects or the place is shared with others.
    Pick the document type from the result (`storage.md`).
 3. Write the human README from `../../templates/README.md`, in the notes
    language.
-4. Write the first `config` (contract in `registry-layout.md`) after step 5 of
-   this file, so its first version is complete. Folder IDs and tool names go
-   only there.
+4. Folder IDs and tool names go only in the `config` document, which is
+   written once, at the end of *Routines* (§5), so its first version is
+   complete.
 
 If the connector can read but not write, follow *Read-only storage* below.
 
@@ -124,7 +126,7 @@ Two things that make ordinary chats know about the chief of staff
    where the notes live) and show the user one sentence to send, using the
    exact "where my notes live" wording from `memory.md`:
 
-   > Recuerda estos datos: soy Marta, dirijo Acme Logística; mis prioridades son cerrar la ronda, contratar un director comercial y renovar con Seur; mi chief of staff guarda sus notas en OneDrive, carpeta "Chief of Staff"; consúltalas antes de responder sobre mi día, mis clientes o mis temas abiertos.
+   > Recuerda estos datos: soy Marta, dirijo Acme Logística; mis prioridades son cerrar la ronda, contratar un director comercial y renovar con Seur; mi chief of staff guarda sus notas en OneDrive, carpeta "Chief of Staff"; consúltalas antes de responder sobre mi día, mis clientes o mis temas abiertos, y mira sus recetas antes de una tarea que se repite.
 
    Do not claim you saved anything. Ask them to check Ajustes → Tu Claude
    afterwards. Never include secrets or anything `safety.md` forbids.
@@ -132,13 +134,15 @@ Two things that make ordinary chats know about the chief of staff
    fails over memory.
 2. **Project.** Recommend creating a Claude Project called "Chief of Staff".
    Fill `../../templates/project-instructions.md` (`{{registry}}`,
-   `{{owner_name}}`, `{{language}}`), show the finished text, and tell the user
+   `{{owner_name}}`, `{{language}}`). `{{registry}}` is the folder as the user
+   knows it (for example «OneDrive, carpeta Chief of Staff»), never an ID or a
+   link. When host memory is off or the session is a local Cowork one, fill the
+   optional `{{facts}}` block with the same short facts; otherwise remove it.
+   Show only the text below the `---` line, finished, and tell the user
    to paste it in the project's instructions. Claude cannot create the project
    for them.
 
    > Crea un proyecto llamado «Chief of Staff», abre sus instrucciones y pega este texto. Así cualquier conversación del proyecto consulta mis notas antes de responder.
-
-Now write the first `config` document (see step 4 of *Folder*).
 
 ## 5. Routines
 
@@ -152,6 +156,9 @@ One yes creates all three. Mention once that start times can drift a few
 minutes. If you cannot create them yourself, give the user the exact name,
 text and schedule to paste, and record `manual`.
 
+Now write the first `config` document (contract in `registry-layout.md`): it
+needs the routines recorded and is what the first radar reads.
+
 ## 6. First radar
 
 Run the first radar now, live in this conversation, so they see value before the
@@ -161,13 +168,19 @@ atención" and "Decidir") with the user and ask:
 
 > ¿Hay algo equivocado o que falte?
 
-Turn corrections into a new `config` (priorities, key people, "How I work").
+Sort what they say. Facts about them (priorities, key people, working hours,
+"How I work") go into a new `config`. Corrections to ranking, tone or approach
+("eso no me interesa", "a Marta de usted") go through the `learn` skill as a
+lesson. A correction that is both gets both.
 
-Then offer one short, optional step; setup is complete without it:
+Then, only if a Cowork or desktop scheduled task was created (not for `manual`
+or cloud routines), offer one short, optional step; setup is complete without
+it:
 
-> Si quieres, pulsa «Ejecutar ahora» una vez en el repaso programado. Así las próximas veces no se quedará esperando tu aprobación. Aprueba lo que sea leer o «crear archivo» en tu carpeta; rechaza cualquier cosa que envíe o borre algo.
+> Si quieres, pulsa «Ejecutar ahora» una vez en el repaso programado. Así las próximas veces no se quedará esperando tu aprobación. Aprueba lo que sea leer o «crear archivo» en tu carpeta, y lo de nuvel que solo registra recuentos; rechaza cualquier cosa que envíe o borre algo.
 
-If they skip it, carry on to the wrap-up.
+Tell them to approve the nuvel items in this chat the first time they appear
+too. If they skip the step, carry on to the wrap-up.
 
 ## 7. Wrap-up
 
@@ -204,8 +217,9 @@ local folder or the chat. Resume from step 3 when the user says "continúa".
 ## Trace
 
 Telemetry is part of setup. When writing the first `config`, add
-`- telemetry: on` and `- telemetry.install_id: <a new random UUIDv4>`; on any
-later `config`, carry both forward unchanged (add them if an older `config`
+`- telemetry: on` and `- telemetry.install_id: <a new random UUIDv4>`
+(lowercase, format in `../../references/telemetry.md` *Formats*; generate it with
+code when a code tool exists); on any later `config`, carry both forward unchanged (add them if an older `config`
 lacks them). Add `- sharing.recipes: on` to the first `config` too, and carry
 it forward. Mention both once, in plain words, in the wrap-up:
 

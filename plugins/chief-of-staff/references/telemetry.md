@@ -16,8 +16,9 @@ be improved. It never describes *what the run was about*.
 - **Read-only and append-only stay true.** Sending a trace is not a source write
   and not a registry write.
 - **No connector, no trace.** If no tool named `record_run_trace` is available
-  (the nuvel connector is not added), skip silently — no warning, no mention to
-  the user. The plugin ships no connector of its own.
+  (the nuvel connector is not added), send nothing and say nothing to the user —
+  no warning, no mention. The run document's `## Trace` section says only
+  `not sent: no connector`. The plugin ships no connector of its own.
 - **Off means off.** If the newest `config` has `- telemetry: off`, skip
   silently. If it has no `telemetry.install_id` (a v0.2 install), do not send
   and note `trace: not sent (no install_id)` in the run journal; setup's
@@ -31,13 +32,13 @@ Keep a running tally while the skill works; build the object once, at the end.
 | field | value |
 |---|---|
 | `schema` | `nuvel.skill_run/1` |
-| `run_id` | a new UUIDv4 for this run (never reused) |
-| `install_id` | `telemetry.install_id` from the newest `config` |
-| `plugin` | `{"name": "chief-of-staff", "version": <plugin version from the manifest>}` |
+| `run_id` | a new UUIDv4 for this run (never reused), in the format below |
+| `install_id` | `telemetry.install_id` from the newest `config` (must be in the UUID format below) |
+| `plugin` | `{"name": "chief-of-staff", "version": <plugin version, see Formats>}` |
 | `skill` | `{"name": <this skill>, "version": <same plugin version>}` (skills have no version of their own) |
 | `host` | `claude-chat`, `claude-cowork`, `claude-code`, `claude-routine`, `codex` or `other` — where this run is happening |
 | `mode` | `scheduled` (started by a routine) or `interactive` (the user asked) |
-| `started_at` | ISO 8601 UTC time the run began |
+| `started_at` | UTC time the run began, in the timestamp format below |
 | `duration_s` | whole seconds from start to now; approximate is fine |
 | `outcome` | `success`, `partial` (something was skipped or a source failed), `failure`, `blocked` (stopped by a rule, such as no registry) or `skipped` |
 | `steps` | one entry per catalog step that ran: `{"id": "<skill>.<step>", "status": "ok"\|"skipped"\|"error", "counts": {…}}` |
@@ -48,6 +49,27 @@ Keep a running tally while the skill works; build the object once, at the end.
 | `user_corrected` | optional boolean: the user corrected the result during an interactive run |
 
 Never add a `tenant` field; the server sets it.
+
+### Formats
+
+The server rejects a whole object on a single malformed value, so these are
+exact. A rejected `install_id` would silently drop every trace, signal and
+share from that install, forever.
+
+- **UUIDs** (`run_id`, `install_id`, `signal_id`, `recipe_id`) are lowercase
+  hex in the form `xxxxxxxx-xxxx-4xxx-Yxxx-xxxxxxxxxxxx`, where `Y` is one of
+  `8`, `9`, `a`, `b`. No uppercase, no braces. Generate them with code when a
+  code tool exists; never write one by hand if you can avoid it. Example:
+  `3f2b8c1e-5d4a-4e9b-9a7c-1b2d3e4f5a6b`.
+- **Timestamps** (`started_at`, a signal's `at`) are UTC in the form
+  `YYYY-MM-DDTHH:MM:SSZ`, with seconds, a `T` and a final `Z`. Example:
+  `2026-10-27T09:30:00Z`. Not `2026-10-27 09:30`, not `2026-10-27T09:30Z`.
+- **Plugin version** is the `version` in `../.claude-plugin/plugin.json`,
+  currently `0.3.0`: three numbers separated by dots, never `0.3`.
+- **Tool names**: any `tools[]` entry whose lowercased name does not match
+  `^[a-z0-9][a-z0-9_.:-]{0,79}$` is left out of the object.
+- **Error steps**: `errors[].step` is one of the step ids in the skill's
+  `trace-steps.json`.
 
 ### Identifiers
 
@@ -129,9 +151,20 @@ Switches, both read from the newest `config`:
 
 As with traces: no tool, no send, silently; never a `tenant` field; never
 block or change the user's task; retry an error once, then journal one line
-in the `learn` run document — `signal: not sent (<class>)`,
-`share: not sent (<class>)`, or `share: blocked (pii)` when the self-check or
-the server's screen stops a recipe. A blocked share is recorded as the
-recipe's `blocked_version` and retried only at the recipe's next `version`
-(text change), never on a stats-only update. The user is told once, at setup, that useful recipes are shared
-anonymously; they are never asked per recipe.
+in the `learn` run document: `signal: not sent (<class>)`,
+`share: not sent (<class>)`, `share: blocked (pii)` when the self-check stops a
+recipe, or `share: rejected (<paths>)` when the server rejects it (the paths
+are field names only, never content). A blocked or rejected share is recorded
+as the recipe's `blocked_version` and retried only at the recipe's next
+`version` (text change), never on a stats-only update. The user is told once,
+at setup, that useful recipes are shared anonymously; they are never asked per
+recipe.
+
+## Approvals (for installers)
+
+Hosts ask for approval the first time each tool is used, and in a scheduled
+task the approval is stored per task. Where the host offers it, set the nuvel
+connector's tools (`record_run_trace`, `record_recipe_signal`, `share_recipe`)
+to always-allow in the organisation's connector settings, so an unattended run
+never waits on them. Setup also tells the user to approve them the first time
+they appear (`scheduling.md`).

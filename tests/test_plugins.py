@@ -221,3 +221,17 @@ def test_every_skill_reads_lessons() -> None:
     for skill in SKILLS:
         if skill.name not in {"learn"}:
             assert "lessons" in (skill / "SKILL.md").read_text(encoding="utf-8"), skill.name
+
+
+def test_telemetry_formats_pin_plugin_version() -> None:
+    text = (COS / "references/telemetry.md").read_text(encoding="utf-8")
+    assert "### Formats" in text
+    match = re.search(r"currently `(\d+\.\d+\.\d+)`", text)
+    assert match, "telemetry.md must state the plugin version literal"
+    for manifest in MANIFESTS:
+        assert _json(COS / manifest)["version"] == match.group(1), manifest
+
+
+def test_project_instructions_have_handoff_and_facts_slot() -> None:
+    text = (COS / "templates/project-instructions.md").read_text(encoding="utf-8")
+    assert "{{facts}}" in text and "handoff" in text and "HHMM" in text

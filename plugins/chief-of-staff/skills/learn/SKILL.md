@@ -1,6 +1,6 @@
 ---
 name: learn
-description: Let the chief of staff learn from the user. Use right after the user corrects the assistant ("no, así no", "a Marta de usted", "eso no me interesa", "don't put newsletters in my brief"), at the end of a complex or multi-step task or one the user says will recur ("prepare a client proposal", "do the month-end check"), when a routine sees a new lasting preference in handoffs or config, and when the user says to drop something it learned ("bórrala", "esa no"). Writes lessons and recipes (lightweight reusable how-tos) to the registry, acts on its own and tells the user afterwards in one line. Never blocks the user's task.
+description: Let the chief of staff learn from the user. Use before starting a multi-step or recurring task, to look for a matching recipe in the registry and follow it; right after the user corrects the assistant ("no, así no", "a Marta de usted", "eso no me interesa", "don't put newsletters in my brief"), at the end of a complex or multi-step task or one the user says will recur ("prepare a client proposal", "do the month-end check"), when a routine sees a new lasting preference in handoffs or config, and when the user says to drop something it learned ("bórrala", "esa no"). Writes lessons and recipes (lightweight reusable how-tos) to the registry, acts on its own and tells the user afterwards in one line. Never blocks the user's task.
 ---
 
 # Learn
@@ -32,9 +32,24 @@ OneDrive create file):
   `recipes/` inside the registry root, and one new `config` that lists them
   (§1).
 
-When the nuvel connector is added: `record_recipe_signal` and `share_recipe`.
-Nothing else: no source reads are needed, and never any send, reply, share,
+When the nuvel connector is added: `record_run_trace`, `record_recipe_signal`
+and `share_recipe`. Nothing else: no source reads are needed, and never any send, reply, share,
 event change or file change outside the registry.
+
+## 0. Before a task
+
+When the user asks for a multi-step or recurring task in any conversation
+("prepara la propuesta para el cliente", "do the month-end check"), look for a
+recipe before starting, even if no routine skill is running:
+
+1. Find the registry and read the newest `config` (§1, steps 1-2). None, or
+   `paused: true` → carry on with the task normally.
+2. List `recipes/` and keep the newest version per slug with `status: active`.
+3. If one's *When to use* matches the task, follow its *Steps* and *Pitfalls*,
+   and remember it was used: after the task, §3 *Update* records the use.
+4. No match → do the task normally; after it, §3 *Create* may write a recipe.
+
+This is read-only and never delays the task.
 
 ## When to run
 
@@ -97,7 +112,7 @@ the newest version per slug wins and keeps the same `recipe_id` forever
 
 **Create** after a complex task when no active recipe's *When to use* matches:
 slug in lowercase ASCII with hyphens (`propuesta-cliente`); `recipe_id` a new
-random UUIDv4; `category` exactly one identifier from `recipe-categories.md`
+random UUIDv4 (format in `telemetry.md` *Formats*); `category` exactly one identifier from `recipe-categories.md`
 (closest fit, else `other`); stats `uses: 0`, `successes: 0`,
 `corrections: 0`, `last_used` = today, `version: 1`, `shared_version: 0`,
 `blocked_version: 0`, `status: active` (only later tasks that follow it count as uses). Write
@@ -105,12 +120,22 @@ the steps as they actually worked, folding in what the user corrected along the
 way. The private recipe may name people and tools; it lives in the user's own
 registry.
 
+**One document per recipe per run.** Work out the new version in memory
+first (the stats below, the sharing decision in §5), then write **one**
+recipe document that already carries the updated stats and the resulting
+`shared_version` / `blocked_version`, and only then send signals (§4). Never
+write a second version of the same recipe in the same run: registry names have
+minute precision and the registry never overwrites.
+
 **Update** after a task that used a recipe, in a new version with the stats
 carried forward and changed:
 
 - `uses` +1 and `last_used` = today, every time.
-- **Successful use** = the task the recipe was used for finished and the user
-  did not correct the result in that conversation → `successes` +1.
+- **Successful use** = the task the recipe was used for finished, the user saw
+  the result in an interactive run, and did not correct it in that conversation
+  → `successes` +1. In a **scheduled** run nobody sees the result, so a use
+  counts `uses` +1 only, never a success; nor does a scheduled run count a
+  correction.
 - A correction instead → `corrections` +1 (not a success), and fold the fix
   into *Steps* or *Pitfalls*. If the correction arrives later in the same
   conversation, after a success was already counted, write a new version that
@@ -120,14 +145,17 @@ carried forward and changed:
 
 **Retire** on "bórrala" / "esa no": a new version with `status: retired`.
 Skills ignore retired recipes. A recipe without `recipe_id` or `category`
-(written without this skill) gets them now and counts as created.
+(written without this skill) gets them now and counts as created. A recipe
+written through the Project-instructions fallback has no counters: a missing
+`version` is 1, and a missing `shared_version` or `blocked_version` is 0.
 
 ## 4. Signals to nuvel
 
 Only when the tool `record_recipe_signal` is available, `telemetry` is `on`
 and `config` has `telemetry.install_id` (otherwise skip, as in
-`telemetry.md`). One call per recipe event, right after that recipe version is
-written (`learn.signal`), with the argument `{"signal": {...}}`:
+`telemetry.md`). One call per recipe event, **after** that recipe's single
+document for this run is written (`learn.signal`), formats as in
+`telemetry.md` *Formats*, with the argument `{"signal": {...}}`:
 
 | field | value |
 |---|---|
@@ -135,13 +163,13 @@ written (`learn.signal`), with the argument `{"signal": {...}}`:
 | `signal_id` | a new UUIDv4 for this signal |
 | `recipe_id` | the recipe's `recipe_id` |
 | `install_id` | `telemetry.install_id` from `config` |
-| `plugin` | `{"name": "chief-of-staff", "version": <plugin version from the manifest>}` |
+| `plugin` | `{"name": "chief-of-staff", "version": <plugin version, `telemetry.md` *Formats*>}` |
 | `category` | the recipe's `category` |
 | `event` | `created`, `used`, `succeeded`, `corrected` or `retired` |
-| `at` | the time, RFC 3339 UTC, e.g. `2026-10-27T09:30:00Z` |
+| `at` | the time as `YYYY-MM-DDTHH:MM:SSZ`, e.g. `2026-10-27T09:30:00Z` (seconds and `Z` are required) |
 | `uses`, `successes`, `corrections` | the counters **after** this event |
 
-A use sends `used`, then `succeeded` or `corrected`. A late correction that
+A use sends `used`, then `succeeded` or `corrected` (an interactive run only; a scheduled run sends `used` alone). A late correction that
 moves an already counted success sends one `corrected` signal only, carrying
 the cumulative counters after the move (`successes` one lower, `corrections`
 one higher); no `used` and no `succeeded` follow it. Nothing else goes in the
@@ -163,7 +191,8 @@ only when **all** hold:
   (first share, or a later version with new text that has not been blocked).
   A stats-only update never re-attempts a blocked version.
 
-Then (`learn.share`):
+Then (`learn.share`), **before** the recipe document is written (§3), so that
+its outcome goes into that same document:
 
 1. **Rewrite a generic copy from scratch** — never edit the private text. In
    `owner.language`, in sentence case. Roles, not names ("el cliente", "el
@@ -175,9 +204,9 @@ Then (`learn.share`):
 2. **Self-check** a second time against that same list, field by field. Also
    reject any run of two or more Capitalised words not at the start of the
    text, any digit, any `@`, and any word with a dot inside it. Any hit → do
-   not send: journal `share: blocked (pii)` and write a new recipe version
-   with `blocked_version` = `version` (stats unchanged), so it is tried again
-   only when the recipe's `version` next goes up.
+   not send: journal `share: blocked (pii)` and write the recipe document with
+   `blocked_version` = `version`, so it is tried again only when the recipe's
+   `version` next goes up.
 3. Call `share_recipe` with `{"recipe": {...}}`:
 
 | field | value |
@@ -193,12 +222,16 @@ Then (`learn.share`):
 
 No other fields, never `tenant`.
 
-4. `"recorded"` or `"duplicate"` → write a new recipe version with
-   `shared_version` = `version` (stats unchanged). A rejection (it names field
-   paths only) → journal `share: blocked (pii)` and write a new recipe version
-   with `blocked_version` = `version`, exactly as for the self-check; never
-   retry it.
-   Any other error → retry once, then journal `share: not sent (<class>)`.
+4. `"recorded"` or `"duplicate"` → write the recipe document with
+   `shared_version` = `version`. A rejection (`"rejected"`, it names field
+   paths only; it can be a PII hit or a format problem such as a malformed
+   `install_id`) → journal `share: rejected (<paths>)` and write the recipe
+   document with `blocked_version` = `version`; never retry it.
+   Any other error → retry once, then journal `share: not sent (<class>)` and
+   write the recipe document without changing `shared_version`.
+
+Formats for `recipe_id`, `install_id` and `plugin.version` are in
+`telemetry.md` *Formats*.
 
 ## 6. Journal and tell the user
 

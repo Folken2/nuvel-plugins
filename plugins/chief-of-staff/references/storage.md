@@ -18,7 +18,7 @@ At setup:
 
 1. Create the root folder `Chief of Staff` (in *My Drive* / the user's OneDrive
    root, unless they choose a place) and its subfolders `config`, `runs`,
-   `handoff`. Record every folder ID.
+   `handoff`, `lessons` and `recipes`. Record every folder ID.
 2. **Prove the round trip** before relying on it: create a small test document,
    read it back, check the text survived, then move the test document to the
    trash. Pick the document type from the result:
@@ -44,8 +44,8 @@ one sentence ("this is enabled by whoever manages Microsoft 365 / Claude at
 your company") and stop.
 
 1. Create the folder `Chief of Staff` at the **OneDrive root** (SharePoint only
-   if the user asks for a team library), then `config`, `runs`, `handoff`
-   inside it. Record every folder ID (or drive item ID).
+   if the user asks for a team library), then `config`, `runs`, `handoff`,
+   `lessons` and `recipes` inside it. Record every folder ID (or drive item ID).
 2. Create the test document as `.md` plain text. Read it back and compare the
    text. If it reads back as text, every registry document is `.md`; otherwise
    fall back to `.docx`. Record the choice in the `config` document.

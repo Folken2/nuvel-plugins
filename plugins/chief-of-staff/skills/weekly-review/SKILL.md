@@ -13,7 +13,8 @@ Read/search/list on the registry and the calendar (Outlook calendar list events
 or Google Calendar; OneDrive or Drive for the registry; discover Microsoft tools
 by function, `sources.md` *Microsoft 365*). Create one new document in the
 registry's `runs/` folder, plus one new `lessons` document when duplicate
-lessons are merged (step 3). Nothing else: no sending mail, drafts, calendar event
+lessons are merged (step 3), plus what the `learn` skill writes when it runs.
+Nothing else: no sending mail, drafts, calendar event
 changes, Teams messages, or file changes outside the registry.
 
 ## Lessons and recipes

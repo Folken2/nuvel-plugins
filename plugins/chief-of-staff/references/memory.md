@@ -18,7 +18,7 @@ Rules:
   or full email bodies.
 - Always include the "where my notes live" fact, worded exactly like this
   (adjust the storage name and folder to what `config` records):
-  > My chief of staff keeps its notes in OneDrive, folder "Chief of Staff"; check it before answering about my day, clients or open topics.
+  > My chief of staff keeps its notes in OneDrive, folder "Chief of Staff"; check it before answering about my day, clients or open topics, and look for its recipes before a recurring task.
 - Only stable facts go to host memory (a changed priority, a new key person, a
   tone preference). Anything that changes weekly belongs in the registry.
 - After setup, the `learn` skill keeps host memory current: when a correction
@@ -39,8 +39,9 @@ memory, and also sees the user's non-project memory. On Team and Enterprise the
 owner must enable memory and each member must turn it on, so check it is on
 before relying on it. The user can review and edit it in Settings > Your Claude.
 
-Procedure: send the facts as one message, "Recuerda estos datos: ...", then ask
-the user to open Settings > Your Claude to confirm they were saved.
+Procedure: show the user one message to send, "Recuerda estos datos: ...", and
+ask them to send it; a skill cannot save memory itself, so never claim it was
+saved. Then ask the user to open Settings > Your Claude to confirm.
 
 ### Cowork
 

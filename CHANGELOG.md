@@ -17,7 +17,8 @@ a first-class path, and a chief of staff that learns.
 - **Host memory:** say a «Recuerda…» sentence in any chat and it is kept.
 - **Project instructions:** setup produces instructions for the user's Claude
   project so every conversation starts with the right context.
-- **Run traces:** each run records what it read and wrote in its journal.
+- **Run traces:** each run records what it read and wrote in its journal and,
+  when the nuvel connector is present, sends nuvel the same content-free counts.
 - **`learn` skill:** lessons from corrections (read by every skill), recipes for
   complex or repeated tasks, anonymous recipe signals, and anonymised recipe
   sharing with nuvel. Sharing is on by default (you are told at setup, not

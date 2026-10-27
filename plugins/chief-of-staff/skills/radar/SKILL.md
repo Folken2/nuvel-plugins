@@ -41,7 +41,8 @@ folder yet → carry on without them (`registry-layout.md`).
 
 In a scheduled run, if an open handoff or a `config` change shows a lasting
 preference ("from now on, ignore X"), run the `learn` skill at the end so it
-becomes a lesson. Interactive run corrected by the user → run `learn` too.
+becomes a lesson. Interactive run corrected by the user, or a recipe was used
+→ run `learn` too.
 
 ## 1. Load state
 
@@ -70,8 +71,8 @@ the others:
    conversation IDs (Outlook, opaque, compared for equality only) already in
    `seen`.
    - Triage on sender, subject, snippet and category alone. Gmail: skip
-     `category:promotions`, `category:social`; Outlook: skim *Other* instead of
-     *Focused*, and use `isRead`, flagged and categories as hints only (rules in
+     `category:promotions`, `category:social`; Outlook: read *Focused*; only skim
+     *Other*, and use `isRead`, flagged and categories as hints only (rules in
      `sources.md` *Microsoft 365*). Skip newsletters, receipts and
      notifications unless they match a priority, a VIP or a handoff — count
      them, don't open them.

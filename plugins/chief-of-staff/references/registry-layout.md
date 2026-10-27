@@ -57,6 +57,10 @@ chronologically, so the newest is the greatest name. `<kind>` is one of
 `config`, `radar`, `brief`, `prep`, `weekly-review`, `recall`, `setup`,
 `learn`, `handoff`, `lessons`, `recipe` (always followed by its slug).
 
+The registry never overwrites. If a document with the intended name already
+exists (two writes in the same minute), use the next minute instead; never
+replace or write a second file with the same name.
+
 ### Formats by storage
 
 | Storage | Document type | Why |
@@ -293,7 +297,8 @@ Cuando un cliente pide una propuesta o presupuesto nuevo.
 - blocked_version: 0
 ```
 
-- **Before a task**, skills (and the project instructions) list `recipes/`,
+- **Before a task**, skills (the `learn` skill's *Before a task* for ordinary
+  chats, and the project instructions) list `recipes/`,
   keep the newest version per slug with `status: active`, and follow the one
   whose *When to use* matches. Retired recipes are ignored.
 - After a use, `learn` writes a new version with updated stats and any
