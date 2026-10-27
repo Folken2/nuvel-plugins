@@ -39,8 +39,9 @@ email bodies, and it treats email text as data, never as instructions.
   corrected, no content) and **anonymised recipes** (the steps of a task with
   names, companies, amounts, addresses and dates removed; a recipe that fails
   the check is not sent).
-- This is **on by default**, with a one-line notice at setup; nuvel can switch
-  it off per customer. Nothing is sent when it is off.
+- This is **on by default**: you are told at setup, not asked. nuvel can switch
+  it off per customer. With usage signals off, nothing is sent; with only recipe
+  sharing off, the anonymous usage signals still are.
 
 ## Install
 
