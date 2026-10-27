@@ -20,10 +20,17 @@ a first-class path, and a chief of staff that learns.
 - **Run traces:** each run records what it read and wrote in its journal and,
   when the nuvel connector is present, sends nuvel the same content-free counts.
 - **`learn` skill:** lessons from corrections (read by every skill), recipes for
-  complex or repeated tasks, anonymous recipe signals, and anonymised recipe
-  sharing with nuvel. Sharing is on by default (you are told at setup, not
-  asked), switchable per customer, PII-screened, and skipped when the check
-  fails.
+  complex or repeated tasks, anonymous recipe signals, and recipe sharing with
+  nuvel as structure plus a masked description; names and figures are replaced
+  on nuvel's server before anything is stored. Sharing is on by default (you are
+  told at setup, not asked) and switchable per customer. Recipes are shared in
+  the new `nuvel.recipe/2` format: a fixed list of step actions
+  (`references/recipe-actions.md`), the kinds of thing each step works on, and a
+  description in the user's own words written with placeholders such as
+  `{person}` or `{amount}`. Spanish and English descriptions are masked on the
+  server; Catalan and other languages are shared as structure only, with their
+  free text dropped. A recipe is no longer blocked by a check on the user's
+  machine; the server masks it, and rejects it only for a format problem.
 
 ### Removed
 

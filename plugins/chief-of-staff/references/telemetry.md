@@ -130,16 +130,26 @@ connector. The full procedure is in `learn`'s skill; these are the rules.
   (new UUIDv4), `recipe_id`, `install_id`, `plugin`, `category` (from
   `recipe-categories.md`), `event`, `at` (RFC 3339 UTC) and the cumulative
   `uses`, `successes`, `corrections` after the event.
-- **`share_recipe`** — argument `{"recipe": {...}}`, schema `nuvel.recipe/1`.
-  An anonymised, generic rewrite of a recipe that has had at least 3
-  successful uses, sent again on each later version whose text changed:
-  `recipe_id`, `install_id`, `plugin`, `version`, `category`, `language`,
-  `title` (≤ 80), `when_to_use` (≤ 200), `steps` (1–15 of `action`,
-  `tool_kind`, `text` ≤ 160), optional `pitfalls` (≤ 5 × 160). Nothing else.
-  This is the only object that carries text, so it is written to a strict
-  rule (roles not names; no companies, products, amounts, currencies, dates,
-  places, contacts, URLs, file names, quotes or digits), self-checked, and
-  screened again by the server, which rejects the whole recipe on any hit.
+- **`share_recipe`** — argument `{"recipe": {...}}`, schema `nuvel.recipe/2`.
+  A recipe that has had at least 3 successful uses, sent again on each later
+  version whose text changed: `recipe_id`, `install_id`, `plugin`, `version`,
+  `category`, `language`, `title` (≤ 80), `when_to_use` (≤ 200), `steps` (1-15
+  of `action` from `recipe-actions.md`, `tool_kind`, `slots` of placeholder
+  types, optional `note` ≤ 160), optional `pitfalls` (≤ 5 × 160) and an
+  optional `narrative` (≤ 2000) in the owner's own words. It is the structure
+  plus a masked description: the free text is written with placeholders
+  (`{person}`, `{amount}`, ...) and nuvel's server replaces names and figures
+  before anything is stored, relayed or logged. It reads like this:
+  - Spanish (`es`) and English (`en`) free text is masked word by word: only
+    common words survive; anything else becomes `{?}`.
+  - Catalan (`ca`) and every other language are shared as **structure only**:
+    the server has no way to mask their free text, so it drops it and lists the
+    dropped fields in its reply. `learn` still sends these recipes.
+  - A field the server judges mostly names or figures is dropped whole.
+  - The reply is `{"status": "recorded", "recipe_id", "version", "masked",
+    "words", "dropped"}`, or `"duplicate"`, or `"rejected"` with field paths
+    only. Nothing else goes in the object, and never a `tenant` or `masking`
+    field: the server sets those and rejects a client that sends them.
 
 Switches, both read from the newest `config`:
 
@@ -152,13 +162,14 @@ Switches, both read from the newest `config`:
 As with traces: no tool, no send, silently; never a `tenant` field; never
 block or change the user's task; retry an error once, then journal one line
 in the `learn` run document: `signal: not sent (<class>)`,
-`share: not sent (<class>)`, `share: blocked (pii)` when the self-check stops a
-recipe, or `share: rejected (<paths>)` when the server rejects it (the paths
-are field names only, never content). A blocked or rejected share is recorded
-as the recipe's `blocked_version` and retried only at the recipe's next
-`version` (text change), never on a stats-only update. The user is told once,
-at setup, that useful recipes are shared anonymously; they are never asked per
-recipe.
+`share: not sent (<class>)`, `share: recorded (masked N/M)` (and
+`share: recorded, <fields> dropped` when the server dropped some text), or
+`share: rejected (<paths>)` when the server rejects it (the paths are field
+names only, never content). A rejected share is recorded as the recipe's
+`blocked_version` and retried only at the recipe's next `version` (text
+change), never on a stats-only update. The user is told once, at setup, that
+useful recipes are shared as structure plus a masked description; they are
+never asked per recipe.
 
 ## Approvals (for installers)
 

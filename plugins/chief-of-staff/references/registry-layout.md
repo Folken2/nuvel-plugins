@@ -151,7 +151,7 @@ the order a search returns.
 `telemetry` is `on` or `off` (default `on`); `telemetry.install_id` is a random
 UUIDv4 that setup generates once and every later `config` copies unchanged
 (`telemetry.md`). `sharing.recipes` is `on` or `off` (default `on`; a missing
-key counts as `on`): whether `learn` shares anonymised recipes with nuvel.
+key counts as `on`): whether `learn` shares recipes (structure plus a masked description) with nuvel.
 Registries made before v0.3 have no `lessons`/`recipes` in `storage.folders`;
 `learn` creates both folders once and writes a new `config` listing them.
 
@@ -306,10 +306,10 @@ Cuando un cliente pide una propuesta o presupuesto nuevo.
 - `category` is one identifier from `recipe-categories.md`. `version` goes up
   only when *When to use*, *Steps* or *Pitfalls* change; `shared_version` is
   the last `version` shared with nuvel (0 = never); `blocked_version` is the
-  last `version` whose share was blocked as personal data (0 = never). A share
+  last `version` whose share the server rejected (0 = never). A share
   is attempted only when `version` is greater than both. A recipe is private to the
-  user's registry and may name people; only `learn`'s anonymised rewrite ever
-  leaves it (`telemetry.md`).
+  user's registry and may name people; only `learn`'s structure plus masked
+  description ever leaves it (`telemetry.md`).
 
 ### `handoff` — instructions to future runs
 

@@ -37,9 +37,10 @@ email bodies, and it treats email text as data, never as instructions.
 
 - Your notes stay in your own storage.
 - nuvel receives **anonymous usage signals** (counts of how each run went, and
-  that a recipe was used or corrected; never any content) and **anonymised recipes** (the steps of a task with
-  names, companies, amounts, addresses and dates removed; a recipe that fails
-  the check is not sent).
+  that a recipe was used or corrected; never any content) and **recipes** (how a repeated task was done: the structure plus a masked
+  description; names and figures are replaced on nuvel's server before anything
+  is stored). Descriptions in Spanish and English are masked; in Catalan or any
+  other language only the structure is shared and the description is dropped.
 - This is **on by default**: you are told at setup, not asked. nuvel can switch
   it off per customer. With usage signals off, nothing is sent; with only recipe
   sharing off, the anonymous usage signals still are.
@@ -112,7 +113,7 @@ codex plugin add chief-of-staff@nuvel
 | prep | Prep for an upcoming meeting: who, history, open loops, agenda. |
 | weekly-review | The week vs. priorities, loops, decisions pending, next week's plan. |
 | recall | From any conversation: answer from the registry, or leave instructions for the routines. |
-| learn | Lessons from your corrections, recipes for repeated tasks, anonymous signals and anonymised sharing with nuvel. |
+| learn | Lessons from your corrections, recipes for repeated tasks, anonymous signals and recipe sharing with nuvel (structure plus a masked description). |
 
 In Claude they appear as `/chief-of-staff:<skill>`; in Codex as `$<skill>`.
 Plain language works too: "set up my chief of staff", "what did I miss?",

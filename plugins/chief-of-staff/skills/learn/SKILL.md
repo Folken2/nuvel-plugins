@@ -179,59 +179,109 @@ object: no title, slug, step or name, and never a `tenant` field. A
 
 ## 5. Sharing recipes with nuvel
 
-nuvel collects good recipes, anonymised, to turn the best into real skills for
-everyone. Sharing is automatic (the user is told once, at setup) and happens
-only when **all** hold:
+nuvel collects good recipes to turn the best into real skills for everyone.
+What it receives is the **structure** of the recipe (which kinds of step, in
+which order, on which kinds of thing) plus a **description in the user's own
+words, masked**: names and figures are replaced on nuvel's server before
+anything is stored. Sharing is automatic (the user is told once, at setup) and
+happens only when **all** hold:
 
 - `share_recipe` is available, `telemetry` is `on`, `telemetry.install_id`
   exists, and `config` does not say `- sharing.recipes: off` (missing = `on`);
 - the recipe is `active` with `successes` ≥ 3 (at least three of its uses
   were a successful use, §3);
 - its `version` is greater than both `shared_version` and `blocked_version`
-  (first share, or a later version with new text that has not been blocked).
-  A stats-only update never re-attempts a blocked version.
+  (first share, or a later version with new text that was not rejected). A
+  stats-only update never re-attempts a rejected version.
 
 Then (`learn.share`), **before** the recipe document is written (§3), so that
-its outcome goes into that same document:
+its outcome goes into that same document. There is no self-check that blocks
+the share: personal details are masked by the server, not stopped here. Your
+job is to send a clean structure and a description already written with
+placeholders, so that what survives the masking still reads well.
 
-1. **Rewrite a generic copy from scratch** — never edit the private text. In
-   `owner.language`, in sentence case. Roles, not names ("el cliente", "el
-   socio", "la gestoría"). No people, companies, products or brands, amounts or
-   currencies (symbols, codes or words), dates, places, emails, phone numbers,
-   URLs or domains, file or folder names, and no quotes. No digits at all: a
-   small count is written in words ("dos opciones"). Put a space after every
-   period.
-2. **Self-check** a second time against that same list, field by field. Also
-   reject any run of two or more Capitalised words not at the start of the
-   text, any digit, any `@`, and any word with a dot inside it. Any hit → do
-   not send: journal `share: blocked (pii)` and write the recipe document with
-   `blocked_version` = `version`, so it is tried again only when the recipe's
-   `version` next goes up.
-3. Call `share_recipe` with `{"recipe": {...}}`:
+1. **Build `steps`** from the private recipe, one per real step (1–15):
+   - `action`: exactly one identifier from `../../references/recipe-actions.md`
+     (closest fit, else `other`);
+   - `tool_kind`: what the step works through (`email`, `calendar`, `chat`,
+     `docs`, `storage`, `tasks`, `web`, or `none`);
+   - `slots`: the kinds of thing the step works on (0–4 different types from
+     the placeholder list in `recipe-actions.md`; `[]` when none);
+   - `note` (optional, ≤ 160 characters): what the step does, with
+     placeholders instead of the real thing.
+
+   Example notes, in Spanish:
+
+   > Buscar el último correo de {person} con la petición de {company}.
+   >
+   > Preparar el borrador con el importe de {amount} y la entrega el {date}.
+   >
+   > Pedir a {person} que revise el borrador antes de enviarlo.
+
+2. **Write `narrative`** (optional but wanted, ≤ 2000 characters): in
+   `owner.language`, the original wording of what the user asked and how it was
+   solved, as a short story, not a transcript. Replace every person, company,
+   product, place, amount, date, email, phone, URL, file or folder with its
+   placeholder (`{person}`, `{company}`, `{amount}`, `{date}`, `{topic}`, …,
+   all in `recipe-actions.md`). The server masks again regardless; the
+   placeholders you write are what keep the narrative readable. Example, in
+   Spanish:
+
+   > El usuario pidió preparar una propuesta para {company}. Busqué el último
+   > correo de {person} sobre {topic}, revisé una propuesta parecida y redacté
+   > un borrador con el importe de {amount} y la entrega el {date}. {person}
+   > pidió ajustar el plazo y lo corregí antes de enviarlo.
+
+   Never write `{?}` yourself: only the server uses it.
+
+3. **Language.** `title`, `when_to_use`, `note`, `pitfalls` and `narrative` are
+   written in `owner.language`. The server can mask free text only in Spanish
+   (`es`) and English (`en`). For Catalan (`ca`) and any other language the
+   recipe is still sent and recorded, but only its structure is kept: the free
+   text is dropped on the server and listed in `dropped`. Send it anyway; do
+   not translate the text to make it pass.
+
+4. Call `share_recipe` with `{"recipe": {...}}`:
 
 | field | value |
 |---|---|
-| `schema` | `nuvel.recipe/1` |
-| `recipe_id`, `install_id`, `plugin`, `category` | as in the signal |
-| `version` | the recipe's `version` |
+| `schema` | `nuvel.recipe/2` |
+| `recipe_id` | the recipe's `recipe_id` (UUIDv4) |
+| `install_id` | `telemetry.install_id` from `config` (UUIDv4) |
+| `plugin` | `{"name": "chief-of-staff", "version": <plugin version, `telemetry.md` *Formats*>}`; the version matches `^\d{1,2}\.\d{1,2}\.\d{1,2}$` |
+| `version` | the recipe's `version`, an integer 1–1000 |
+| `category` | one identifier from `recipe-categories.md` |
 | `language` | two lowercase letters from `owner.language` (`es`, `ca`, `en`) |
 | `title` | ≤ 80 characters |
 | `when_to_use` | ≤ 200 characters |
-| `steps` | 1–15 items `{"action": <lowercase verb identifier, letters and underscores only, e.g. draft_reply>, "tool_kind": email\|calendar\|chat\|docs\|storage\|tasks\|web\|none, "text": ≤ 160 characters}` |
+| `steps` | 1–15 items `{"action": <from recipe-actions.md>, "tool_kind": email\|calendar\|chat\|docs\|storage\|tasks\|web\|none, "slots": [<placeholder types>, 0–4, no repeats], "note": optional, ≤ 160 characters}` |
 | `pitfalls` | optional, ≤ 5 strings of ≤ 160 characters |
+| `narrative` | optional, ≤ 2000 characters |
 
-No other fields, never `tenant`.
+No other fields at any level, and never `tenant` or `masking` (the server sets
+them; the whole recipe is rejected if you send them).
 
-4. `"recorded"` or `"duplicate"` → write the recipe document with
-   `shared_version` = `version`. A rejection (`"rejected"`, it names field
-   paths only; it can be a PII hit or a format problem such as a malformed
-   `install_id`) → journal `share: rejected (<paths>)` and write the recipe
-   document with `blocked_version` = `version`; never retry it.
-   Any other error → retry once, then journal `share: not sent (<class>)` and
-   write the recipe document without changing `shared_version`.
+5. Read the reply:
+   - `"recorded"` (it carries `recipe_id`, `version`, `masked`, `words` and
+     `dropped`) → write the recipe document with `shared_version` = `version`.
+     Journal `share: recorded (masked N/M)`, where N is `masked` and M is
+     `words`. If `dropped` is not empty, also journal
+     `share: recorded, <fields> dropped` with the field paths it lists. A
+     field is dropped when the server judged too much of it to be names or
+     figures, or when its language cannot be masked (above); the structure is
+     kept either way.
+   - `"duplicate"` → write the recipe document with `shared_version` =
+     `version`.
+   - `"rejected"` (it names field paths only, where a key chosen by the client
+     appears as `*`; it is a format problem such as a malformed `install_id`
+     or a value outside a list) → journal `share: rejected (<paths>)` and
+     write the recipe document with `blocked_version` = `version`; never retry
+     it. `blocked_version` is used for this and nothing else.
+   - Any other error → retry once, then journal `share: not sent (<class>)`
+     and write the recipe document without changing `shared_version`.
 
-Formats for `recipe_id`, `install_id` and `plugin.version` are in
-`telemetry.md` *Formats*.
+Nothing changes in what the user is told (§6). Formats for `recipe_id`,
+`install_id` and `plugin.version` are in `telemetry.md` *Formats*.
 
 ## 6. Journal and tell the user
 
@@ -262,7 +312,8 @@ send nothing.
 - **Counts:** `lessons_added`, `lessons_dropped` and `lessons_total` on
   `learn.lesson`; `recipes_created`, `recipes_updated` and `recipes_retired` on
   `learn.recipe`; `signals_sent` and `signals_failed` on `learn.signal`;
-  `shares_sent`, `shares_blocked` and `shares_failed` on `learn.share`.
+  `shares_sent`, `shares_blocked` (shares the server rejected) and
+  `shares_failed` on `learn.share`.
 - **Routing:** what triggered each change: `correction`, `complex_task`,
   `recipe_use`, `routine_preference`, `removal`.
 - **Outcome:** `partial` if a lesson or recipe could not be written; `blocked`

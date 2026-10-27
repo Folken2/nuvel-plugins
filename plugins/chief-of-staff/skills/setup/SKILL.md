@@ -190,7 +190,7 @@ what needs them now; that it never sends or changes anything; that from any
 conversation they can ask "¿qué vio mi chief of staff hoy?" or "dile al repaso
 que vigile X"; that it learns from their corrections and remembers how
 recurring tasks are done; and that setup can change anything later. Add the
-two one-line notices from *Trace* below (anonymous counts, anonymous recipe
+two one-line notices from *Trace* below (anonymous counts, recipe
 sharing); they do not count toward the 6 lines.
 
 Write one `runs/YYYY-MM-DD HHMM setup` document with the technical journal of
@@ -225,7 +225,7 @@ it forward. Mention both once, in plain words, in the wrap-up:
 
 > Se envían solo recuentos anónimos de cómo funciono, nunca contenido; se puede apagar.
 
-> Las recetas útiles se comparten de forma anónima con nuvel para mejorar el servicio.
+> Las recetas útiles se comparten con nuvel como estructura más una descripción en la que los nombres y las cifras se sustituyen antes de guardarse; se puede apagar.
 
 Last, follow `../../references/telemetry.md`: if `record_run_trace` is available
 and `telemetry` is on, send one content-free trace right before saving the

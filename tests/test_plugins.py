@@ -207,8 +207,37 @@ def test_recipe_categories() -> None:
 def test_learn_contract() -> None:
     text = (COS / "skills/learn/SKILL.md").read_text(encoding="utf-8")
     for token in ("record_recipe_signal", "share_recipe", "recipe-categories.md", "sharing.recipes",
-                  "successful use", "share: blocked (pii)", "lessons", "## Trace"):
+                  "successful use", "lessons", "## Trace"):
         assert token in text, token
+
+
+GLOBAL_ACTIONS = [
+    "search", "read", "summarise", "extract", "compare", "check", "calculate", "list", "draft",
+    "edit", "translate", "create", "update", "file", "propose_slot", "schedule", "send", "reply",
+    "forward", "share", "remind", "follow_up", "ask", "decide", "wait", "other",
+]
+GLOBAL_PLACEHOLDERS = [
+    "person", "company", "team", "product", "project", "document", "file", "folder", "amount",
+    "number", "date", "time", "period", "place", "email", "phone", "url", "id", "topic", "other",
+]
+
+
+def test_recipe_actions_catalogue() -> None:
+    text = (COS / "references/recipe-actions.md").read_text(encoding="utf-8")
+    actions = re.findall(r"^- `([a-z_]+)` — ", _section(text, "## Actions"), flags=re.M)
+    assert actions == GLOBAL_ACTIONS
+    placeholders = re.findall(r"^- `\{([a-z]+)\}` — ", _section(text, "## Placeholders"), flags=re.M)
+    assert placeholders == GLOBAL_PLACEHOLDERS
+
+
+def test_learn_share_table_v2() -> None:
+    text = (COS / "skills/learn/SKILL.md").read_text(encoding="utf-8")
+    for token in ("nuvel.recipe/2", "slots", "narrative", "recipe-actions.md", "^\\d{1,2}\\.\\d{1,2}\\.\\d{1,2}$"):
+        assert token in text, token
+    assert "share: blocked (pii)" not in text
+    assert "nuvel.recipe/1" not in text
+    tele = (COS / "references/telemetry.md").read_text(encoding="utf-8")
+    assert "nuvel.recipe/2" in tele and "share: blocked (pii)" not in tele and "nuvel.recipe/1" not in tele
 
 
 def test_registry_layout_has_learning_folders() -> None:
