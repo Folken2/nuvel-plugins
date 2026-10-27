@@ -33,7 +33,9 @@ folder's README from `../../templates/README.md`.
 Look for one (*Finding the registry* in `registry-layout.md`). If found, read the
 newest `config`, summarise the setup in 3–4 plain lines, and ask what to change:
 about them, their sources, where notes live, the schedule, pause, or remove.
-Jump to the matching step below, then write a new `config`.
+Jump to the matching step below, then write a new `config`. If the newest
+`config` lacks `telemetry` or `telemetry.install_id` (an older install), add
+`- telemetry: on` and a new `telemetry.install_id` in that new `config`.
 
 ## 1. Detect
 

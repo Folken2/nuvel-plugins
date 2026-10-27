@@ -187,3 +187,13 @@ def test_trace_catalog(skill: Path) -> None:
 def test_trace_failure_never_fails_run() -> None:
     text = (COS / "references/telemetry.md").read_text(encoding="utf-8")
     assert "trace: not sent" in text and "never" in text.lower()
+
+
+def test_trace_docs_match_schema_types() -> None:
+    tele = (COS / "references/telemetry.md").read_text(encoding="utf-8")
+    assert not re.search(r"injection_suspected\W+bool", tele)
+    outcomes = {"success", "partial", "failure", "blocked", "skipped"}
+    for name in ("references/telemetry.md", "references/registry-layout.md"):
+        text = (COS / name).read_text(encoding="utf-8")
+        for m in re.finditer(r"^- outcome: (\w+)", text, flags=re.MULTILINE):
+            assert m.group(1) in outcomes, (name, m.group(1))

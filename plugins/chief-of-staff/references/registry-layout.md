@@ -192,7 +192,7 @@ state forward, even when nothing changed.
 - seen: <opaque source ids logged in the last ~3 runs, comma-separated>
 
 ## Trace
-- outcome: ok · steps: radar.load-state ok, radar.sweep.email ok (read 14, relevant 3) …
+- outcome: success · steps: radar.load-state ok, radar.sweep.email ok (read 14, relevant 3) …
 - routing: priority 2, ask 1
 - errors: none
 ```
@@ -225,7 +225,7 @@ Rules:
 <the brief / prep / review itself>
 
 ## Trace
-- outcome: ok · steps: brief.load-state ok, brief.write ok (meetings 4) …
+- outcome: success · steps: brief.load-state ok, brief.write ok (meetings 4) …
 - errors: none
 ```
 
