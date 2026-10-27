@@ -149,7 +149,9 @@ functions with no I/O.
    - **dates in words**: a month name or weekday next to a number or number
      word ("15 de marzo", "march fifteenth") → `{date}`. A bare month or
      weekday ("los lunes") passes only through rule 5: it must be in the
-     lexicon (es and en lexicons carry them) and not Capitalised mid-sentence.
+     lexicon and not Capitalised mid-sentence. The en lexicon carries them; the es
+     lexicon does not carry the months that are also names or places (marzo,
+     mayo, abril…), so "en marzo" masks as `{?}`.
      English capitalises them, so "see you on Monday" masks `Monday` as `{?}`
      while "monday" and a sentence-initial "Monday" pass. *(Amendment, final
      review.)*
