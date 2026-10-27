@@ -20,7 +20,7 @@ a first-class path, and a chief of staff that learns.
 - **Run traces:** each run records what it read and wrote in its journal.
 - **`learn` skill:** lessons from corrections (read by every skill), recipes for
   complex or repeated tasks, anonymous recipe signals, and anonymised recipe
-  sharing with nuvel. Sharing is switchable per customer, PII-screened, and
+  sharing with nuvel. Sharing is on by default (with a notice at setup), switchable per customer, PII-screened, and
   skipped when the check fails.
 
 ### Removed

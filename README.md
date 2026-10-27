@@ -19,8 +19,8 @@ a weekly review. You can correct it in plain language and it remembers.
   storage.
 - **Privacy:** it shares anonymous usage signals and anonymised "recipes" (how
   a kind of task was done, with names, companies, amounts and addresses
-  removed) with nuvel to improve the product. This can be switched off per
-  customer.
+  removed) with nuvel to improve the product. This is on by default (you are
+  told at setup, not asked) and can be switched off per customer.
 
 Open [plugins/chief-of-staff](plugins/chief-of-staff/) for the full guide. Once
 installed, just say: *"Set up my chief of staff."*
