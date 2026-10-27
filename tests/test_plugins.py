@@ -132,3 +132,37 @@ def test_microsoft_sections_marked_unverified() -> None:
     for name in ("sources.md", "storage.md", "registry-layout.md"):
         text = (COS / "references" / name).read_text(encoding="utf-8")
         assert "**Unverified (no tenant yet)**" in text, name
+
+
+JARGON = ("MCP", "cron", "scope", "OAuth", "Entra", "API", "token", "folder ID", "connector ID", "JSON")
+
+
+def _section(text: str, heading: str) -> str:
+    start = text.index(heading)
+    nxt = text.find("\n## ", start + len(heading))
+    return text[start: nxt if nxt != -1 else None]
+
+
+def test_setup_asks_at_most_six_questions() -> None:
+    text = (COS / "skills/setup/SKILL.md").read_text(encoding="utf-8")
+    questions = re.findall(r"^\d+\. ", _section(text, "## 2. Questions"), flags=re.M)
+    assert 1 <= len(questions) <= 6
+
+
+def test_setup_user_phrases_have_no_jargon() -> None:
+    text = (COS / "skills/setup/SKILL.md").read_text(encoding="utf-8")
+    quoted = [l for l in text.splitlines() if l.lstrip().startswith(">")]
+    assert quoted, "setup must show user-facing phrases as blockquotes"
+    bad = [l for l in quoted for w in JARGON if re.search(rf"\b{re.escape(w)}\b", l)]
+    assert not bad, bad
+
+
+def test_setup_read_only_storage_stops_without_fallback() -> None:
+    sec = _section((COS / "skills/setup/SKILL.md").read_text(encoding="utf-8"), "## Read-only storage")
+    assert "continúa" in sec and "never" in sec.lower() and "elsewhere" in sec.lower()
+
+
+def test_project_instructions_template() -> None:
+    text = (COS / "templates/project-instructions.md").read_text(encoding="utf-8")
+    for token in ("{{registry}}", "{{owner_name}}", "{{language}}", "recall", "read-only"):
+        assert token in text, token
