@@ -16,7 +16,8 @@ Rules: `../../references/safety.md`. Registry contract:
 Read/search/list tools on email and calendar: Outlook mail search and Outlook
 calendar list events, or Gmail and Google Calendar (discover Microsoft tools by
 function, `sources.md` *Microsoft 365*). Create one new document in the
-registry's `runs/` folder. Nothing else — no sending mail, drafts, replies or
+registry's `runs/` folder (plus what the `learn` skill writes when it runs).
+Nothing else — no sending mail, drafts, replies or
 calendar event create/update/delete/respond, no Teams messages, no file changes
 outside the registry.
 

@@ -49,7 +49,8 @@ handoff.
 
 Never call, on either ecosystem, send mail, drafts, calendar event
 create/update/delete/respond, Teams messages, or file changes outside the
-registry. The only writes are new `handoff/` or `config` documents (create-only;
+registry. The only writes are new `handoff/` or `config` documents, plus what
+the `learn` skill writes when it runs (create-only;
 OneDrive: OneDrive create file). To find the registry or its newest document on
 OneDrive, list the folder children and sort by name (`registry-layout.md`
 *Finding the registry*, *Finding "the newest"*).

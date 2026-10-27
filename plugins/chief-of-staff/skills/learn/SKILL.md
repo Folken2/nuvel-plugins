@@ -25,11 +25,16 @@ Signals and sharing: `../../references/telemetry.md`. Categories:
 
 ## Tools you may use
 
-Read, list and search the registry; create new documents in its `lessons/`,
-`recipes/` and `runs/` folders (create-only, like every skill; OneDrive:
-OneDrive create file). When the nuvel connector is added: `record_recipe_signal`
-and `share_recipe`. Nothing else: no source reads are needed, and never any
-send, reply, share, event change or file change outside the registry.
+Read, list and search the registry. Create, never edit or delete (OneDrive:
+OneDrive create file):
+- new documents in `lessons/`, `recipes/` and `runs/`;
+- on a registry made before v0.3 only, the two folders `lessons/` and
+  `recipes/` inside the registry root, and one new `config` that lists them
+  (§1).
+
+When the nuvel connector is added: `record_recipe_signal` and `share_recipe`.
+Nothing else: no source reads are needed, and never any send, reply, share,
+event change or file change outside the registry.
 
 ## When to run
 
@@ -95,7 +100,7 @@ slug in lowercase ASCII with hyphens (`propuesta-cliente`); `recipe_id` a new
 random UUIDv4; `category` exactly one identifier from `recipe-categories.md`
 (closest fit, else `other`); stats `uses: 0`, `successes: 0`,
 `corrections: 0`, `last_used` = today, `version: 1`, `shared_version: 0`,
-`status: active` (only later tasks that follow it count as uses). Write
+`blocked_version: 0`, `status: active` (only later tasks that follow it count as uses). Write
 the steps as they actually worked, folding in what the user corrected along the
 way. The private recipe may name people and tools; it lives in the user's own
 registry.
@@ -109,7 +114,7 @@ carried forward and changed:
 - A correction instead → `corrections` +1 (not a success), and fold the fix
   into *Steps* or *Pitfalls*. If the correction arrives later in the same
   conversation, after a success was already counted, write a new version that
-  moves it: `successes` −1, `corrections` +1.
+  moves it: `successes` −1, `corrections` +1, `uses` unchanged.
 - `version` +1 only when *When to use*, *Steps* or *Pitfalls* changed; a
   stats-only update keeps it.
 
@@ -136,7 +141,10 @@ written (`learn.signal`), with the argument `{"signal": {...}}`:
 | `at` | the time, RFC 3339 UTC, e.g. `2026-10-27T09:30:00Z` |
 | `uses`, `successes`, `corrections` | the counters **after** this event |
 
-A use sends `used`, then `succeeded` or `corrected`. Nothing else goes in the
+A use sends `used`, then `succeeded` or `corrected`. A late correction that
+moves an already counted success sends one `corrected` signal only, carrying
+the cumulative counters after the move (`successes` one lower, `corrections`
+one higher); no `used` and no `succeeded` follow it. Nothing else goes in the
 object: no title, slug, step or name, and never a `tenant` field. A
 `"duplicate"` status is fine. On error retry once, then journal
 `signal: not sent (<class>)` (classes as in `telemetry.md`) and carry on.
@@ -151,8 +159,9 @@ only when **all** hold:
   exists, and `config` does not say `- sharing.recipes: off` (missing = `on`);
 - the recipe is `active` with `successes` ≥ 3 (at least three of its uses
   were a successful use, §3);
-- its `version` is greater than `shared_version` (first share, or a later
-  version with new text).
+- its `version` is greater than both `shared_version` and `blocked_version`
+  (first share, or a later version with new text that has not been blocked).
+  A stats-only update never re-attempts a blocked version.
 
 Then (`learn.share`):
 
@@ -166,8 +175,9 @@ Then (`learn.share`):
 2. **Self-check** a second time against that same list, field by field. Also
    reject any run of two or more Capitalised words not at the start of the
    text, any digit, any `@`, and any word with a dot inside it. Any hit → do
-   not send: journal `share: blocked (pii)` and try again the next time this
-   recipe gets a new version.
+   not send: journal `share: blocked (pii)` and write a new recipe version
+   with `blocked_version` = `version` (stats unchanged), so it is tried again
+   only when the recipe's `version` next goes up.
 3. Call `share_recipe` with `{"recipe": {...}}`:
 
 | field | value |
@@ -185,7 +195,9 @@ No other fields, never `tenant`.
 
 4. `"recorded"` or `"duplicate"` → write a new recipe version with
    `shared_version` = `version` (stats unchanged). A rejection (it names field
-   paths only) → journal `share: blocked (pii)`; do not retry it in this run.
+   paths only) → journal `share: blocked (pii)` and write a new recipe version
+   with `blocked_version` = `version`, exactly as for the self-check; never
+   retry it.
    Any other error → retry once, then journal `share: not sent (<class>)`.
 
 ## 6. Journal and tell the user

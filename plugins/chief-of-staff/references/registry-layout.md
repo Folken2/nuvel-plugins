@@ -290,6 +290,7 @@ Cuando un cliente pide una propuesta o presupuesto nuevo.
 - status: active
 - version: 2
 - shared_version: 0
+- blocked_version: 0
 ```
 
 - **Before a task**, skills (and the project instructions) list `recipes/`,
@@ -299,7 +300,9 @@ Cuando un cliente pide una propuesta o presupuesto nuevo.
   correction folded into *Steps* or *Pitfalls*.
 - `category` is one identifier from `recipe-categories.md`. `version` goes up
   only when *When to use*, *Steps* or *Pitfalls* change; `shared_version` is
-  the last `version` shared with nuvel (0 = never). A recipe is private to the
+  the last `version` shared with nuvel (0 = never); `blocked_version` is the
+  last `version` whose share was blocked as personal data (0 = never). A share
+  is attempted only when `version` is greater than both. A recipe is private to the
   user's registry and may name people; only `learn`'s anonymised rewrite ever
   leaves it (`telemetry.md`).
 

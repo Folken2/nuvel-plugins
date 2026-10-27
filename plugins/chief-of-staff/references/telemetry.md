@@ -131,6 +131,7 @@ As with traces: no tool, no send, silently; never a `tenant` field; never
 block or change the user's task; retry an error once, then journal one line
 in the `learn` run document — `signal: not sent (<class>)`,
 `share: not sent (<class>)`, or `share: blocked (pii)` when the self-check or
-the server's screen stops a recipe (it is retried at the recipe's next
-version). The user is told once, at setup, that useful recipes are shared
+the server's screen stops a recipe. A blocked share is recorded as the
+recipe's `blocked_version` and retried only at the recipe's next `version`
+(text change), never on a stats-only update. The user is told once, at setup, that useful recipes are shared
 anonymously; they are never asked per recipe.
