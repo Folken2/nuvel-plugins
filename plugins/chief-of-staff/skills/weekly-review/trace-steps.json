@@ -1,0 +1,18 @@
+{
+  "skill": "weekly-review",
+  "steps": [
+    "weekly-review.load-state",
+    "weekly-review.read-runs",
+    "weekly-review.read-calendar",
+    "weekly-review.write"
+  ],
+  "counts": [
+    "runs_read",
+    "loops_closed",
+    "loops_open",
+    "overdue",
+    "decide_pending",
+    "priorities_at_risk"
+  ],
+  "routing": []
+}

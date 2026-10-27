@@ -116,6 +116,8 @@ the order a search returns.
 - storage.folders: config=<id>, runs=<id>, handoff=<id>
 - quiet_hours: 20:00-08:00
 - notify: needs-you-now
+- telemetry: on
+- telemetry.install_id: <uuid4, generated once by setup, never changed>
 
 ## Priorities
 1. …
@@ -133,6 +135,10 @@ the order a search returns.
 ## How I work
 <free text>
 ```
+
+`telemetry` is `on` or `off` (default `on`); `telemetry.install_id` is a random
+UUIDv4 that setup generates once and every later `config` copies unchanged
+(`telemetry.md`).
 
 Headings and keys stay in English (skills parse them); values and free text are
 in `owner.language`. Changing anything = writing a new `config` document with
@@ -184,9 +190,17 @@ state forward, even when nothing changed.
 - email: 2026-10-20T19:39:00+02:00 — ok
 - calendar: 2026-10-20T19:39:10+02:00 — ok
 - seen: <opaque source ids logged in the last ~3 runs, comma-separated>
+
+## Trace
+- outcome: ok · steps: radar.load-state ok, radar.sweep.email ok (read 14, relevant 3) …
+- routing: priority 2, ask 1
+- errors: none
 ```
 
 Rules:
+- `## Trace` is the last section of every run document: exactly what was sent to
+  `record_run_trace` (ids, counts, outcome) or one line saying why nothing was
+  sent (`telemetry.md`). It never contains content.
 - Section headings stay in English (other skills and runs parse them); the
   bullets are in `owner.language`.
 - `Cursors`: a failed source keeps its previous cursor (copied from the
@@ -209,6 +223,10 @@ Rules:
 - Notes: <anything missing or odd>
 
 <the brief / prep / review itself>
+
+## Trace
+- outcome: ok · steps: brief.load-state ok, brief.write ok (meetings 4) …
+- errors: none
 ```
 
 They don't carry state; the newest `radar` stays the current picture.

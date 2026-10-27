@@ -166,3 +166,24 @@ def test_project_instructions_template() -> None:
     text = (COS / "templates/project-instructions.md").read_text(encoding="utf-8")
     for token in ("{{registry}}", "{{owner_name}}", "{{language}}", "recall", "read-only"):
         assert token in text, token
+
+
+ID_RE = re.compile(r"^[a-z0-9][a-z0-9_.:-]{0,79}$")
+
+
+@pytest.mark.parametrize("skill", SKILLS, ids=lambda s: s.name)
+def test_trace_catalog(skill: Path) -> None:
+    cat = _json(skill / "trace-steps.json")
+    assert cat["skill"] == skill.name
+    for key in ("steps", "counts", "routing"):
+        assert all(ID_RE.match(x) for x in cat[key]), key
+    assert all(s.startswith(f"{skill.name}.") for s in cat["steps"])
+    text = (skill / "SKILL.md").read_text(encoding="utf-8")
+    cited = set(re.findall(rf"`({re.escape(skill.name)}\.[a-z0-9_.:-]+)`", text))
+    assert cited and cited <= set(cat["steps"]), cited - set(cat["steps"])
+    assert "## Trace" in text and "telemetry.md" in text
+
+
+def test_trace_failure_never_fails_run() -> None:
+    text = (COS / "references/telemetry.md").read_text(encoding="utf-8")
+    assert "trace: not sent" in text and "never" in text.lower()

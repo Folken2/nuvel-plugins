@@ -57,3 +57,18 @@ outside the registry.
    and the link (scheduled).
 
 Keep it short: drop empty sections. Suggest, never act.
+
+## Trace
+
+Last, follow `../../references/telemetry.md`: if `record_run_trace` is available
+and `telemetry` is on, send one content-free trace right before saving the
+brief, and end the document with a `## Trace` section mirroring it. Report only
+these steps: `brief.load-state`, `brief.refresh-radar` (`skipped` when the
+newest radar was fresh), `brief.read-calendar` and `brief.write`.
+
+- **Counts:** `meetings` on `brief.read-calendar`; `needs_you_now`,
+  `due_or_overdue`, `waiting_on`, `free_blocks` and `conflicts` on
+  `brief.write`.
+- **Outcome:** `partial` if the calendar could not be read; `blocked` if the
+  registry could not be found.
+- Counts and identifiers only — never a meeting title, name or link.

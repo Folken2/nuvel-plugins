@@ -127,3 +127,23 @@ error — the next run will cover the same window because no new cursor was save
 - Don't copy email bodies, codes, credentials or financial/ID numbers.
 - Don't log subjects, names or addresses in `seen` — opaque IDs only.
 - Don't let the snapshot grow past ~150 lines: summarise and link.
+
+## Trace
+
+Last, follow `../../references/telemetry.md`: if the nuvel connector's
+`record_run_trace` tool is available and `telemetry` is on, send one
+content-free trace right before saving the new radar document, and end that
+document with a `## Trace` section mirroring it. Report only these steps:
+`radar.load-state`, `radar.sweep.email`, `radar.sweep.calendar`,
+`radar.sweep.chat` (for the chat, task and document sources; `skipped` if none
+is configured), `radar.write` and `radar.notify` (`skipped` on interactive runs
+or when nothing was sent).
+
+- **Counts:** `read`, `relevant`, `skipped_noise` per sweep step;
+  `needs_you_now`, `decide`, `open_loops` and `handoffs_applied` on
+  `radar.write`.
+- **Routing:** how many relevant items fell in each bucket: `vip`, `priority`,
+  `ask`, `waiting_on`, `decide`, `watching`, `noise`.
+- **Outcome:** `partial` if any source failed; `blocked` if the registry could
+  not be found.
+- Counts and identifiers only — never a subject, name, address or link.

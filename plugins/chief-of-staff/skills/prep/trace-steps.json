@@ -1,0 +1,17 @@
+{
+  "skill": "prep",
+  "steps": [
+    "prep.load-state",
+    "prep.identify-meeting",
+    "prep.gather-context",
+    "prep.write"
+  ],
+  "counts": [
+    "attendees",
+    "open_loops",
+    "handoffs",
+    "threads_read",
+    "runs_searched"
+  ],
+  "routing": []
+}

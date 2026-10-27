@@ -1,0 +1,20 @@
+{
+  "skill": "setup",
+  "steps": [
+    "setup.detect",
+    "setup.questions",
+    "setup.folder",
+    "setup.memory",
+    "setup.routines",
+    "setup.first-radar",
+    "setup.wrap-up"
+  ],
+  "counts": [
+    "sources_ok",
+    "sources_missing",
+    "questions_asked",
+    "routines_created",
+    "corrections"
+  ],
+  "routing": []
+}

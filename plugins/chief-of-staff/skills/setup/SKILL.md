@@ -188,3 +188,24 @@ local folder or the chat. Resume from step 3 when the user says "continúa".
   `paused: true`. All skills refuse to run while paused.
 - **Remove:** delete the routines (with the user's yes). Never delete the notes
   folder — tell the user where it is and that deleting it is their call.
+
+## Trace
+
+Telemetry is part of setup. When writing the first `config`, add
+`- telemetry: on` and `- telemetry.install_id: <a new random UUIDv4>`; on any
+later `config`, carry both forward unchanged (add them if an older `config`
+lacks them). Mention it once, in plain words, in the wrap-up: "Se envían solo
+recuentos anónimos de cómo funciona, nunca contenido; se puede apagar."
+
+Last, follow `../../references/telemetry.md`: if `record_run_trace` is available
+and `telemetry` is on, send one content-free trace right before saving the
+setup document, and end it with a `## Trace` section mirroring it. Report only
+these steps: `setup.detect`, `setup.questions`, `setup.folder`, `setup.memory`,
+`setup.routines`, `setup.first-radar` and `setup.wrap-up`.
+
+- **Counts:** `sources_ok` and `sources_missing` on `setup.detect`;
+  `questions_asked` on `setup.questions`; `routines_created` on
+  `setup.routines`; `corrections` on `setup.first-radar`.
+- **Outcome:** `partial` if setup stopped at read-only storage or a step was
+  skipped; `blocked` if a connector the user must enable is missing.
+- Counts and identifiers only — never the user's answers.

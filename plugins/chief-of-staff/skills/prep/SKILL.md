@@ -58,3 +58,17 @@ files outside the registry.
 
 5. Reply with the prep and its link. Say what you couldn't find instead of
    inventing it; label inferences ("likely", "seems").
+
+## Trace
+
+Last, follow `../../references/telemetry.md`: if `record_run_trace` is available
+and `telemetry` is on, send one content-free trace right before saving the prep
+document, and end it with a `## Trace` section mirroring it. Report only these
+steps: `prep.load-state`, `prep.identify-meeting`, `prep.gather-context` and
+`prep.write`.
+
+- **Counts:** `attendees` on `prep.identify-meeting`; `open_loops`, `handoffs`,
+  `threads_read` and `runs_searched` on `prep.gather-context`.
+- **Outcome:** `partial` if a context source failed; `blocked` if the registry
+  could not be found.
+- Counts and identifiers only — never a meeting title, attendee name or link.

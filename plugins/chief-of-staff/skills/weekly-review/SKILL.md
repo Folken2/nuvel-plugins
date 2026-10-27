@@ -50,3 +50,18 @@ changes, Teams messages, or file changes outside the registry.
 ```
 
 4. Reply with the review, or a short notification with the link when scheduled.
+
+## Trace
+
+Last, follow `../../references/telemetry.md`: if `record_run_trace` is available
+and `telemetry` is on, send one content-free trace right before saving the
+review, and end the document with a `## Trace` section mirroring it. Report only
+these steps: `weekly-review.load-state`, `weekly-review.read-runs`,
+`weekly-review.read-calendar` and `weekly-review.write`.
+
+- **Counts:** `runs_read` on `weekly-review.read-runs`; `loops_closed`,
+  `loops_open`, `overdue`, `decide_pending` and `priorities_at_risk` on
+  `weekly-review.write`.
+- **Outcome:** `partial` if the calendar could not be read; `blocked` if the
+  registry could not be found.
+- Counts and identifiers only — never a priority, name or link.

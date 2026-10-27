@@ -1,0 +1,23 @@
+{
+  "skill": "recall",
+  "steps": [
+    "recall.find-registry",
+    "recall.search",
+    "recall.answer",
+    "recall.handoff",
+    "recall.config-change"
+  ],
+  "counts": [
+    "runs_read",
+    "hits",
+    "live_checks",
+    "handoffs_written",
+    "config_changes"
+  ],
+  "routing": [
+    "watch",
+    "rank",
+    "ignore",
+    "remind"
+  ]
+}
