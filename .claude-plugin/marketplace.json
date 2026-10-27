@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "chief-of-staff",
-      "description": "Your AI chief of staff for Claude and Cowork: sweeps email and calendar every two hours and keeps an append-only registry in Google Drive, OneDrive, SharePoint or a local folder. Morning briefs, meeting prep, weekly reviews. Read-only on your sources.",
+      "description": "Your AI chief of staff for Claude and Cowork: works with Microsoft 365 and Google, sweeps email and calendar every two hours and keeps an append-only registry in your own storage. Morning briefs, meeting prep, weekly reviews, learns from your corrections. Read-only on your sources.",
       "author": {
         "name": "nuvel"
       },

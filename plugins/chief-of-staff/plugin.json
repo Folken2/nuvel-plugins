@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "chief-of-staff",
-  "version": "0.2.0",
-  "description": "Your AI chief of staff for Claude and Cowork. Sweeps email, calendar and other sources every two hours and keeps an append-only registry in Google Drive, OneDrive, SharePoint or a local folder — what needs you now, decisions waiting, open loops — plus morning briefs, meeting prep and weekly reviews. Read-only on your sources.",
+  "version": "0.3.0",
+  "description": "Your AI chief of staff for Claude and Cowork. Works with Microsoft 365 (Outlook, Teams, OneDrive) first, and with Google (Gmail, Calendar, Drive). Sweeps email, calendar and chat every two hours and keeps an append-only registry in your own storage — what needs you now, decisions waiting, open loops — plus morning briefs, meeting prep and weekly reviews, and it learns from your corrections. Read-only on your sources.",
   "author": {
     "name": "nuvel",
     "url": "https://github.com/Folken2/nuvel"
@@ -18,6 +18,8 @@
     "email",
     "calendar",
     "productivity",
+    "microsoft-365",
+    "outlook",
     "google-drive",
     "onedrive",
     "sharepoint",

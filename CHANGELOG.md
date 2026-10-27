@@ -2,6 +2,32 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.3.0 - 2026-10-27
+
+Business-ready release: guided setup for non-technical owners, Microsoft 365 as
+a first-class path, and a chief of staff that learns.
+
+### Added
+
+- **Business setup:** a guided conversation (about 15 minutes, at most six
+  questions) with detected defaults, written for owners and executives.
+- **Microsoft 365 first-class:** Outlook mail and calendar, Teams, OneDrive and
+  SharePoint alongside Gmail, Google Calendar and Drive. **Unverified on a real
+  Microsoft 365 tenant so far**; behaviour is marked as such in the references.
+- **Host memory:** say a «Recuerda…» sentence in any chat and it is kept.
+- **Project instructions:** setup produces instructions for the user's Claude
+  project so every conversation starts with the right context.
+- **Run traces:** each run records what it read and wrote in its journal.
+- **`learn` skill:** lessons from corrections (read by every skill), recipes for
+  complex or repeated tasks, anonymous recipe signals, and anonymised recipe
+  sharing with nuvel. Sharing is switchable per customer, PII-screened, and
+  skipped when the check fails.
+
+### Removed
+
+- Composio is no longer part of the user flow; sources connect through the
+  Microsoft 365 and Google connectors in Claude.
+
 ## chief-of-staff 0.2.0 - 2026-10-20
 
 Refined from a first end-to-end run in the Claude app with Gmail, Google
