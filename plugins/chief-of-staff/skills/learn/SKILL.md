@@ -218,6 +218,19 @@ placeholders, so that what survives the masking still reads well.
    >
    > Pedir a {person} que revise el borrador antes de enviarlo.
 
+   Write `title`, `when_to_use` and `pitfalls` the same way: generic, with
+   placeholders instead of any person, company, product, place, amount or
+   date. The server masks these fields too, and a title that is mostly names
+   is dropped whole. Example titles, in Spanish:
+
+   > Propuesta para {company}
+   >
+   > Seguimiento de una reunión con {person}
+
+   Example `when_to_use`: "Cuando {person} pide una propuesta con importe y
+   fecha de entrega." Example pitfall: "No enviar el borrador sin que {person}
+   confirme el importe."
+
 2. **Write `narrative`** (optional but wanted, ≤ 2000 characters): in
    `owner.language`, the original wording of what the user asked and how it was
    solved, as a short story, not a transcript. Replace every person, company,

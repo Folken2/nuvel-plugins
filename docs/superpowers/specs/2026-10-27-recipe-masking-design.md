@@ -148,7 +148,11 @@ functions with no I/O.
      ("dos opciones") passes.
    - **dates in words**: a month name or weekday next to a number or number
      word ("15 de marzo", "march fifteenth") → `{date}`. A bare month or
-     weekday ("los lunes") passes.
+     weekday ("los lunes") passes only through rule 5: it must be in the
+     lexicon (es and en lexicons carry them) and not Capitalised mid-sentence.
+     English capitalises them, so "see you on Monday" masks `Monday` as `{?}`
+     while "monday" and a sentence-initial "Monday" pass. *(Amendment, final
+     review.)*
 3. Tokenise the rest into words, numbers-free by now, punctuation and
    placeholders. Word tokens are Unicode letters with internal `'`, `’` or `-`.
    Hyphenated and apostrophised words are checked part by part, and **all**
@@ -209,8 +213,19 @@ which is not shipped:
   (es `un`/`una`, en `a`). Exact counts are treated as identifying, so
   "dos opciones" becomes "{number} opciones".
 - Standalone single-letter words are allowed per language: es a/y/o/e/u,
-  en a, ca a/i/o/e. A one-letter word followed by "." and another word is a
+  en a/i, ca a/i/o/e. A one-letter word followed by "." and another word is a
   name initial and is masked.
+
+*(Amendment, final review.)*
+- Some classes are exempt from the name, place and brand subtraction: closed
+  function words (`function-{lang}.txt`), the action-catalogue verbs with
+  their inflections (`actions-{lang}.txt`, es and en), English months and
+  weekdays, the N most frequent base words (es N = 300, en N = 0), and in es
+  the reviewed business list. N started at the tune-chosen 1000 and was
+  lowered because holdout leaked; in en the class of auxiliaries, modals and
+  contraction parts was taken out of the function list for the same reason,
+  and the business list stays subtracted because exempting it leaked on
+  `tune/`. Exempt words still fail rule 5 when Capitalised mid-sentence.
 
 #### 4.3 Other languages
 

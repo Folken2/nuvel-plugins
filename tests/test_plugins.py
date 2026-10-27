@@ -236,6 +236,9 @@ def test_learn_share_table_v2() -> None:
         assert token in text, token
     assert "share: blocked (pii)" not in text
     assert "nuvel.recipe/1" not in text
+    for token in ("Propuesta para {company}", "Seguimiento de una reunión con {person}",
+                  "`title`, `when_to_use` and `pitfalls`"):
+        assert token in text, token
     tele = (COS / "references/telemetry.md").read_text(encoding="utf-8")
     assert "nuvel.recipe/2" in tele and "share: blocked (pii)" not in tele and "nuvel.recipe/1" not in tele
 

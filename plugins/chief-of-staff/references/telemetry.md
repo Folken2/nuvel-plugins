@@ -139,7 +139,7 @@ connector. The full procedure is in `learn`'s skill; these are the rules.
   optional `narrative` (≤ 2000) in the owner's own words. It is the structure
   plus a masked description: the free text is written with placeholders
   (`{person}`, `{amount}`, ...) and nuvel's server replaces names and figures
-  before anything is stored, relayed or logged. It reads like this:
+  before anything is stored, relayed or logged. In detail:
   - Spanish (`es`) and English (`en`) free text is masked word by word: only
     common words survive; anything else becomes `{?}`.
   - Catalan (`ca`) and every other language are shared as **structure only**:

@@ -17,10 +17,11 @@ a weekly review. You can correct it in plain language and it remembers.
 - **What it never does:** it only reads. It never sends, replies, archives,
   accepts, deletes or shares anything. Its notes live in a folder in your own
   storage.
-- **Privacy:** it shares anonymous usage signals and "recipes" (how
-  a kind of task was done: the structure plus a masked description; names and
-  figures are replaced on nuvel's server before anything is stored) with nuvel to improve the product. This is on by default (you are
-  told at setup, not asked) and can be switched off per customer.
+- **Privacy:** it shares anonymous usage signals and "recipes" (how a kind of
+  task was done: the structure plus a masked description; names and figures
+  are replaced on nuvel's server before anything is stored) with nuvel to
+  improve the product. This is on by default (you are told at setup, not
+  asked) and can be switched off per customer.
 
 Open [plugins/chief-of-staff](plugins/chief-of-staff/) for the full guide. Once
 installed, just say: *"Set up my chief of staff."*
