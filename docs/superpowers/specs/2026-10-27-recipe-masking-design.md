@@ -430,7 +430,12 @@ Adding it by hand is forbidden (§6).
 - **Catalan clitics.** Catalan suffix clitics are allowed as elisions in `ca`:
   `'l`, `'m`, `'n`, `'s`, `'t`, `'ls`, `'ns`, `'ho`, `'hi` and hyphenated
   `-li`, `-lo`, `-la`, `-los`, `-les`, `-ho`, `-hi`, `-ne`, `-me`, `-te`,
-  `-se`, `-nos`, `-vos`. Readability: "envia'l", "fes-ho".
+  `-se`, `-nos`, `-vos`. Readability: "envia'l", "fes-ho". (Final fix
+  batch:) the stem may carry one prefix elision, one letter of `l d s n m t`
+  and an apostrophe before the lexicon word ("d'enviar-lo", "d'escriure'l"),
+  and a fixed pronoun combination after a hyphen ("posar-s'hi") counts as one
+  hyphen and one apostrophe clitic; the limits and the case rule are
+  unchanged, and the invariant has its own copy of the prefix set.
 - **A fresh blind held-out split, `holdout2/`**, for es, en and ca: ≥ 60
   lines each. It is written by a subagent that never sees the lexicons, the
   masker or any earlier corpus. It is committed before any lexicon change.
@@ -461,9 +466,10 @@ en has one leak (see the residual class below).
 vocabulary, so it misses names that are also ordinary words: a lowercase common word used as a
 brand, or a surname that is also a common word. There is one such leak each on
 es and en holdout2. This is accepted, not fixed per entry (§6), and the
-plain-language privacy wording says so ("a name that is also an everyday word,
-e.g. a surname like Baker, can pass through; don't put personal names in free
-text").
+plain-language privacy wording says so ("a name spelled exactly like an everyday
+word (e.g. March, or Sala in Catalan) can pass through; don't put personal
+names in free text"). The example words are pinned by a test in nuvel
+(`tests/test_docs_catalan_masked.py`) that runs them through the masker.
 
 **Use of holdout2.** It was run 4 times in the first round and once in the fix
 round, so it is no longer a blind gate; `holdout/` and `holdout2/` both remain

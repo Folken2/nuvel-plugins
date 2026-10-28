@@ -142,8 +142,8 @@ connector. The full procedure is in `learn`'s skill; these are the rules.
   before anything is stored, relayed or logged. In detail:
   - Spanish (`es`), English (`en`) and Catalan (`ca`) free text is masked word
     by word: only common words survive; anything else becomes `{?}`. Known
-    limit: a name that is also an everyday word (e.g. a surname like Baker, or
-    a lowercase common word used as a brand) can pass through, so never put
+    limit: a name spelled exactly like an everyday word (e.g. March, or Sala
+    in Catalan, or a lowercase common word used as a brand) can pass through, so never put
     personal names in free text.
   - Every other language is shared as **structure only**: the server has no
     way to mask its free text, so it drops it and lists the dropped fields in

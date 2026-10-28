@@ -285,3 +285,31 @@ def test_no_catalan_structure_only():
                 if claim.search(clause) and stale.search(clause):
                     bad.append(f"{path.relative_to(ROOT)}: {clause[:60]}")
     assert not bad, bad
+
+
+# Every place that lists the masked languages, with the phrase that must name
+# Catalan (whitespace is normalised, so wrapped lines match).
+MASKED_LANGUAGE_LISTS = {
+    "CHANGELOG.md": "Spanish, English and Catalan descriptions are masked",
+    "plugins/chief-of-staff/README.md": "Descriptions in Spanish, English and Catalan are masked",
+    "plugins/chief-of-staff/references/telemetry.md":
+        "Spanish (`es`), English (`en`) and Catalan (`ca`) free text is masked",
+    "plugins/chief-of-staff/skills/learn/SKILL.md":
+        "The server masks free text in Spanish (`es`), English (`en`) and Catalan (`ca`)",
+}
+
+
+@pytest.mark.parametrize("name, phrase", sorted(MASKED_LANGUAGE_LISTS.items()))
+def test_masked_language_lists_name_catalan(name: str, phrase: str) -> None:
+    text = " ".join((ROOT / name).read_text(encoding="utf-8").split())
+    assert phrase in text, name
+
+
+def test_residual_privacy_examples() -> None:
+    """The privacy wording's example words (March, Sala) are pinned against the
+    masker by nuvel's tests/test_docs_catalan_masked.py; a word the masker
+    masks (e.g. Baker) must not come back."""
+    for name in MASKED_LANGUAGE_LISTS:
+        text = " ".join((ROOT / name).read_text(encoding="utf-8").split())
+        assert "e.g. March, or Sala" in text, name
+        assert "Baker" not in text, name

@@ -41,9 +41,9 @@ email bodies, and it treats email text as data, never as instructions.
   description; names and figures are replaced on nuvel's server before anything
   is stored). Descriptions in Spanish, English and Catalan are masked; in any
   other language only the structure is shared and the description is dropped.
-  Masking keeps every word in its everyday vocabulary, so a name that is also
-  one of those words (e.g. a surname like Baker) can pass through, so don't put personal
-  names in free text.
+  Masking keeps every word in its everyday vocabulary, so a name spelled exactly
+  like one of those words (e.g. March, or Sala in Catalan) can pass through, so don't
+  put personal names in free text.
 - This is **on by default**: you are told at setup, not asked. nuvel can switch
   it off per customer. With usage signals off, nothing is sent; with only recipe
   sharing off, the anonymous usage signals still are.

@@ -254,8 +254,8 @@ placeholders, so that what survives the masking still reads well.
    > corregir abans de l'enviament.
 
    Placeholders matter because masking keeps every word in its everyday
-   vocabulary, so a name spelled like one of those words (e.g. a surname like
-   Baker) can pass through. Never put personal names in free text.
+   vocabulary, so a name spelled exactly like one of those words (e.g. March, or
+   Sala in Catalan) can pass through. Never put personal names in free text.
 
    Never write `{?}` yourself: only the server uses it.
 

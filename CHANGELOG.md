@@ -30,8 +30,8 @@ a first-class path, and a chief of staff that learns.
   `{person}` or `{amount}`. Spanish, English and Catalan descriptions are
   masked on the server; other languages are shared as structure only, with
   their free text dropped. Masking keeps every word in its everyday
-  vocabulary, so a name that is also one of those words (a surname like Baker)
-  can pass through: do not put personal names in free text. A recipe is no
+  vocabulary, so a name spelled exactly like one of those words (e.g. March, or
+  Sala in Catalan) can pass through: do not put personal names in free text. A recipe is no
   longer blocked by a check on the user's machine; the server masks it, and
   rejects it only for a format problem.
 
