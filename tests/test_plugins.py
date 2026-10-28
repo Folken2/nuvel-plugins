@@ -273,13 +273,15 @@ def test_no_catalan_structure_only():
     """Catalan recipes are masked like es and en; no text may say otherwise."""
     files = [p for p in (ROOT / "plugins").rglob("*") if p.suffix in {".md", ".json"}]
     files += [ROOT / "README.md", ROOT / "CHANGELOG.md"]
+    claim = re.compile(r"catalan|\(`ca`\)", re.I)
+    stale = re.compile(
+        r"structure.only|dropped|drops|cannot be masked|can mask free text only", re.I
+    )
     bad = []
     for path in files:
-        for no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            if re.search(r"catalan|\(`ca`\)", line, re.I) and re.search(
-                r"structure.only|dropped|drops|cannot be masked|can mask free text only",
-                line,
-                re.I,
-            ):
-                bad.append(f"{path.relative_to(ROOT)}:{no}")
+        text = path.read_text(encoding="utf-8")
+        for para in re.split(r"\n\s*\n", text):
+            for clause in re.split(r"[.;]\s", " ".join(para.split())):
+                if claim.search(clause) and stale.search(clause):
+                    bad.append(f"{path.relative_to(ROOT)}: {clause[:60]}")
     assert not bad, bad

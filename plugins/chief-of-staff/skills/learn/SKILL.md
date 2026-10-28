@@ -251,11 +251,11 @@ placeholders, so that what survives the masking still reads well.
    > l'últim correu de {person} sobre {topic}, vaig revisar una proposta
    > semblant i vaig redactar un esborrany amb l'import de {amount} i el
    > lliurament el {date}. {person} va demanar ajustar el termini i ho vaig
-   > corregir abans d'enviar-lo.
+   > corregir abans de l'enviament.
 
-   Placeholders matter because masking removes words it does not know, and a
-   name that is also an everyday word (e.g. a surname like Baker) can pass
-   through. Never put personal names in free text.
+   Placeholders matter because masking keeps every word in its everyday
+   vocabulary, so a name spelled like one of those words (e.g. a surname like
+   Baker) can pass through. Never put personal names in free text.
 
    Never write `{?}` yourself: only the server uses it.
 

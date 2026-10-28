@@ -236,7 +236,7 @@ structure is stored.
 
 A language ships a lexicon only if its permissive sources reach the 75 %
 readability floor with zero leaks (§6). Otherwise it is **structure only**,
-and the build reports which language and why. Catalan is the likely case. Its
+and the build reports which language and why. Catalan was the likely case; see the "Addendum 2026-10-28" outcome, where it shipped. Its
 corpus is still written, so the language can be switched on later when a
 source is found.
 
@@ -457,8 +457,8 @@ Adding it by hand is forbidden (§6).
 es and en stay at zero leaks on tune and holdout. On holdout2 each of es and
 en has one leak (see the residual class below).
 
-**Accepted residual class.** The masker removes words it does not know, so it
-misses names that are also ordinary words: a lowercase common word used as a
+**Accepted residual class.** The masker keeps every word in its everyday
+vocabulary, so it misses names that are also ordinary words: a lowercase common word used as a
 brand, or a surname that is also a common word. There is one such leak each on
 es and en holdout2. This is accepted, not fixed per entry (§6), and the
 plain-language privacy wording says so ("a name that is also an everyday word,
