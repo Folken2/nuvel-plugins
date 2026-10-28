@@ -39,8 +39,11 @@ email bodies, and it treats email text as data, never as instructions.
 - nuvel receives **anonymous usage signals** (counts of how each run went, and
   that a recipe was used or corrected; never any content) and **recipes** (how a repeated task was done: the structure plus a masked
   description; names and figures are replaced on nuvel's server before anything
-  is stored). Descriptions in Spanish and English are masked; in Catalan or any
+  is stored). Descriptions in Spanish, English and Catalan are masked; in any
   other language only the structure is shared and the description is dropped.
+  Masking removes words it does not know, but a name that is also an everyday
+  word (e.g. a surname like Baker) can pass through, so don't put personal
+  names in free text.
 - This is **on by default**: you are told at setup, not asked. nuvel can switch
   it off per customer. With usage signals off, nothing is sent; with only recipe
   sharing off, the anonymous usage signals still are.

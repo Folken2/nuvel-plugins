@@ -446,3 +446,25 @@ Adding it by hand is forbidden (§6).
   "masked like es and en": learn, telemetry.md, the READMEs, the CHANGELOG,
   N docs and SOURCES.md. The `build_lexicon.py` ca guard is removed once ca
   ships.
+
+**Outcome (2026-10-28).** ca shipped as lexicon `ca-2026.10.2`. Final numbers
+(leaks / readability):
+
+| language | tune | holdout | holdout2 |
+|---|---|---|---|
+| ca | 0 / 0.93 | 0 / 0.89 | 0 / 0.92 |
+
+es and en stay at zero leaks on tune and holdout. On holdout2 each of es and
+en has one leak (see the residual class below).
+
+**Accepted residual class.** The masker removes words it does not know, so it
+misses names that are also ordinary words: a lowercase common word used as a
+brand, or a surname that is also a common word. There is one such leak each on
+es and en holdout2. This is accepted, not fixed per entry (§6), and the
+plain-language privacy wording says so ("a name that is also an everyday word,
+e.g. a surname like Baker, can pass through; don't put personal names in free
+text").
+
+**Use of holdout2.** It was run 4 times in the first round and once in the fix
+round, so it is no longer a blind gate; `holdout/` and `holdout2/` both remain
+as regression tests.

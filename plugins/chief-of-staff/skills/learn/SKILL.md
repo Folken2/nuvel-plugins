@@ -245,11 +245,23 @@ placeholders, so that what survives the masking still reads well.
    > un borrador con el importe de {amount} y la entrega el {date}. {person}
    > pidió ajustar el plazo y lo corregí antes de enviarlo.
 
+   The same in Catalan:
+
+   > L'usuari va demanar preparar una proposta per a {company}. Vaig cercar
+   > l'últim correu de {person} sobre {topic}, vaig revisar una proposta
+   > semblant i vaig redactar un esborrany amb l'import de {amount} i el
+   > lliurament el {date}. {person} va demanar ajustar el termini i ho vaig
+   > corregir abans d'enviar-lo.
+
+   Placeholders matter because masking removes words it does not know, and a
+   name that is also an everyday word (e.g. a surname like Baker) can pass
+   through. Never put personal names in free text.
+
    Never write `{?}` yourself: only the server uses it.
 
 3. **Language.** `title`, `when_to_use`, `note`, `pitfalls` and `narrative` are
-   written in `owner.language`. The server can mask free text only in Spanish
-   (`es`) and English (`en`). For Catalan (`ca`) and any other language the
+   written in `owner.language`. The server masks free text in Spanish
+   (`es`), English (`en`) and Catalan (`ca`). For any other language the
    recipe is still sent and recorded, but only its structure is kept: the free
    text is dropped on the server and listed in `dropped`. Send it anyway; do
    not translate the text to make it pass.

@@ -140,11 +140,14 @@ connector. The full procedure is in `learn`'s skill; these are the rules.
   plus a masked description: the free text is written with placeholders
   (`{person}`, `{amount}`, ...) and nuvel's server replaces names and figures
   before anything is stored, relayed or logged. In detail:
-  - Spanish (`es`) and English (`en`) free text is masked word by word: only
-    common words survive; anything else becomes `{?}`.
-  - Catalan (`ca`) and every other language are shared as **structure only**:
-    the server has no way to mask their free text, so it drops it and lists the
-    dropped fields in its reply. `learn` still sends these recipes.
+  - Spanish (`es`), English (`en`) and Catalan (`ca`) free text is masked word
+    by word: only common words survive; anything else becomes `{?}`. Known
+    limit: a name that is also an everyday word (e.g. a surname like Baker, or
+    a lowercase common word used as a brand) can pass through, so never put
+    personal names in free text.
+  - Every other language is shared as **structure only**: the server has no
+    way to mask its free text, so it drops it and lists the dropped fields in
+    its reply. `learn` still sends these recipes.
   - A field the server judges mostly names or figures is dropped whole.
   - The reply is `{"status": "recorded", "recipe_id", "version", "masked",
     "words", "dropped"}`, or `"duplicate"`, or `"rejected"` with field paths

@@ -267,3 +267,19 @@ def test_telemetry_formats_pin_plugin_version() -> None:
 def test_project_instructions_have_handoff_and_facts_slot() -> None:
     text = (COS / "templates/project-instructions.md").read_text(encoding="utf-8")
     assert "{{facts}}" in text and "handoff" in text and "HHMM" in text
+
+
+def test_no_catalan_structure_only():
+    """Catalan recipes are masked like es and en; no text may say otherwise."""
+    files = [p for p in (ROOT / "plugins").rglob("*") if p.suffix in {".md", ".json"}]
+    files += [ROOT / "README.md", ROOT / "CHANGELOG.md"]
+    bad = []
+    for path in files:
+        for no, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if re.search(r"catalan|\(`ca`\)", line, re.I) and re.search(
+                r"structure.only|dropped|drops|cannot be masked|can mask free text only",
+                line,
+                re.I,
+            ):
+                bad.append(f"{path.relative_to(ROOT)}:{no}")
+    assert not bad, bad
