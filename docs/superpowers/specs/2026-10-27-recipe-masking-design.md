@@ -403,3 +403,46 @@ nuvel's server before anything is stored". The CHANGELOG is updated to match.
 - Which frequency, name and place sources to use, within the licence rule in
   §4.2.
 - The exact lexicon size per language, chosen from the corpus.
+
+## Addendum 2026-10-28: Catalan support
+
+**Intent.** Catalan-speaking customers share recipes with a masked narrative,
+not structure only. nuvel asked for it on 2026-10-28.
+
+**Why Catalan was structure-only.** Of the ca tune corpus, one marked token
+leaked: the lowercase brand "arc" in "pintures arc". It is also a common
+Catalan word. No permissive name, place or brand list in use contained it.
+Adding it by hand is forbidden (§6).
+
+**Decisions:**
+
+- **New permissive company sources, added by class and never per entry.**
+  Wikidata companies, brands and organisations located or headquartered in the
+  Catalan-speaking regions (Catalonia, Valencian Community, Balearic Islands,
+  Andorra, Northern Catalonia):
+  - at any sitelink count;
+  - single-token labels only (the existing rule);
+  - CC0.
+
+  Idescat name statistics may be added if their licence meets the rule. The
+  licence rule is unchanged: a licence that is not on the list, even
+  "attribution-only open data", is rejected.
+- **Catalan clitics.** Catalan suffix clitics are allowed as elisions in `ca`:
+  `'l`, `'m`, `'n`, `'s`, `'t`, `'ls`, `'ns`, `'ho`, `'hi` and hyphenated
+  `-li`, `-lo`, `-la`, `-los`, `-les`, `-ho`, `-hi`, `-ne`, `-me`, `-te`,
+  `-se`, `-nos`, `-vos`. Readability: "envia'l", "fes-ho".
+- **A fresh blind held-out split, `holdout2/`**, for es, en and ca: ≥ 60
+  lines each. It is written by a subagent that never sees the lexicons, the
+  masker or any earlier corpus. It is committed before any lexicon change.
+  - It is an **acceptance gate only**. It is run once, at the end. If it
+    leaks, the fix is general, and the report says that `holdout2` was used.
+  - `holdout/`, now known to have been used as a gate, stays as a regression
+    test.
+- **Acceptance.** ca ships `ca.txt` when tune, holdout and holdout2 all have
+  zero leaks and readability ≥ 75 % on each. es and en must also stay at zero
+  leaks on holdout2. If ca cannot meet this with permissive sources, it stays
+  structure-only, and the report says exactly what is missing.
+- **Plugin and docs.** Every "Catalan is structure only" statement becomes
+  "masked like es and en": learn, telemetry.md, the READMEs, the CHANGELOG,
+  N docs and SOURCES.md. The `build_lexicon.py` ca guard is removed once ca
+  ships.
