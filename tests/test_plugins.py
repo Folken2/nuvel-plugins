@@ -206,9 +206,52 @@ def test_recipe_categories() -> None:
 
 def test_learn_contract() -> None:
     text = (COS / "skills/learn/SKILL.md").read_text(encoding="utf-8")
-    for token in ("record_recipe_signal", "share_recipe", "recipe-categories.md", "sharing.recipes",
-                  "successful use", "lessons", "## Trace"):
+    for token in ("recipe-categories.md", "../../references/recipes.md", "lessons", "## Trace",
+                  "draft", "active", "retired", "index", "explicit approval"):
         assert token in text, token
+    # learn never changes the sharing fields; it only carries them forward.
+    assert "`shared_version` and `blocked_version` forward unchanged" in " ".join(text.split())
+
+
+def test_learn_has_no_sharing_tools() -> None:
+    text = (COS / "skills/learn/SKILL.md").read_text(encoding="utf-8")
+    for token in ("share_recipe", "record_recipe_signal", "nuvel.recipe/", "nuvel.recipe_signal/"):
+        assert token not in text, token
+    cat = _json(COS / "skills/learn/trace-steps.json")
+    assert "learn.signal" not in cat["steps"] and "learn.share" not in cat["steps"]
+    for count in ("signals_sent", "signals_failed", "shares_sent", "shares_blocked", "shares_failed"):
+        assert count not in cat["counts"], count
+    for count in ("drafts_created", "recipes_promoted", "index_written"):
+        assert count in cat["counts"], count
+
+
+def test_learn_reads_index_only_before_a_task() -> None:
+    sec = _section((COS / "skills/learn/SKILL.md").read_text(encoding="utf-8"), "## 0. Before a task")
+    assert "`index`" in sec and "newest" in sec
+    assert "List `recipes/`" not in sec and "list `recipes/`" not in sec
+
+
+def test_recipes_reference_contract() -> None:
+    text = " ".join((COS / "references/recipes.md").read_text(encoding="utf-8").split())
+    for token in ("`draft`", "`active`", "`retired`", "`days_used`", "`last_outcome`", "60 days",
+                  "`successes` ≥ 1", "`days_used` ≥ 3", "# Recipes index",
+                  "`learn` writes the first `index` when none exists and active recipes do"):
+        assert token in text, token
+
+
+def test_success_is_explicit_approval() -> None:
+    text = " ".join((COS / "references/recipes.md").read_text(encoding="utf-8").split())
+    assert "`last_outcome: silent`" in text
+    assert "Silence is not a success" in text
+    assert "move the success" not in text and "successes` −1" not in text
+
+
+def test_registry_layout_index_and_text_switch() -> None:
+    text = (COS / "references/registry-layout.md").read_text(encoding="utf-8")
+    for token in ("- days_used:", "- last_outcome:", "draft|active|retired", "index`",
+                  "# Recipes index", "sharing.recipe_text"):
+        assert token in text, token
+    assert "list `recipes/`" not in text
 
 
 GLOBAL_ACTIONS = [
@@ -230,17 +273,17 @@ def test_recipe_actions_catalogue() -> None:
     assert placeholders == GLOBAL_PLACEHOLDERS
 
 
-def test_learn_share_table_v2() -> None:
-    text = (COS / "skills/learn/SKILL.md").read_text(encoding="utf-8")
-    for token in ("nuvel.recipe/2", "slots", "narrative", "recipe-actions.md", "^\\d{1,2}\\.\\d{1,2}\\.\\d{1,2}$"):
-        assert token in text, token
-    assert "share: blocked (pii)" not in text
-    assert "nuvel.recipe/1" not in text
-    for token in ("Propuesta para {company}", "Seguimiento de una reunión con {person}",
-                  "`title`, `when_to_use` and `pitfalls`"):
-        assert token in text, token
-    tele = (COS / "references/telemetry.md").read_text(encoding="utf-8")
-    assert "nuvel.recipe/2" in tele and "share: blocked (pii)" not in tele and "nuvel.recipe/1" not in tele
+def test_recipe_text_guidance() -> None:
+    """v0.3's free-text guidance lives in recipe-sharing.md, under the text opt-in."""
+    text = (COS / "references/recipe-sharing.md").read_text(encoding="utf-8")
+    sec = _section(text, "## Text (only with `sharing.recipe_text: on`)")
+    for token in ("recipe-actions.md", "Propuesta para {company}", "Seguimiento de una reunión con {person}",
+                  "`title`, `when_to_use` and `pitfalls`", "`step_notes`", "Never write `{?}`"):
+        assert token in sec, token
+    for name in ("references/recipe-sharing.md", "skills/learn/SKILL.md"):
+        doc = (COS / name).read_text(encoding="utf-8")
+        assert "share: blocked (pii)" not in doc and "nuvel.recipe/1" not in doc, name
+        assert "`note`" not in doc, name
 
 
 def test_registry_layout_has_learning_folders() -> None:
@@ -294,7 +337,7 @@ MASKED_LANGUAGE_LISTS = {
     "plugins/chief-of-staff/README.md": "Descriptions in Spanish, English and Catalan are masked",
     "plugins/chief-of-staff/references/telemetry.md":
         "Spanish (`es`), English (`en`) and Catalan (`ca`) free text is masked",
-    "plugins/chief-of-staff/skills/learn/SKILL.md":
+    "plugins/chief-of-staff/references/recipe-sharing.md":
         "The server masks free text in Spanish (`es`), English (`en`) and Catalan (`ca`)",
 }
 
