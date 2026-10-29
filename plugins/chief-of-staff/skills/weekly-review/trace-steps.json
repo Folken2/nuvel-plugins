@@ -5,6 +5,8 @@
     "weekly-review.read-runs",
     "weekly-review.read-calendar",
     "weekly-review.merge-lessons",
+    "weekly-review.recipes",
+    "weekly-review.share",
     "weekly-review.write"
   ],
   "counts": [
@@ -16,7 +18,16 @@
     "priorities_at_risk",
     "lessons_merged",
     "lessons_learned",
-    "recipes_changed"
+    "recipes_changed",
+    "drafts_expired",
+    "recipes_merged",
+    "index_written",
+    "signals_sent",
+    "signals_failed",
+    "shares_sent",
+    "shares_blocked",
+    "shares_failed",
+    "shares_with_text"
   ],
   "routing": []
 }

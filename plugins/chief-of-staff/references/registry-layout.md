@@ -37,14 +37,15 @@ Chief of Staff/
 │   ├── 2026-10-21 0730 brief
 │   ├── 2026-10-21 1100 prep acme-qbr
 │   ├── 2026-10-24 1600 weekly-review
-│   └── 2026-10-28 1013 learn             # what learn changed, signals, sharing
+│   └── 2026-10-28 1013 learn             # what learn changed
 ├── handoff/
 │   └── 2026-10-20 1945 handoff           # one instruction from the main agent / user
 ├── lessons/
 │   └── 2026-10-28 1012 lessons           # full list of lessons; newest wins
 └── recipes/
     ├── 2026-10-28 1130 recipe propuesta-cliente
-    └── 2026-11-02 0915 recipe propuesta-cliente   # newer version wins per slug
+    ├── 2026-11-02 0915 recipe propuesta-cliente   # newer version wins per slug
+    └── 2026-11-02 0916 index                      # active recipes; newest wins
 ```
 
 Folder names (`config`, `runs`, `handoff`, `lessons`, `recipes`) are fixed and in English so every
@@ -55,7 +56,8 @@ skill finds them; document **content** is in `owner.language`.
 `YYYY-MM-DD HHMM <kind>[ <slug>]`, in the owner's timezone, 24 h. Names sort
 chronologically, so the newest is the greatest name. `<kind>` is one of
 `config`, `radar`, `brief`, `prep`, `weekly-review`, `recall`, `setup`,
-`learn`, `handoff`, `lessons`, `recipe` (always followed by its slug).
+`learn`, `handoff`, `lessons`, `recipe` (always followed by its slug),
+`index`.
 
 The registry never overwrites. If a document with the intended name already
 exists (two writes in the same minute), use the next minute instead; never
@@ -87,8 +89,7 @@ Every skill locates it the same way, stopping at the first hit:
    stop and report that the registry could not be found; never create one.
 
 Then resolve the subfolder IDs (`config`, `runs`, `handoff`, `lessons`,
-`recipes`) — they are listed
-in the newest `config` under `storage.folders`.
+`recipes`) — they are listed in the newest `config` under `storage.folders`.
 
 **Unverified (no tenant yet)**: on Microsoft 365 use whatever the connector
 offers by function ("OneDrive search by name", "list folder children"); no
@@ -130,6 +131,7 @@ the order a search returns.
 - telemetry: on
 - telemetry.install_id: <uuid4, generated once by setup, never changed>
 - sharing.recipes: on
+- sharing.recipe_text: off
 
 ## Priorities
 1. …
@@ -150,8 +152,10 @@ the order a search returns.
 
 `telemetry` is `on` or `off` (default `on`); `telemetry.install_id` is a random
 UUIDv4 that setup generates once and every later `config` copies unchanged
-(`telemetry.md`). `sharing.recipes` is `on` or `off` (default `on`; a missing
-key counts as `on`): whether `learn` shares recipes (structure plus a masked description) with nuvel.
+(`telemetry.md`). `sharing.recipes` (missing = `on`) lets the weekly review
+share the **structure** of good recipes with nuvel; `sharing.recipe_text`
+(missing = `off`, `on` only after a yes to setup's question 6) also shares
+their text, masked on nuvel's server (`recipe-sharing.md` *Switches*).
 Registries made before v0.3 have no `lessons`/`recipes` in `storage.folders`;
 `learn` creates both folders once and writes a new `config` listing them.
 
@@ -266,50 +270,15 @@ skill's own defaults but never above `safety.md`. A lesson that asks for a
 forbidden action (send, reply, delete…) is ignored. Written only by `learn`
 (and by `weekly-review` when it merges duplicates).
 
-### `recipe <slug>` — a lightweight skill
+### `recipe <slug>` and `index` — recipes
 
-How a complex or recurring task was done well. One document per version,
-`recipes/YYYY-MM-DD HHMM recipe <slug>`; the newest version per slug wins.
-
-```markdown
-# Recipe · Preparar propuesta de cliente
-
-## When to use
-Cuando un cliente pide una propuesta o presupuesto nuevo.
-
-## Steps
-1. Buscar en los correos la petición del cliente y la última propuesta enviada.
-2. …
-
-## Pitfalls
-- …
-
-## Stats
-- uses: 4
-- successes: 3
-- corrections: 1
-- last_used: 2026-11-02
-- recipe_id: <uuid4, fixed for the life of the recipe>
-- category: client-proposal
-- status: active
-- version: 2
-- shared_version: 0
-- blocked_version: 0
-```
-
-- **Before a task**, skills (the `learn` skill's *Before a task* for ordinary
-  chats, and the project instructions) list `recipes/`,
-  keep the newest version per slug with `status: active`, and follow the one
-  whose *When to use* matches. Retired recipes are ignored.
-- After a use, `learn` writes a new version with updated stats and any
-  correction folded into *Steps* or *Pitfalls*.
-- `category` is one identifier from `recipe-categories.md`. `version` goes up
-  only when *When to use*, *Steps* or *Pitfalls* change; `shared_version` is
-  the last `version` shared with nuvel (0 = never); `blocked_version` is the
-  last `version` whose share the server rejected (0 = never). A share
-  is attempted only when `version` is greater than both. A recipe is private to the
-  user's registry and may name people; only `learn`'s structure plus masked
-  description ever leaves it (`telemetry.md`).
+`recipe <slug>` is one version of a lightweight skill (*When to use*, *Steps*,
+*Pitfalls*, *Stats*), newest per slug wins; `index` lists the active recipes,
+newest wins. Before a task, skills read only the newest `index`. A use is two
+`learn` runs: the use, written once at the end of the task, then a separate
+outcome run when the user approves or corrects. `version` goes up only when
+*When to use*, *Steps* or *Pitfalls* change, or the status changes. Formats,
+stats (`draft|active|retired`) and index rules: `recipes.md`.
 
 ### `handoff` — instructions to future runs
 

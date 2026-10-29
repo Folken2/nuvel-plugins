@@ -146,7 +146,7 @@ def _section(text: str, heading: str) -> str:
 def test_setup_asks_at_most_six_questions() -> None:
     text = (COS / "skills/setup/SKILL.md").read_text(encoding="utf-8")
     questions = re.findall(r"^\d+\. ", _section(text, "## 2. Questions"), flags=re.M)
-    assert 1 <= len(questions) <= 6
+    assert len(questions) == 6
 
 
 def test_setup_user_phrases_have_no_jargon() -> None:
@@ -206,9 +206,76 @@ def test_recipe_categories() -> None:
 
 def test_learn_contract() -> None:
     text = (COS / "skills/learn/SKILL.md").read_text(encoding="utf-8")
-    for token in ("record_recipe_signal", "share_recipe", "recipe-categories.md", "sharing.recipes",
-                  "successful use", "lessons", "## Trace"):
+    for token in ("recipe-categories.md", "../../references/recipes.md", "lessons", "## Trace",
+                  "draft", "active", "retired", "index", "explicit approval"):
         assert token in text, token
+    # learn never changes the sharing fields; it only carries them forward.
+    assert "`shared_version` and `blocked_version` forward unchanged" in " ".join(text.split())
+
+
+def test_learn_has_no_sharing_tools() -> None:
+    text = (COS / "skills/learn/SKILL.md").read_text(encoding="utf-8")
+    for token in ("share_recipe", "record_recipe_signal", "nuvel.recipe/", "nuvel.recipe_signal/"):
+        assert token not in text, token
+    cat = _json(COS / "skills/learn/trace-steps.json")
+    assert "learn.signal" not in cat["steps"] and "learn.share" not in cat["steps"]
+    for count in ("signals_sent", "signals_failed", "shares_sent", "shares_blocked", "shares_failed"):
+        assert count not in cat["counts"], count
+    for count in ("drafts_created", "recipes_promoted", "index_written"):
+        assert count in cat["counts"], count
+
+
+def test_learn_reads_index_only_before_a_task() -> None:
+    sec = _section((COS / "skills/learn/SKILL.md").read_text(encoding="utf-8"), "## 0. Before a task")
+    assert "`index`" in sec and "newest" in sec
+    assert "List `recipes/`" not in sec and "list `recipes/`" not in sec
+
+
+def test_recipes_reference_contract() -> None:
+    text = " ".join((COS / "references/recipes.md").read_text(encoding="utf-8").split())
+    for token in ("`draft`", "`active`", "`retired`", "`days_used`", "`last_outcome`", "60 days",
+                  "`successes` ≥ 1", "`days_used` ≥ 3", "# Recipes index",
+                  "`learn` writes the first `index` when none exists and active recipes do"):
+        assert token in text, token
+
+
+def test_success_is_explicit_approval() -> None:
+    text = " ".join((COS / "references/recipes.md").read_text(encoding="utf-8").split())
+    assert "`last_outcome: silent`" in text
+    assert "Silence is not a success" in text
+    assert "move the success" not in text and "successes` −1" not in text
+
+
+def test_use_is_written_once() -> None:
+    """The use is written at task end; a later approval or correction is a separate
+    run that never touches uses or days_used (no double counting)."""
+    text = " ".join((COS / "references/recipes.md").read_text(encoding="utf-8").split())
+    for token in ("**1. The use, written once, at the end of the task**",
+                  "a later run never adds to `uses` or `days_used` for the same use",
+                  "triggers a separate `learn` run",
+                  "changes only `successes` or `corrections` and `last_outcome` (plus, for a correction, "
+                  "its fix in *Steps* or *Pitfalls*), never `uses` or `days_used`",
+                  "Two runs, one document each",
+                  "an approval after a correction sets it back to `success`",
+                  "The task that promotes it counts as a use",
+                  "A correction after an approval keeps the success",
+                  "it never counts in `recipes_created`"):
+        assert token in text, token
+    skill = " ".join((COS / "skills/learn/SKILL.md").read_text(encoding="utf-8").split())
+    for token in ("**Use**, written once, at the end of a task", "No later run adds to `uses` or `days_used`",
+                  "a correction after an approval keeps the success", "any run that finds active recipes but no `index`"):
+        assert token in skill, token
+
+
+def test_registry_layout_index_and_text_switch() -> None:
+    text = (COS / "references/registry-layout.md").read_text(encoding="utf-8")
+    for token in ("draft|active|retired", "index`", "sharing.recipe_text", "`recipes.md`"):
+        assert token in text, token
+    assert "list `recipes/`" not in text
+    # The recipe and index document contracts live in recipes.md.
+    recipes = (COS / "references/recipes.md").read_text(encoding="utf-8")
+    for token in ("- days_used:", "- last_outcome:", "draft|active|retired", "# Recipes index"):
+        assert token in recipes, token
 
 
 GLOBAL_ACTIONS = [
@@ -230,23 +297,110 @@ def test_recipe_actions_catalogue() -> None:
     assert placeholders == GLOBAL_PLACEHOLDERS
 
 
-def test_learn_share_table_v2() -> None:
-    text = (COS / "skills/learn/SKILL.md").read_text(encoding="utf-8")
-    for token in ("nuvel.recipe/2", "slots", "narrative", "recipe-actions.md", "^\\d{1,2}\\.\\d{1,2}\\.\\d{1,2}$"):
+def test_recipe_text_guidance() -> None:
+    """v0.3's free-text guidance lives in recipe-sharing.md, under the text opt-in."""
+    text = (COS / "references/recipe-sharing.md").read_text(encoding="utf-8")
+    sec = _section(text, "## Text (only with `sharing.recipe_text: on`)")
+    for token in ("recipe-actions.md", "Propuesta para {company}", "Seguimiento de una reunión con {person}",
+                  "`title`, `when_to_use` and `pitfalls`", "`step_notes`", "Never write `{?}`"):
+        assert token in sec, token
+    for name in ("references/recipe-sharing.md", "skills/learn/SKILL.md"):
+        doc = (COS / name).read_text(encoding="utf-8")
+        assert "share: blocked (pii)" not in doc and "nuvel.recipe/1" not in doc, name
+        assert "`note`" not in doc, name
+
+
+SPEC_QUESTION_SIX = (
+    "Cuando una forma de trabajar te funciona varias veces, puedo enviar a nuvel su esquema "
+    "(qué pasos, en qué orden, sin ningún texto tuyo) para mejorar el producto. ¿Quieres que "
+    "además envíe la descripción en tus palabras, con los nombres y las cifras sustituidos? "
+    "Por defecto, no."
+)
+
+
+def test_setup_question_six_text_opt_in_defaults_no() -> None:
+    sec = _section((COS / "skills/setup/SKILL.md").read_text(encoding="utf-8"), "## 2. Questions")
+    q6 = " ".join(sec[sec.index("\n6. "):].split())
+    assert SPEC_QUESTION_SIX in q6
+    assert "descripción" in q6 and "Por defecto, no" in q6
+    flat = " ".join((COS / "skills/setup/SKILL.md").read_text(encoding="utf-8").split())
+    assert "solo el esquema, nunca tu texto" in flat
+
+
+def test_recipe_text_off_unless_asked() -> None:
+    share = " ".join((COS / "references/recipe-sharing.md").read_text(encoding="utf-8").split())
+    assert "A missing `sharing.recipe_text` counts as `off`" in share
+    assert "Build `text` only when `config` says `- sharing.recipe_text: on`" in share
+    setup = (COS / "skills/setup/SKILL.md").read_text(encoding="utf-8")
+    assert "- sharing.recipe_text: off" in setup
+    assert "never turns it on without asking" in " ".join(setup.split())
+
+
+def test_sharing_procedure_v3() -> None:
+    text = (COS / "references/recipe-sharing.md").read_text(encoding="utf-8")
+    for token in ("nuvel.recipe/3", "nuvel.recipe_signal/2", "`step_notes`", "`days_used`", "`slots`",
+                  "`stats`", "^\\d{1,2}\\.\\d{1,2}\\.\\d{1,2}$", "recipe-actions.md", "`shared_version`",
+                  "`blocked_version`", "`recorded`", "`duplicate`", "`rejected`", "`record_recipe_signal`",
+                  "`share_recipe`", "`successes` ≥ 1", "`days_used` ≥ 3", "## Switches"):
         assert token in text, token
-    assert "share: blocked (pii)" not in text
-    assert "nuvel.recipe/1" not in text
-    for token in ("Propuesta para {company}", "Seguimiento de una reunión con {person}",
-                  "`title`, `when_to_use` and `pitfalls`"):
-        assert token in text, token
+    for token in ("nuvel.recipe/2", "nuvel.recipe/1", "nuvel.recipe_signal/1", '"event"', "`event`"):
+        assert token not in text, token
+
+
+def test_telemetry_names_v3_schemas() -> None:
     tele = (COS / "references/telemetry.md").read_text(encoding="utf-8")
-    assert "nuvel.recipe/2" in tele and "share: blocked (pii)" not in tele and "nuvel.recipe/1" not in tele
+    for token in ("nuvel.recipe/3", "nuvel.recipe_signal/2", "recipe-sharing.md", "`sharing.recipe_text`",
+                  "`sharing.recipes`", "`telemetry`"):
+        assert token in tele, token
+    stale = re.compile(r"nuvel\.recipe/[12]\b|nuvel\.recipe_signal/1\b")
+    for path in COS.rglob("*"):
+        if path.suffix in {".md", ".json"}:
+            assert not stale.search(path.read_text(encoding="utf-8")), path.relative_to(ROOT)
+    sched = " ".join((COS / "references/scheduling.md").read_text(encoding="utf-8").split())
+    assert "`record_recipe_signal`" in sched and "`share_recipe`" in sched
+    assert "used by the weekly review" in sched
+
+
+def test_weekly_review_recipe_batch_order() -> None:
+    text = (COS / "skills/weekly-review/SKILL.md").read_text(encoding="utf-8")
+    marks = ["**Merge duplicate lessons.**", "**Expire drafts.**", "**Merge duplicate recipes.**",
+             "**Rebuild the index.**", "**Signals.**", "**Share.**"]
+    pos = [text.index(m) for m in marks]
+    assert pos == sorted(pos), pos
+    assert "at most one new version per recipe" in " ".join(text.split())
+    tools = _section(text, "## Tools you may use")
+    assert "`record_recipe_signal`" in tools and "`share_recipe`" in tools
+    cat = _json(COS / "skills/weekly-review/trace-steps.json")
+    assert {"weekly-review.recipes", "weekly-review.share"} <= set(cat["steps"])
+    for count in ("drafts_expired", "recipes_merged", "index_written", "signals_sent", "signals_failed",
+                  "shares_sent", "shares_blocked", "shares_failed", "shares_with_text"):
+        assert count in cat["counts"], count
+    assert "../../references/recipe-sharing.md" in text
+
+
+def test_no_skill_lists_recipes_folder_to_match() -> None:
+    for skill in _skills(COS):
+        text = " ".join((skill / "SKILL.md").read_text(encoding="utf-8").split())
+        if skill.name in {"weekly-review", "learn"}:
+            continue
+        assert "list `recipes/`" not in text.lower(), skill.name
+        if skill.name != "setup":
+            assert "newest `index`" in text, skill.name
+    tmpl = (COS / "templates/project-instructions.md").read_text(encoding="utf-8")
+    assert "newest note ending in \"index\"" in " ".join(tmpl.split())
+    # weekly-review reads the index to match, and lists recipes/ only for its batch.
+    wr = _section((COS / "skills/weekly-review/SKILL.md").read_text(encoding="utf-8"), "## Lessons and recipes")
+    wr = " ".join(wr.split())
+    assert "newest `index`" in wr and "list `recipes/`" not in wr.lower()
 
 
 def test_registry_layout_has_learning_folders() -> None:
     text = (COS / "references/registry-layout.md").read_text(encoding="utf-8")
-    for token in ("lessons/", "recipes/", "## When to use", "## Stats", "sharing.recipes"):
+    for token in ("lessons/", "recipes/", "sharing.recipes"):
         assert token in text, token
+    recipes = (COS / "references/recipes.md").read_text(encoding="utf-8")
+    for token in ("recipes/YYYY-MM-DD HHMM recipe <slug>", "## When to use", "## Stats"):
+        assert token in recipes, token
 
 
 def test_every_skill_reads_lessons() -> None:
@@ -294,7 +448,7 @@ MASKED_LANGUAGE_LISTS = {
     "plugins/chief-of-staff/README.md": "Descriptions in Spanish, English and Catalan are masked",
     "plugins/chief-of-staff/references/telemetry.md":
         "Spanish (`es`), English (`en`) and Catalan (`ca`) free text is masked",
-    "plugins/chief-of-staff/skills/learn/SKILL.md":
+    "plugins/chief-of-staff/references/recipe-sharing.md":
         "The server masks free text in Spanish (`es`), English (`en`) and Catalan (`ca`)",
 }
 
@@ -313,3 +467,20 @@ def test_residual_privacy_examples() -> None:
         text = " ".join((ROOT / name).read_text(encoding="utf-8").split())
         assert "e.g. March, or Sala" in text, name
         assert "Baker" not in text, name
+
+
+def test_skill_md_line_cap() -> None:
+    """Every SKILL.md stays within 500 lines; long procedures go to references/."""
+    assert SKILLS
+    for skill in SKILLS:
+        lines = (skill / "SKILL.md").read_text(encoding="utf-8").count("\n") + 1
+        assert lines <= 500, f"{skill.name}: {lines} lines"
+
+
+def test_share_reply_maps_to_trace_counts() -> None:
+    sec = " ".join(_section((COS / "references/recipe-sharing.md").read_text(encoding="utf-8"),
+                            "## Trace counts").split())
+    for token in ("share `recorded` or `duplicate` | `shares_sent`", "share `rejected` | `shares_blocked`",
+                  "persists after the retry | `shares_failed`", "`shares_with_text` counts the shares sent with `text`",
+                  "no `telemetry.install_id`", "`sharing.recipes: off` does not skip it: signals still go out"):
+        assert token in sec, token
