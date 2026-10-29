@@ -17,9 +17,10 @@ It **acts on its own and tells the user afterwards**, in one line at the end of
 the reply. It never asks first, and it never delays, blocks or changes the
 result of the task the user asked for: learning happens after the work.
 
-Registry contract (the `lessons`, `recipe <slug>` and `index` documents):
-`../../references/registry-layout.md`. Recipe states, stats, migration and the
-index: `../../references/recipes.md`. Rules: `../../references/safety.md`.
+Registry contract (the `lessons` document):
+`../../references/registry-layout.md`. The `recipe <slug>` and `index`
+documents, recipe states, stats and migration: `../../references/recipes.md`.
+Rules: `../../references/safety.md`.
 Host memory: `../../references/memory.md`. Categories:
 `../../references/recipe-categories.md`. Formats and traces:
 `../../references/telemetry.md`.
@@ -199,7 +200,7 @@ worth learning, write nothing and send nothing.
   (written `active` straight away), `recipes_updated`, `recipes_retired` and
   `index_written` on `learn.recipe`.
 - **Routing:** what triggered each change: `correction`, `complex_task`,
-  `recipe_use`, `routine_preference`, `removal`.
+  `recurring_task`, `recipe_use`, `outcome`, `routine_preference`, `removal`.
 - **Outcome:** `partial` if a lesson, recipe or index could not be written;
   `blocked` if the registry could not be found.
 - Counts and identifiers only — never a rule, recipe title, slug or name.

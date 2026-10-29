@@ -55,7 +55,8 @@ Registry: <storage.kind> <root folder id or path>
   and storage, **create file** on storage, and the nuvel tools when they
   appear: `record_run_trace` (every skill; counts only), and
   `record_recipe_signal` and `share_recipe`, used by the weekly review
-  (recipe counters, and the structure of good recipes). Every skill calls the
+  (recipe counters, the structure of good recipes and, only if the user said
+  yes at setup, their masked text). Every skill calls the
   trace tool right before saving its note, so an unapproved nuvel tool would
   otherwise leave the run waiting before the note exists. Approvals are stored per task: approve them in the chat the first
   time they appear. Tell them to **reject** any

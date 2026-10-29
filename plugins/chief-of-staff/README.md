@@ -44,7 +44,8 @@ email bodies, and it treats email text as data, never as instructions.
 - The **masked description** of a recipe (in your own words, with names and
   figures replaced on nuvel's server) is sent **only if you said yes** to the
   question in setup. Descriptions in Spanish, English and Catalan are masked;
-  in any other language the description is not sent. Masking keeps every word
+  in any other language the description is sent, then dropped by nuvel's
+  server and never stored. Masking keeps every word
   in its everyday vocabulary, so a name spelled exactly like one of those words
   (e.g. March, or Sala in Catalan) can pass through, so don't put personal
   names in free text.

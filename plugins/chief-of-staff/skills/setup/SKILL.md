@@ -32,8 +32,12 @@ folder's README from `../../templates/README.md`.
 
 Look for one (*Finding the registry* in `registry-layout.md`). If found, read the
 newest `config`, summarise the setup in 3–4 plain lines, and ask what to change:
-about them, their sources, where notes live, the schedule, pause, or remove.
-Jump to the matching step below, then write a new `config`. If the newest
+about them, their sources, where notes live, the schedule, what is shared
+with nuvel, pause, or remove. Jump to the matching step below, then write a
+new `config`. *What is shared*: ask question 6 again (a clear yes →
+`sharing.recipe_text: on`, anything else → `off`), then ask whether to keep
+sharing useful recipes at all (no → `sharing.recipes: off`, yes → `on`).
+If the newest
 `config` lacks `telemetry` or `telemetry.install_id` (an older install), add
 `- telemetry: on` and a new `telemetry.install_id` in that new `config`; if its
 `telemetry.install_id` is not in the format in `telemetry.md` *Formats* (lowercase

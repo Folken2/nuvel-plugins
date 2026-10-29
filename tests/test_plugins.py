@@ -253,7 +253,8 @@ def test_use_is_written_once() -> None:
     for token in ("**1. The use, written once, at the end of the task**",
                   "a later run never adds to `uses` or `days_used` for the same use",
                   "triggers a separate `learn` run",
-                  "changes only `successes` or `corrections` and `last_outcome`, never `uses` or `days_used`",
+                  "changes only `successes` or `corrections` and `last_outcome` (plus, for a correction, "
+                  "its fix in *Steps* or *Pitfalls*), never `uses` or `days_used`",
                   "Two runs, one document each",
                   "an approval after a correction sets it back to `success`",
                   "The task that promotes it counts as a use",
@@ -268,10 +269,13 @@ def test_use_is_written_once() -> None:
 
 def test_registry_layout_index_and_text_switch() -> None:
     text = (COS / "references/registry-layout.md").read_text(encoding="utf-8")
-    for token in ("- days_used:", "- last_outcome:", "draft|active|retired", "index`",
-                  "# Recipes index", "sharing.recipe_text"):
+    for token in ("draft|active|retired", "index`", "sharing.recipe_text", "`recipes.md`"):
         assert token in text, token
     assert "list `recipes/`" not in text
+    # The recipe and index document contracts live in recipes.md.
+    recipes = (COS / "references/recipes.md").read_text(encoding="utf-8")
+    for token in ("- days_used:", "- last_outcome:", "draft|active|retired", "# Recipes index"):
+        assert token in recipes, token
 
 
 GLOBAL_ACTIONS = [
@@ -392,8 +396,11 @@ def test_no_skill_lists_recipes_folder_to_match() -> None:
 
 def test_registry_layout_has_learning_folders() -> None:
     text = (COS / "references/registry-layout.md").read_text(encoding="utf-8")
-    for token in ("lessons/", "recipes/", "## When to use", "## Stats", "sharing.recipes"):
+    for token in ("lessons/", "recipes/", "sharing.recipes"):
         assert token in text, token
+    recipes = (COS / "references/recipes.md").read_text(encoding="utf-8")
+    for token in ("recipes/YYYY-MM-DD HHMM recipe <slug>", "## When to use", "## Stats"):
+        assert token in recipes, token
 
 
 def test_every_skill_reads_lessons() -> None:
@@ -464,6 +471,16 @@ def test_residual_privacy_examples() -> None:
 
 def test_skill_md_line_cap() -> None:
     """Every SKILL.md stays within 500 lines; long procedures go to references/."""
+    assert SKILLS
     for skill in SKILLS:
         lines = (skill / "SKILL.md").read_text(encoding="utf-8").count("\n") + 1
         assert lines <= 500, f"{skill.name}: {lines} lines"
+
+
+def test_share_reply_maps_to_trace_counts() -> None:
+    sec = " ".join(_section((COS / "references/recipe-sharing.md").read_text(encoding="utf-8"),
+                            "## Trace counts").split())
+    for token in ("share `recorded` or `duplicate` | `shares_sent`", "share `rejected` | `shares_blocked`",
+                  "persists after the retry | `shares_failed`", "`shares_with_text` counts the shares sent with `text`",
+                  "no `telemetry.install_id`", "`sharing.recipes: off` does not skip it: signals still go out"):
+        assert token in sec, token

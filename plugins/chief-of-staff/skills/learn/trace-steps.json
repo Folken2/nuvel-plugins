@@ -20,7 +20,9 @@
   "routing": [
     "correction",
     "complex_task",
+    "recurring_task",
     "recipe_use",
+    "outcome",
     "routine_preference",
     "removal"
   ]

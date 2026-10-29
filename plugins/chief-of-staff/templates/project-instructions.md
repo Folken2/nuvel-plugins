@@ -25,10 +25,13 @@ matches, open only that recipe's newest note and follow it. After a correction,
 save a new `lessons` note named "YYYY-MM-DD HHMM lessons": the previous list
 plus `- <rule> — scope: all — since <date>`. After a multi-step or recurring
 task, save a new note "YYYY-MM-DD HHMM recipe <name>" with `## When to use`,
-`## Steps`, `## Pitfalls`, `## Stats` (uses, successes, corrections, last_used,
-status). "Bórrala" → a new version with `status: retired`. Then end your reply
-with one line saying what you noted. Never send recipe signals or share recipes
-from here: only the weekly review does that.
+`## Steps`, `## Pitfalls`, `## Stats` (uses, successes, corrections, days_used,
+last_used, last_outcome, status). A new recipe starts at 0 uses with
+`last_outcome: silent` and `status: draft`; write `status: active` only when
+the user says the task will recur. "Bórrala" → a new version with
+`status: retired`. Then end your reply with one line saying what you noted.
+Never send recipe signals or share recipes from here: only the weekly review
+does that.
 
 **Passing an instruction to the routines.** To pass an instruction to the
 routines ("vigila X"), save a note "YYYY-MM-DD HHMM handoff" in the `handoff`

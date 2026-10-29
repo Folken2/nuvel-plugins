@@ -1,10 +1,57 @@
 # Recipes
 
-How a private recipe lives in the registry: its states, its stats, when it
-counts a success, and the `index` that *Before a task* reads. The document
-format is in `registry-layout.md` (*`recipe <slug>`* and *`index`*). Written
-by `learn` (create, promote, update, retire, index) and by `weekly-review`
-(expire, merge, rebuild the index, share). Sharing is in `recipe-sharing.md`.
+How a private recipe lives in the registry: its document, its states, its
+stats, when it counts a success, and the `index` that *Before a task* reads.
+The registry's general rules (append-only, names, folders) are in
+`registry-layout.md`. Written by `learn` (create, promote, update, retire,
+index) and by `weekly-review` (expire, merge, rebuild the index, share).
+Sharing is in `recipe-sharing.md`.
+
+## Document: `recipe <slug>`
+
+How a complex or recurring task was done well: a lightweight skill. One
+document per version, `recipes/YYYY-MM-DD HHMM recipe <slug>`; the newest
+version per slug wins.
+
+```markdown
+# Recipe · Preparar propuesta de cliente
+
+## When to use
+Cuando un cliente pide una propuesta o presupuesto nuevo.
+
+## Steps
+1. Buscar en los correos la petición del cliente y la última propuesta enviada.
+2. …
+
+## Pitfalls
+- …
+
+## Stats
+- uses: 4
+- successes: 2
+- corrections: 1
+- days_used: 3
+- last_used: 2026-11-02
+- last_outcome: success
+- recipe_id: <uuid4, fixed for the life of the recipe>
+- category: client-proposal
+- status: active          (draft|active|retired)
+- version: 2
+- shared_version: 0
+- blocked_version: 0
+```
+
+- `status` is `draft` (the task may come back; never followed), `active` (in
+  the `index`, followed before a task) or `retired` (ignored).
+- `last_outcome` is `success` (the user approved the result), `silent` (no
+  approval) or `corrected`.
+- `category` is one identifier from `recipe-categories.md`.
+- `shared_version` is the last `version` shared with nuvel (0 = never);
+  `blocked_version` is the last `version` whose share the server rejected
+  (0 = never).
+- A recipe is private to the user's registry and may name people; only its
+  structure (and, with `sharing.recipe_text: on`, its masked text) ever leaves
+  it (`recipe-sharing.md`).
 
 ## States: `draft` → `active` → `retired`
 
@@ -67,8 +114,8 @@ the same use.
 
 **2. The outcome, written when the user reacts** later in the same
 conversation. That reaction triggers a separate `learn` run, whose new version
-changes only `successes` or `corrections` and `last_outcome`, never `uses` or
-`days_used`:
+changes only `successes` or `corrections` and `last_outcome` (plus, for a
+correction, its fix in *Steps* or *Pitfalls*), never `uses` or `days_used`:
 
 - **Success = explicit approval only.** In an interactive run the user says
   the result worked ("perfecto", "esto es lo que quería", "this worked",
@@ -77,7 +124,7 @@ changes only `successes` or `corrections` and `last_outcome`, never `uses` or
   subject or a scheduled run (nobody sees the result) → nothing more is
   written; the use stays `last_outcome: silent`, no success and no correction.
 - **Correction** → `corrections` +1, `last_outcome: corrected`, and fold the
-  fix into *Steps* or *Pitfalls*. A correction after an approval keeps the
+  fix into *Steps* or *Pitfalls*, so `version` +1. A correction after an approval keeps the
   success (`successes` is never lowered).
 - `last_outcome` is always the latest outcome: an approval after a correction
   sets it back to `success`.
@@ -123,8 +170,9 @@ gets the missing fields on its next write, and its status is unchanged:
 
 ## Index
 
-`recipes/YYYY-MM-DD HHMM index` is the full list of **active** recipes; the
-newest `index` wins, like `lessons`. Drafts and retired recipes are not in it.
+One document, `recipes/YYYY-MM-DD HHMM index`, holds the full list of
+**active** recipes; the newest `index` wins, like `lessons`. Drafts and
+retired recipes are not in it.
 
 ```markdown
 # Recipes index
@@ -132,7 +180,7 @@ newest `index` wins, like `lessons`. Drafts and retired recipes are not in it.
 ## client-proposal
 - propuesta-cliente — Cuando un cliente pide una propuesta o presupuesto nuevo.
 
-## month-end
+## monthly-close
 - cierre-mes — Al acabar el mes, para revisar facturas y cobros pendientes.
 ```
 

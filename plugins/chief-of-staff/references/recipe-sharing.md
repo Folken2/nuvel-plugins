@@ -95,7 +95,9 @@ the server, not stopped here.
 
 1. **Build `steps`** from the private recipe, one per real step (1–15), each
    exactly `{action, tool_kind, slots}` and nothing else (what a step does in
-   words goes only in `text.step_notes`):
+   words goes only in `text.step_notes`). More than 15 real steps → join
+   neighbouring steps (same `action` first) until at most 15 remain, one
+   `step_notes` entry per joined step:
    - `action`: one identifier from `recipe-actions.md` (closest fit, else
      `other`);
    - `tool_kind`: what the step works through: `email`, `calendar`, `chat`,
@@ -145,6 +147,25 @@ No other fields at any level.
 The journal lines go in the weekly review's run document, never the recipe's
 name or text. Nothing changes in what the user is told: setup told them once
 what is shared; they are never asked per recipe.
+
+## Trace counts
+
+Each reply counts once, on `weekly-review.share`:
+
+| reply | count |
+|---|---|
+| signal `recorded` or `duplicate` | `signals_sent` |
+| signal error that persists after the retry | `signals_failed` |
+| share `recorded` or `duplicate` | `shares_sent` |
+| share `rejected` | `shares_blocked` |
+| share error that persists after the retry | `shares_failed` |
+
+`shares_with_text` counts the shares sent with `text` (also counted in
+`shares_sent`), whatever the server dropped from it. `weekly-review.share` is
+`skipped` when `telemetry` is `off`, `config` has no `telemetry.install_id`,
+neither `record_recipe_signal` nor `share_recipe` is available, or there are no
+recipes. `sharing.recipes: off` does not skip it: signals still go out, and
+the share counts stay 0.
 
 ## Text (only with `sharing.recipe_text: on`)
 

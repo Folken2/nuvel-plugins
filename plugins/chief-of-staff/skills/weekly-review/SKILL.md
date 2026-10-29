@@ -53,8 +53,10 @@ Afterwards, if the user corrected the result or a recipe was used, run the
    2. **Merge duplicate recipes.** Two `active` recipes for the same task →
       keep the one with more `successes` (tie: newer `last_used`). Its new
       version folds in the other's *Pitfalls*, sums `uses`, `successes`,
-      `corrections` and `days_used`, takes the newer `last_used`, and gets
-      `version` +1; the other gets `status: retired`.
+      `corrections` and `days_used`, takes the newer `last_used`, keeps its
+      own `last_outcome`, and gets `version` +1; the other gets `status:
+      retired`. Three or more → pick the keeper the same way and merge the
+      others into it one at a time, in memory (still one new version).
    3. **Rebuild the index.** From the result, the full list of `active`
       recipes (format in `recipes.md` *Index*). Write one new
       `recipes/YYYY-MM-DD HHMM index` only if it differs from the newest one
@@ -115,8 +117,8 @@ review, and end the document with a `## Trace` section mirroring it. Report only
 these steps: `weekly-review.load-state`, `weekly-review.read-runs`,
 `weekly-review.read-calendar`, `weekly-review.merge-lessons` (`skipped` when
 there were no duplicates), `weekly-review.recipes` (step 4.1–4.3; `skipped`
-with no recipes), `weekly-review.share` (step 4.4–4.5; `skipped` when no
-nuvel recipe tool is available or `telemetry` is off) and
+with no recipes), `weekly-review.share` (step 4.4–4.5; when it is `skipped`
+and which reply counts where: `recipe-sharing.md` *Trace counts*) and
 `weekly-review.write`.
 
 - **Counts:** `runs_read` on `weekly-review.read-runs`; `lessons_merged` on
