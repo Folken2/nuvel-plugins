@@ -460,3 +460,10 @@ def test_residual_privacy_examples() -> None:
         text = " ".join((ROOT / name).read_text(encoding="utf-8").split())
         assert "e.g. March, or Sala" in text, name
         assert "Baker" not in text, name
+
+
+def test_skill_md_line_cap() -> None:
+    """Every SKILL.md stays within 500 lines; long procedures go to references/."""
+    for skill in SKILLS:
+        lines = (skill / "SKILL.md").read_text(encoding="utf-8").count("\n") + 1
+        assert lines <= 500, f"{skill.name}: {lines} lines"

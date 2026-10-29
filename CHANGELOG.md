@@ -2,6 +2,42 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.4.0 - 2026-10-29
+
+Honest recipes and structure-only sharing. Requires a nuvel connector speaking
+`nuvel.recipe/3` and `nuvel.recipe_signal/2`.
+
+### Changed
+
+- **Recipes start as drafts:** a recipe is promoted to active when a later
+  task matches it, or straight away if you say the task will recur; unused
+  drafts expire after 60 days (weekly review).
+- **Success means explicit approval:** silence, leaving or a scheduled run no
+  longer counts as success. Stats gain `days_used` and `last_outcome`.
+- **Quality bar before sharing:** active, at least one approval, used on at
+  least three different days, last outcome not a correction.
+- **Recipe index:** before a task only the newest index is read (one read);
+  no index means no recipe lookup.
+- **Weekly batch:** the weekly review expires drafts, merges duplicate
+  recipes, rebuilds the index, sends one `nuvel.recipe_signal/2` snapshot per
+  changed recipe and shares recipes (`references/recipe-sharing.md`).
+- **Sharing is structure only by default** (steps, kinds of tool, kinds of
+  thing, counters; none of your text) in the new `nuvel.recipe/3` format.
+- **Setup question 6:** asks whether to also send the masked description in
+  your own words. Default no; `sharing.recipe_text` is `on` only after a yes.
+- Every `SKILL.md` stays within 500 lines; long procedures live in
+  `references/`. Spanish, English and Catalan descriptions are masked on the
+  server when text sharing is on; a name spelled like an everyday word
+  (e.g. March, or Sala in Catalan) can pass through, so keep personal names
+  out of free text.
+
+### Removed
+
+- `learn` no longer sends signals or shares recipes; it keeps lessons and
+  private recipes only.
+- Per-event recipe signals (`nuvel.recipe_signal/1`) and `nuvel.recipe/2`.
+- Text sharing is no longer on by default.
+
 ## chief-of-staff 0.3.0 - 2026-10-27
 
 Business-ready release: guided setup for non-technical owners, Microsoft 365 as

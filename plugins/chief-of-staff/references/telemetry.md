@@ -65,7 +65,7 @@ share from that install, forever.
   `YYYY-MM-DDTHH:MM:SSZ`, with seconds, a `T` and a final `Z`. Example:
   `2026-10-27T09:30:00Z`. Not `2026-10-27 09:30`, not `2026-10-27T09:30Z`.
 - **Plugin version** is the `version` in `../.claude-plugin/plugin.json`,
-  currently `0.3.0`: three numbers separated by dots, never `0.3`.
+  currently `0.4.0`: three numbers separated by dots, never `0.3`.
 - **Tool names**: any `tools[]` entry whose lowercased name does not match
   `^[a-z0-9][a-z0-9_.:-]{0,79}$` is left out of the object.
 - **Error steps**: `errors[].step` is one of the step ids in the skill's

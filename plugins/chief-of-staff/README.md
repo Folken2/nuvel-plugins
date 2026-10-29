@@ -36,17 +36,21 @@ email bodies, and it treats email text as data, never as instructions.
 ## Privacy and what is shared with nuvel
 
 - Your notes stay in your own storage.
-- nuvel receives **anonymous usage signals** (counts of how each run went, and
-  that a recipe was used or corrected; never any content) and **recipes** (how a repeated task was done: the structure plus a masked
-  description; names and figures are replaced on nuvel's server before anything
-  is stored). Descriptions in Spanish, English and Catalan are masked; in any
-  other language only the structure is shared and the description is dropped.
-  Masking keeps every word in its everyday vocabulary, so a name spelled exactly
-  like one of those words (e.g. March, or Sala in Catalan) can pass through, so don't
-  put personal names in free text.
-- This is **on by default**: you are told at setup, not asked. nuvel can switch
-  it off per customer. With usage signals off, nothing is sent; with only recipe
-  sharing off, the anonymous usage signals still are.
+- nuvel receives **anonymous usage signals** (content-free counts of how each
+  run went, and a weekly snapshot of how each recipe is doing; never any
+  content) and, for recipes that have proved themselves, **recipes shared as
+  structure only by default**: the steps, the kinds of tool, the kinds of thing
+  each step works on and counters, never any of your text.
+- The **masked description** of a recipe (in your own words, with names and
+  figures replaced on nuvel's server) is sent **only if you said yes** to the
+  question in setup. Descriptions in Spanish, English and Catalan are masked;
+  in any other language the description is not sent. Masking keeps every word
+  in its everyday vocabulary, so a name spelled exactly like one of those words
+  (e.g. March, or Sala in Catalan) can pass through, so don't put personal
+  names in free text.
+- Structure sharing is **on by default**: you are told at setup, not asked.
+  Text sharing is **off by default**. nuvel can switch either off per customer.
+  With usage signals off, nothing is sent.
 
 ## Install
 
@@ -116,7 +120,7 @@ codex plugin add chief-of-staff@nuvel
 | prep | Prep for an upcoming meeting: who, history, open loops, agenda. |
 | weekly-review | The week vs. priorities, loops, decisions pending, next week's plan. |
 | recall | From any conversation: answer from the registry, or leave instructions for the routines. |
-| learn | Lessons from your corrections, recipes for repeated tasks, anonymous signals and recipe sharing with nuvel (structure plus a masked description). |
+| learn | Lessons from your corrections and private recipes for repeated tasks; anonymous signals and recipe sharing (structure only by default) run in the weekly review. |
 
 In Claude they appear as `/chief-of-staff:<skill>`; in Codex as `$<skill>`.
 Plain language works too: "set up my chief of staff", "what did I miss?",
@@ -130,7 +134,7 @@ Plain language works too: "set up my chief of staff", "what did I miss?",
   local folder if everything runs on one computer.
 - A scheduler: Cowork scheduled tasks, cloud routines (claude.ai/code/routines),
   or desktop scheduled tasks. Setup picks one with you.
-- Optional: the nuvel connector, for usage signals and recipe sharing.
+- Optional: the nuvel connector, for usage signals and recipe sharing (requires a connector speaking `nuvel.recipe/3` and `nuvel.recipe_signal/2`).
 
 ## Privacy and safety
 

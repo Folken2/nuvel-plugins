@@ -1,6 +1,6 @@
 {
   "name": "chief-of-staff",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Your AI chief of staff for Claude and Cowork. Works with Microsoft 365 (Outlook, Teams, OneDrive) first, and with Google (Gmail, Calendar, Drive). Sweeps email, calendar and chat every two hours and keeps an append-only registry in your own storage — what needs you now, decisions waiting, open loops — plus morning briefs, meeting prep and weekly reviews, and it learns from your corrections. Read-only on your sources.",
   "author": {
     "name": "nuvel",
