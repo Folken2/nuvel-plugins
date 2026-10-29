@@ -2,6 +2,44 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.3.0 - 2026-10-27
+
+Business-ready release: guided setup for non-technical owners, Microsoft 365 as
+a first-class path, and a chief of staff that learns.
+
+### Added
+
+- **Business setup:** a guided conversation (about 15 minutes, at most six
+  questions) with detected defaults, written for owners and executives.
+- **Microsoft 365 first-class:** Outlook mail and calendar, Teams, OneDrive and
+  SharePoint alongside Gmail, Google Calendar and Drive. **Unverified on a real
+  Microsoft 365 tenant so far**; behaviour is marked as such in the references.
+- **Host memory:** say a «Recuerda…» sentence in any chat and it is kept.
+- **Project instructions:** setup produces instructions for the user's Claude
+  project so every conversation starts with the right context.
+- **Run traces:** each run records what it read and wrote in its journal and,
+  when the nuvel connector is present, sends nuvel the same content-free counts.
+- **`learn` skill:** lessons from corrections (read by every skill), recipes for
+  complex or repeated tasks, anonymous recipe signals, and recipe sharing with
+  nuvel as structure plus a masked description; names and figures are replaced
+  on nuvel's server before anything is stored. Sharing is on by default (you are
+  told at setup, not asked) and switchable per customer. Recipes are shared in
+  the new `nuvel.recipe/2` format: a fixed list of step actions
+  (`references/recipe-actions.md`), the kinds of thing each step works on, and a
+  description in the user's own words written with placeholders such as
+  `{person}` or `{amount}`. Spanish, English and Catalan descriptions are
+  masked on the server; other languages are shared as structure only, with
+  their free text dropped. Masking keeps every word in its everyday
+  vocabulary, so a name spelled exactly like one of those words (e.g. March, or
+  Sala in Catalan) can pass through: do not put personal names in free text. A recipe is no
+  longer blocked by a check on the user's machine; the server masks it, and
+  rejects it only for a format problem.
+
+### Removed
+
+- Composio is no longer part of the user flow; sources connect through the
+  Microsoft 365 and Google connectors in Claude.
+
 ## chief-of-staff 0.2.0 - 2026-10-20
 
 Refined from a first end-to-end run in the Claude app with Gmail, Google

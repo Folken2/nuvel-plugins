@@ -1,0 +1,29 @@
+{
+  "skill": "radar",
+  "steps": [
+    "radar.load-state",
+    "radar.sweep.email",
+    "radar.sweep.calendar",
+    "radar.sweep.chat",
+    "radar.write",
+    "radar.notify"
+  ],
+  "counts": [
+    "read",
+    "relevant",
+    "skipped_noise",
+    "needs_you_now",
+    "decide",
+    "open_loops",
+    "handoffs_applied"
+  ],
+  "routing": [
+    "vip",
+    "priority",
+    "ask",
+    "waiting_on",
+    "decide",
+    "watching",
+    "noise"
+  ]
+}

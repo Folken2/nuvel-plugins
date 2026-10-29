@@ -9,8 +9,26 @@ Rules: `../../references/safety.md`. Registry: `../../references/registry-layout
 
 ## Tools you may use
 
-Read/search/list on email, calendar and docs; create one new document in the
-registry's `runs/` folder. No replies, drafts or calendar changes.
+Read/search/list on email, calendar, chat and docs: Outlook mail search,
+Outlook calendar list events, Teams chat read, OneDrive search / list / read
+file, or the Gmail, Google Calendar and Drive equivalents (discover Microsoft
+tools by function, `sources.md` *Microsoft 365*). Create one new document in the
+registry's `runs/` folder (plus what the `learn` skill writes when it runs).
+Never send mail, create drafts, reply, create /
+update / delete / respond-to calendar events, post Teams messages, or change
+files outside the registry.
+
+## Lessons and recipes
+
+Right after reading `config`, read the newest document in the registry's
+`lessons/` folder and apply every lesson scoped to `prep` or `all`; they
+override this skill's defaults but never `safety.md`. Then list `recipes/`
+(newest version per slug, `status: active`) and, if one's *When to use* matches
+this preparation, follow its *Steps* and *Pitfalls*. No `lessons/` or `recipes/`
+folder yet → carry on without them (`registry-layout.md`).
+
+Afterwards, if the user corrected the result or a recipe was used, run the
+`learn` skill (it acts on its own and adds one line to the reply).
 
 ## Steps
 
@@ -24,9 +42,11 @@ registry's `runs/` folder. No replies, drafts or calendar changes.
    2. Full-text search of `runs/` for attendee names, their company and the topic.
    3. Open handoffs about them.
    4. Recent email threads with the attendees (last 30 days; metadata first,
-      open only the 3–5 most relevant).
+      open only the 3–5 most relevant). Outlook: search by attendee address and
+      `receivedDateTime`; Gmail: `from:`/`to:` with `newer_than:30d`. Teams DMs
+      or chats with them, if the chat source is Teams.
    5. Notes or transcripts from the previous meeting in the series, if a meetings
-      source is connected.
+      source is connected (Teams recordings, OneDrive or Drive notes included).
 4. Create `runs/YYYY-MM-DD HHMM prep <meeting-slug>` (in the registry language)
    with the *Other runs* journal header, then:
 
@@ -51,3 +71,17 @@ registry's `runs/` folder. No replies, drafts or calendar changes.
 
 5. Reply with the prep and its link. Say what you couldn't find instead of
    inventing it; label inferences ("likely", "seems").
+
+## Trace
+
+Last, follow `../../references/telemetry.md`: if `record_run_trace` is available
+and `telemetry` is on, send one content-free trace right before saving the prep
+document, and end it with a `## Trace` section mirroring it. Report only these
+steps: `prep.load-state`, `prep.identify-meeting`, `prep.gather-context` and
+`prep.write`.
+
+- **Counts:** `attendees` on `prep.identify-meeting`; `open_loops`, `handoffs`,
+  `threads_read` and `runs_searched` on `prep.gather-context`.
+- **Outcome:** `partial` if a context source failed; `blocked` if the registry
+  could not be found.
+- Counts and identifiers only — never a meeting title, attendee name or link.

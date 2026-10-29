@@ -1,107 +1,241 @@
 ---
 name: setup
-description: Guided onboarding for the AI chief of staff. Use when the user installs or asks to set up, configure, reconfigure, move, pause or remove their chief of staff — e.g. "set up my chief of staff", "configura mi chief of staff", "connect my inbox and calendar so you keep me up to date", "change how often radar runs". Interviews the user, checks their email/calendar/storage connectors, creates the registry folder in Google Drive, OneDrive, SharePoint or a local folder, schedules the radar, brief and weekly-review routines, and runs the first sweep.
+description: Guided onboarding for the AI chief of staff, written for business owners and executives with no technical background. Use when the user installs or asks to set up, configure, reconfigure, move, pause or remove their chief of staff — e.g. "set up my chief of staff", "configura mi chief of staff", "connect my inbox and calendar so you keep me up to date", "change how often radar runs". Takes 10–15 minutes and at most six questions: it checks the email, calendar, chat and storage connectors, creates the registry folder in OneDrive, Google Drive or a local folder, seeds the assistant's memory, prepares the Claude Project instructions, schedules the radar, brief and weekly-review routines, and runs the first radar live.
 ---
 
 # Set up the chief of staff
 
-You are onboarding the user's AI chief of staff. By the end they have a profile,
-working sources, a registry folder in their own storage, scheduled routines, and
-a first radar document they can read. Keep it conversational and short — **one
-question per message**, sensible defaults offered out loud, the user decides.
+You are onboarding the user's AI chief of staff. The user is a busy business
+person (an SME owner or executive), not a technician. Target: **10–15 minutes,
+at most six questions**; everything else is detected, defaulted out loud, or
+confirmed with a yes. By the end they have working sources, a private notes
+folder, scheduled routines and a first radar they can read.
+
+Rules of voice:
+
+- Talk in the user's language, in plain business words. No technical terms in
+  anything the user reads: no folder IDs, tool names, schedules written as
+  code, "permissions scopes", "tokens". Those details go only into the `config`
+  document and the setup journal.
+- One question per message. Offer the default out loud; the user decides.
+- Example phrases below are in Spanish and shown as blockquotes; say the same in
+  the user's language.
 
 Read first (paths relative to this skill's folder):
 `../../references/registry-layout.md`, `../../references/storage.md`,
 `../../references/sources.md`, `../../references/scheduling.md`,
-`../../references/safety.md`.
-
-Talk to the user in the language they write in. The registry may use another
-language — ask (step 1).
+`../../references/memory.md`, `../../references/safety.md`. Project
+instructions come from `../../templates/project-instructions.md`; the notes
+folder's README from `../../templates/README.md`.
 
 ## 0. Is there already a registry?
 
 Look for one (*Finding the registry* in `registry-layout.md`). If found, read the
-newest `config`, summarise the setup in 3–4 lines, and ask what to change:
-profile, sources, storage, routines, pause, or remove. Jump to that step.
+newest `config`, summarise the setup in 3–4 plain lines, and ask what to change:
+about them, their sources, where notes live, the schedule, pause, or remove.
+Jump to the matching step below, then write a new `config`. If the newest
+`config` lacks `telemetry` or `telemetry.install_id` (an older install), add
+`- telemetry: on` and a new `telemetry.install_id` in that new `config`; if its
+`telemetry.install_id` is not in the format in `telemetry.md` *Formats* (lowercase
+UUIDv4), replace it with a new valid one; if it
+lacks `sharing.recipes`, add `- sharing.recipes: on`; if `storage.folders` has
+no `lessons` or `recipes`, create those folders and list them.
 
-## 1. Who you're working for
+Also read the newest document in `lessons/`, if any, and apply the lessons
+scoped to `setup` or `all` (`registry-layout.md` *`lessons`*). When the user
+corrects setup's work in a way that should stick, run the `learn` skill
+afterwards.
 
-One question per message; fill the `config` fields:
+## 1. Detect
 
-1. Name, role, organisation.
-2. Confirm inferred defaults in one message: timezone (from the calendar or
-   system), working hours (09:00–19:00 Mon–Fri), and **the language for the
-   registry notes** — say it can differ from the chat language.
-3. "What are the 3–5 things that matter most to you this quarter?" Push gently
-   for specifics.
-4. "Whose messages should never slip?" (VIPs: name + email or domain + why).
-   Starting with none is fine; say radar will then rank by priorities and by
-   whether someone asks for something.
+Do not ask what tools they use. Look at the connectors in this session and pick
+the ecosystem: Microsoft (Outlook, Teams, OneDrive) or Google (Gmail, Calendar,
+Drive); if mixed, use what works per kind (`sources.md`). Prove each one with a
+single tiny read (one email thread, today's calendar, the folder list). Show one
+plain table:
 
-## 2. Sources
+> Correo ✅ · Calendario ✅ · Teams ✅ · Carpeta ✅
 
-1. Find which kinds (email, calendar, chat, tasks, meetings, docs) have a
-   working tool. Prove each with one tiny read (1 thread, the calendar list).
-2. Show a short table: kind → tool → ✅ / missing (optional).
-3. Email + calendar are the minimum. Offer to connect missing ones through the
-   host's connector settings; never install or authorise anything without a yes.
-4. Point out, once, that these connectors can also send/delete/share and that
-   the chief of staff will never use those tools.
+Email and calendar are the minimum; chat and documents are a bonus.
 
-## 3. Storage — create the registry
+If a connector is missing, name the official one in the host's own words and
+stop guessing:
 
-Follow `../../references/storage.md`:
+> Activa el conector *Microsoft 365* en Ajustes → Conectores.
 
-1. Recommend the storage connector (works from chat, Cowork and cloud
-   routines); a synced/local folder only if everything will run on one computer.
-2. Ask to confirm the location (default `Chief of Staff` in the root, private).
-3. Create the root and `config/`, `runs/`, `handoff/`. Do the round-trip test
-   and pick the document type.
-4. Create the human README (`LLEGEIX-ME`, `README`, `LÉAME`… in the registry
-   language) from `../../templates/README.md`, translated.
-5. Create the first `config` document (`config/YYYY-MM-DD HHMM config`) from
-   the contract in `registry-layout.md`, with folder IDs and `## Routines` still
-   empty if step 4 hasn't happened — or, better, create it after step 4 so the
-   first version is complete.
+If it needs an administrator, say so in one sentence:
 
-## 4. Routines
+> Esto lo activa la persona que gestiona Microsoft 365 / Claude en tu empresa.
 
-Follow `../../references/scheduling.md`:
+Never offer third-party connectors or ask the user for passwords or keys. Say,
+once and calmly, that the chief of staff only reads and writes its own notes
+folder: it never sends, deletes or changes anything for them.
 
-1. Say which mechanism fits (Cowork scheduled tasks → cloud routines → desktop
-   tasks) and what it implies (runs with the app closed or not). Propose the
-   default schedule in their timezone; adjust to their answer.
-2. Create each routine only after a clear yes, with the self-contained prompt
-   template. Record mechanism + schedule + ID in `config`.
-3. If you can't create it yourself, give the user the exact name, prompt and
-   schedule to paste, and record `manual`.
+## 2. Questions
 
-## 5. First sweep
+Six questions at most, one per message, in the user's language. Questions 1–5
+are about them; the timezone, working hours and frequent contacts are not
+asked: infer them from the calendar and mail and confirm in a single message
+("¿Correcto?").
 
-Ask the user to press **Run now** on the radar routine (it pre-approves the
-connector tools and is the real fresh-session test). Tell them to approve only
-read/search tools and "create file" on storage, and to reject anything that
-sends, deletes, shares or changes events. If there is no routine to run, run the
-radar skill here instead. The first radar uses a 7-day window.
+1. Who are you and what does the company do? (one line each)
+2. What are your 3 priorities right now?
+3. Who are the key people — clients, partners, team? Names are enough; look the
+   email addresses up in mail and calendar and confirm them.
+4. In which language should the notes be written? (default: the chat language)
+5. When should it not disturb you? (default: from the working hours seen in the
+   calendar)
 
-Then read the new radar document with the user: walk through *Needs you now*,
-*Decide* and *Open loops*, and ask "Is anything here wrong or missing?". Turn
-corrections into a new `config` (priorities, VIPs, "How I work").
+Then one confirmation message with what you inferred:
 
-## 6. Wrap up
+> Veo que estás en Madrid, trabajas de 9 a 19 de lunes a viernes y hablas a menudo con Ana, Luis y Acme. ¿Correcto?
 
-In a few lines: where the folder is and which document to open (the newest
-radar in `runs/`); when routines run and that they only notify for *Needs you
-now*; that it never sends or changes anything; that from any conversation they
-can ask "what did my chief of staff see today?" or "tell radar to watch for X"
-(recall); and that setup can change anything later.
+Starting with no key people is fine: radar then ranks by priorities and by
+whether someone asks for something.
 
-Write one `runs/YYYY-MM-DD HHMM setup` document with a short journal of what was
-configured.
+## 3. Folder
+
+Create the notes folder without asking where (`storage.md`): a private folder
+called "Chief of Staff" in OneDrive, or in Drive when Google is the ecosystem;
+a synced local folder only if everything runs on one computer. Ask only if the
+user objects or the place is shared with others.
+
+1. Create `config/`, `runs/`, `handoff/`, `lessons/` and `recipes/` inside it.
+2. Prove it works: save a small test note, read it back, remove the test note.
+   Pick the document type from the result (`storage.md`).
+3. Write the human README from `../../templates/README.md`, in the notes
+   language.
+4. Folder IDs and tool names go only in the `config` document, which is
+   written once, at the end of *Routines* (§5), so its first version is
+   complete.
+
+If the connector can read but not write, follow *Read-only storage* below.
+
+Tell the user, in one line:
+
+> Ya tengo una carpeta privada «Chief of Staff» donde guardaré mis notas; solo tú puedes verla.
+
+## 4. Memory and project
+
+Two things that make ordinary chats know about the chief of staff
+(`memory.md`):
+
+1. **Memory.** No host lets a skill write memory by itself; the user does it by
+   saying a "Recuerda…" sentence. Prepare up to 10 short, stable facts (who they
+   are, company, priorities, key people and roles, tone, notes language, and
+   where the notes live) and show the user one sentence to send, using the
+   exact "where my notes live" wording from `memory.md`:
+
+   > Recuerda estos datos: soy Marta, dirijo Acme Logística; mis prioridades son cerrar la ronda, contratar un director comercial y renovar con Seur; mi chief of staff guarda sus notas en OneDrive, carpeta "Chief of Staff"; consúltalas antes de responder sobre mi día, mis clientes o mis temas abiertos, y mira sus recetas antes de una tarea que se repite.
+
+   Do not claim you saved anything. Ask them to check Ajustes → Tu Claude
+   afterwards. Never include secrets or anything `safety.md` forbids.
+   If memory is off, say the fallback in `memory.md` and carry on: setup never
+   fails over memory.
+2. **Project.** Recommend creating a Claude Project called "Chief of Staff".
+   Fill `../../templates/project-instructions.md` (`{{registry}}`,
+   `{{owner_name}}`, `{{language}}`). `{{registry}}` is the folder as the user
+   knows it (for example «OneDrive, carpeta Chief of Staff»), never an ID or a
+   link. When host memory is off or the session is a local Cowork one, fill the
+   optional `{{facts}}` block with the same short facts; otherwise remove it.
+   Show only the text below the `---` line, finished, and tell the user
+   to paste it in the project's instructions. Claude cannot create the project
+   for them.
+
+   > Crea un proyecto llamado «Chief of Staff», abre sus instrucciones y pega este texto. Así cualquier conversación del proyecto consulta mis notas antes de responder.
+
+## 5. Routines
+
+Follow `../../references/scheduling.md`: choose the mechanism that fits, create
+the routines only after a clear yes, record mechanism, schedule and ID in
+`config`. Say the three defaults in one message, in the user's timezone:
+
+> Propongo tres rutinas: un repaso cada 2 horas de 8 a 20 en días laborables, un resumen a las 7:30 y un balance el viernes a las 16:00. ¿Las activo?
+
+One yes creates all three. Mention once that start times can drift a few
+minutes. If you cannot create them yourself, give the user the exact name,
+text and schedule to paste, and record `manual`.
+
+Now write the first `config` document (contract in `registry-layout.md`): it
+needs the routines recorded and is what the first radar reads.
+
+## 6. First radar
+
+Run the first radar now, live in this conversation, so they see value before the
+setup ends. It looks back 7 days and does not depend on the routines. Use the
+radar skill here, then walk through *Needs you now* and *Decide* ("Necesita tu
+atención" and "Decidir") with the user and ask:
+
+> ¿Hay algo equivocado o que falte?
+
+Sort what they say. Facts about them (priorities, key people, working hours,
+"How I work") go into a new `config`. Corrections to ranking, tone or approach
+("eso no me interesa", "a Marta de usted") go through the `learn` skill as a
+lesson. A correction that is both gets both.
+
+Then, only if a Cowork or desktop scheduled task was created (not for `manual`
+or cloud routines), offer one short, optional step; setup is complete without
+it:
+
+> Si quieres, pulsa «Ejecutar ahora» una vez en el repaso programado. Así las próximas veces no se quedará esperando tu aprobación. Aprueba lo que sea leer o «crear archivo» en tu carpeta, y lo de nuvel que solo registra recuentos; rechaza cualquier cosa que envíe o borre algo.
+
+Tell them to approve the nuvel items in this chat the first time they appear
+too. If they skip the step, carry on to the wrap-up.
+
+## 7. Wrap-up
+
+At most 6 lines, business language: where the notes folder is and which note to
+open (the newest radar); when the routines run and that they only interrupt for
+what needs them now; that it never sends or changes anything; that from any
+conversation they can ask "¿qué vio mi chief of staff hoy?" or "dile al repaso
+que vigile X"; that it learns from their corrections and remembers how
+recurring tasks are done; and that setup can change anything later. Add the
+two one-line notices from *Trace* below (anonymous counts, recipe
+sharing); they do not count toward the 6 lines.
+
+Write one `runs/YYYY-MM-DD HHMM setup` document with the technical journal of
+what was configured.
+
+## Read-only storage
+
+When the storage connector can read but not write (for example Microsoft 365
+write access is not yet approved by the administrator): do everything possible
+without the folder, then stop at step 3 (*Folder*) with one sentence:
+
+> Falta un permiso para guardar notas en OneDrive; lo activa quien gestiona Microsoft 365 en tu empresa. Cuando esté, dime «continúa».
+
+Write nothing elsewhere: never fall back silently to another storage, a
+local folder or the chat. Resume from step 3 when the user says "continúa".
 
 ## Pause or remove
 
 - **Pause:** disable each routine listed in `config`; write a new `config` with
   `paused: true`. All skills refuse to run while paused.
-- **Remove:** delete the routines (with the user's yes). Never delete the
-  registry folder — tell the user where it is and that deleting it is their call.
+- **Remove:** delete the routines (with the user's yes). Never delete the notes
+  folder — tell the user where it is and that deleting it is their call.
+
+## Trace
+
+Telemetry is part of setup. When writing the first `config`, add
+`- telemetry: on` and `- telemetry.install_id: <a new random UUIDv4>`
+(lowercase, format in `../../references/telemetry.md` *Formats*; generate it with
+code when a code tool exists); on any later `config`, carry both forward unchanged (add them if an older `config`
+lacks them). Add `- sharing.recipes: on` to the first `config` too, and carry
+it forward. Mention both once, in plain words, in the wrap-up:
+
+> Se envían solo recuentos anónimos de cómo funciono, nunca contenido; se puede apagar.
+
+> Las recetas útiles se comparten con nuvel como estructura más una descripción en la que los nombres y las cifras se sustituyen antes de guardarse; se puede apagar.
+
+Last, follow `../../references/telemetry.md`: if `record_run_trace` is available
+and `telemetry` is on, send one content-free trace right before saving the
+setup document, and end it with a `## Trace` section mirroring it. Report only
+these steps: `setup.detect`, `setup.questions`, `setup.folder`, `setup.memory`,
+`setup.routines`, `setup.first-radar` and `setup.wrap-up`.
+
+- **Counts:** `sources_ok` and `sources_missing` on `setup.detect`;
+  `questions_asked` on `setup.questions`; `routines_created` on
+  `setup.routines`; `corrections` on `setup.first-radar`.
+- **Outcome:** `partial` if setup stopped at read-only storage or a step was
+  skipped; `blocked` if a connector the user must enable is missing.
+- Counts and identifiers only — never the user's answers.

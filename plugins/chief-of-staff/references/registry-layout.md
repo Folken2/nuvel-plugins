@@ -36,12 +36,18 @@ Chief of Staff/
 │   ├── 2026-10-20 1940 radar             # journal of that run + full state snapshot
 │   ├── 2026-10-21 0730 brief
 │   ├── 2026-10-21 1100 prep acme-qbr
-│   └── 2026-10-24 1600 weekly-review
-└── handoff/
-    └── 2026-10-20 1945 handoff           # one instruction from the main agent / user
+│   ├── 2026-10-24 1600 weekly-review
+│   └── 2026-10-28 1013 learn             # what learn changed, signals, sharing
+├── handoff/
+│   └── 2026-10-20 1945 handoff           # one instruction from the main agent / user
+├── lessons/
+│   └── 2026-10-28 1012 lessons           # full list of lessons; newest wins
+└── recipes/
+    ├── 2026-10-28 1130 recipe propuesta-cliente
+    └── 2026-11-02 0915 recipe propuesta-cliente   # newer version wins per slug
 ```
 
-Folder names (`config`, `runs`, `handoff`) are fixed and in English so every
+Folder names (`config`, `runs`, `handoff`, `lessons`, `recipes`) are fixed and in English so every
 skill finds them; document **content** is in `owner.language`.
 
 ### Document names
@@ -49,7 +55,11 @@ skill finds them; document **content** is in `owner.language`.
 `YYYY-MM-DD HHMM <kind>[ <slug>]`, in the owner's timezone, 24 h. Names sort
 chronologically, so the newest is the greatest name. `<kind>` is one of
 `config`, `radar`, `brief`, `prep`, `weekly-review`, `recall`, `setup`,
-`handoff`.
+`learn`, `handoff`, `lessons`, `recipe` (always followed by its slug).
+
+The registry never overwrites. If a document with the intended name already
+exists (two writes in the same minute), use the next minute instead; never
+replace or write a second file with the same name.
 
 ### Formats by storage
 
@@ -69,19 +79,32 @@ Every skill locates it the same way, stopping at the first hit:
 1. **The prompt.** Routines created by `setup` always end with
    `Registry: <storage.kind> <folder id or path>` — use it.
 2. **Search the storage** for a folder titled `Chief of Staff` (Drive:
-   `title = 'Chief of Staff' and mimeType = 'application/vnd.google-apps.folder'`)
-   that contains a `config` folder. On a computer, `~/.chief-of-staff.json`
+   `title = 'Chief of Staff' and mimeType = 'application/vnd.google-apps.folder'`;
+   OneDrive: list the children of the drive root and match the folder name
+   `Chief of Staff`) that contains a `config` folder. On a computer, `~/.chief-of-staff.json`
    (`{"kind": "...", "root": "..."}`) may also point to it.
 3. **Ask the user** — only in an interactive session. In an unattended run,
    stop and report that the registry could not be found; never create one.
 
-Then resolve the subfolder IDs (`config`, `runs`, `handoff`) — they are listed
+Then resolve the subfolder IDs (`config`, `runs`, `handoff`, `lessons`,
+`recipes`) — they are listed
 in the newest `config` under `storage.folders`.
+
+**Unverified (no tenant yet)**: on Microsoft 365 use whatever the connector
+offers by function ("OneDrive search by name", "list folder children"); no
+Drive query syntax applies. Listing the children of a known folder is the
+most dependable path.
 
 ## Finding "the newest"
 
 List the folder restricted to a recent window and take the greatest name, e.g.
 on Drive: `parentId = '<runs id>' and title contains 'radar' and createdTime > '<now − 3 days, RFC 3339>'`.
+On OneDrive / SharePoint, **list the children** of the target folder (for
+`runs`, a flat folder), keep the names that contain the kind (`radar`), and take
+the greatest name. Sort by name yourself; never by the order returned, by
+modified time, or by a search ranking. **Unverified (no tenant yet)**: paging
+and filter options of the Microsoft listing are unconfirmed, so page until the
+list is exhausted when a window is not available.
 If nothing comes back, widen the window (14 days, then no limit). Never rely on
 the order a search returns.
 
@@ -101,9 +124,12 @@ the order a search returns.
 - owner.working_hours: 09:00-19:00 Mon-Fri
 - storage.kind: google-drive
 - storage.root: <folder id or path>
-- storage.folders: config=<id>, runs=<id>, handoff=<id>
+- storage.folders: config=<id>, runs=<id>, handoff=<id>, lessons=<id>, recipes=<id>
 - quiet_hours: 20:00-08:00
 - notify: needs-you-now
+- telemetry: on
+- telemetry.install_id: <uuid4, generated once by setup, never changed>
+- sharing.recipes: on
 
 ## Priorities
 1. …
@@ -121,6 +147,13 @@ the order a search returns.
 ## How I work
 <free text>
 ```
+
+`telemetry` is `on` or `off` (default `on`); `telemetry.install_id` is a random
+UUIDv4 that setup generates once and every later `config` copies unchanged
+(`telemetry.md`). `sharing.recipes` is `on` or `off` (default `on`; a missing
+key counts as `on`): whether `learn` shares recipes (structure plus a masked description) with nuvel.
+Registries made before v0.3 have no `lessons`/`recipes` in `storage.folders`;
+`learn` creates both folders once and writes a new `config` listing them.
 
 Headings and keys stay in English (skills parse them); values and free text are
 in `owner.language`. Changing anything = writing a new `config` document with
@@ -172,9 +205,17 @@ state forward, even when nothing changed.
 - email: 2026-10-20T19:39:00+02:00 — ok
 - calendar: 2026-10-20T19:39:10+02:00 — ok
 - seen: <opaque source ids logged in the last ~3 runs, comma-separated>
+
+## Trace
+- outcome: success · steps: radar.load-state ok, radar.sweep.email ok (read 14, relevant 3) …
+- routing: priority 2, ask 1
+- errors: none
 ```
 
 Rules:
+- `## Trace` is the last section of every run document: exactly what was sent to
+  `record_run_trace` (ids, counts, outcome) or one line saying why nothing was
+  sent (`telemetry.md`). It never contains content.
 - Section headings stay in English (other skills and runs parse them); the
   bullets are in `owner.language`.
 - `Cursors`: a failed source keeps its previous cursor (copied from the
@@ -187,7 +228,7 @@ Rules:
   (cold proposals, partnership offers, invitations) goes to `Decide`; items
   there drop off after 14 days without action (they stay in history).
 
-### Other runs (`brief`, `prep`, `weekly-review`, `recall`, `setup`)
+### Other runs (`brief`, `prep`, `weekly-review`, `recall`, `setup`, `learn`)
 
 ```markdown
 # Brief · 2026-10-21 07:30 · scheduled · claude — ok
@@ -197,9 +238,78 @@ Rules:
 - Notes: <anything missing or odd>
 
 <the brief / prep / review itself>
+
+## Trace
+- outcome: success · steps: brief.load-state ok, brief.write ok (meetings 4) …
+- errors: none
 ```
 
 They don't carry state; the newest `radar` stays the current picture.
+
+### `lessons` — what the user has corrected
+
+One document holds the **full current list** (like `config`):
+`lessons/YYYY-MM-DD HHMM lessons`. Adding or dropping a lesson = a new
+document with the previous list and the change; the newest wins.
+
+```markdown
+# Lessons
+
+- Escribir a Marta de usted — scope: all — since 2026-10-28
+- No poner boletines en el resumen — scope: brief — since 2026-10-29
+```
+
+Each line is `- <rule> — scope: <skill or "all"> — since <date>`, the rule in
+`owner.language`. **Every skill reads the newest `lessons` at the start** and
+applies the lines whose scope is itself or `all`; lessons rank above the
+skill's own defaults but never above `safety.md`. A lesson that asks for a
+forbidden action (send, reply, delete…) is ignored. Written only by `learn`
+(and by `weekly-review` when it merges duplicates).
+
+### `recipe <slug>` — a lightweight skill
+
+How a complex or recurring task was done well. One document per version,
+`recipes/YYYY-MM-DD HHMM recipe <slug>`; the newest version per slug wins.
+
+```markdown
+# Recipe · Preparar propuesta de cliente
+
+## When to use
+Cuando un cliente pide una propuesta o presupuesto nuevo.
+
+## Steps
+1. Buscar en los correos la petición del cliente y la última propuesta enviada.
+2. …
+
+## Pitfalls
+- …
+
+## Stats
+- uses: 4
+- successes: 3
+- corrections: 1
+- last_used: 2026-11-02
+- recipe_id: <uuid4, fixed for the life of the recipe>
+- category: client-proposal
+- status: active
+- version: 2
+- shared_version: 0
+- blocked_version: 0
+```
+
+- **Before a task**, skills (the `learn` skill's *Before a task* for ordinary
+  chats, and the project instructions) list `recipes/`,
+  keep the newest version per slug with `status: active`, and follow the one
+  whose *When to use* matches. Retired recipes are ignored.
+- After a use, `learn` writes a new version with updated stats and any
+  correction folded into *Steps* or *Pitfalls*.
+- `category` is one identifier from `recipe-categories.md`. `version` goes up
+  only when *When to use*, *Steps* or *Pitfalls* change; `shared_version` is
+  the last `version` shared with nuvel (0 = never); `blocked_version` is the
+  last `version` whose share the server rejected (0 = never). A share
+  is attempted only when `version` is greater than both. A recipe is private to the
+  user's registry and may name people; only `learn`'s structure plus masked
+  description ever leaves it (`telemetry.md`).
 
 ### `handoff` — instructions to future runs
 

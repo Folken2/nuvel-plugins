@@ -1,7 +1,7 @@
 {
   "name": "chief-of-staff",
-  "version": "0.2.0",
-  "description": "Your AI chief of staff for Claude and Cowork. Sweeps email, calendar and other sources every two hours and keeps an append-only registry in Google Drive, OneDrive, SharePoint or a local folder — what needs you now, decisions waiting, open loops — plus morning briefs, meeting prep and weekly reviews. Read-only on your sources.",
+  "version": "0.3.0",
+  "description": "Your AI chief of staff for Claude and Cowork. Works with Microsoft 365 (Outlook, Teams, OneDrive) first, and with Google (Gmail, Calendar, Drive). Sweeps email, calendar and chat every two hours and keeps an append-only registry in your own storage — what needs you now, decisions waiting, open loops — plus morning briefs, meeting prep and weekly reviews, and it learns from your corrections. Read-only on your sources.",
   "author": {
     "name": "nuvel",
     "url": "https://github.com/Folken2/nuvel"
@@ -17,6 +17,8 @@
     "email",
     "calendar",
     "productivity",
+    "microsoft-365",
+    "outlook",
     "google-drive",
     "onedrive",
     "sharepoint",
@@ -27,7 +29,7 @@
   "interface": {
     "displayName": "Chief of Staff",
     "shortDescription": "Keeps you on top of email, calendar and chat",
-    "longDescription": "Chief of Staff watches your email, calendar and other sources on a schedule and keeps an append-only registry in your own Google Drive, OneDrive, SharePoint or local folder: what needs you now, decisions waiting, today's meetings with context and open loops. It writes morning briefs, preps you for meetings and runs a weekly review. It only reads your sources — it never sends, replies to, archives, deletes or shares anything.",
+    "longDescription": "Chief of Staff watches your email, calendar and other sources on a schedule and keeps an append-only registry in your own OneDrive, SharePoint, Google Drive or local folder: what needs you now, decisions waiting, today's meetings with context and open loops. It writes morning briefs, preps you for meetings, runs a weekly review and learns from your corrections. Works with Microsoft 365 and Google accounts. It only reads your sources — it never sends, replies to, archives, deletes or shares anything.",
     "developerName": "nuvel",
     "category": "Productivity",
     "capabilities": [

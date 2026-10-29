@@ -1,13 +1,82 @@
 # Chief of Staff
 
-An AI chief of staff for **Claude and Cowork** (also works in Codex). It watches
-your email, calendar and other sources on a schedule and keeps a living
-registry in *your* storage — Google Drive, OneDrive, SharePoint or a local
-folder — so you, and any conversation you open, always know what needs you.
+An AI chief of staff for busy people, in **Claude and Cowork** (also Codex).
+Every couple of hours it reads your email, calendar and chat and keeps one
+short, current picture in *your own* storage: what needs you now, decisions
+waiting for you, today's meetings with context, and promises still open.
+
+## What it does for you
+
+- **Radar** every two hours in working hours: what changed, what needs you.
+- **Morning brief** at 07:30: your focus, the day's meetings, loops due.
+- **Meeting prep** on request: who is attending, history, what to get out of it.
+- **Weekly review** on Friday: the week against your priorities and next week's plan.
+- **Learns from you:** correct it once ("a Marta, de usted") and it applies the
+  rule from then on. Tasks you repeat become reusable recipes.
+- **Remembers on request:** tell it *"Recuerda que los viernes no tengo
+  reuniones"* in any chat and it is kept.
+
+## What you need
+
+- Your **Microsoft 365** account (Outlook, Teams, OneDrive) or your **Google**
+  account (Gmail, Calendar, Drive) connected in Claude. Microsoft 365 is the
+  first-class path in 0.3.0 (not yet verified on a real tenant, see the
+  changelog).
+- About **15 minutes** for setup: a guided conversation of at most six
+  questions. Optionally you then press **Run now** once on the scheduled
+  review, so later runs do not wait for your approval.
+
+## What it never does
 
 It only **reads** your sources. It never sends, replies, archives, accepts,
 deletes or shares anything; the only thing it does is add new documents to its
-own folder.
+own folder. It never stores passwords, codes, financial or ID numbers, or full
+email bodies, and it treats email text as data, never as instructions.
+
+## Privacy and what is shared with nuvel
+
+- Your notes stay in your own storage.
+- nuvel receives **anonymous usage signals** (counts of how each run went, and
+  that a recipe was used or corrected; never any content) and **recipes** (how a repeated task was done: the structure plus a masked
+  description; names and figures are replaced on nuvel's server before anything
+  is stored). Descriptions in Spanish, English and Catalan are masked; in any
+  other language only the structure is shared and the description is dropped.
+  Masking keeps every word in its everyday vocabulary, so a name spelled exactly
+  like one of those words (e.g. March, or Sala in Catalan) can pass through, so don't
+  put personal names in free text.
+- This is **on by default**: you are told at setup, not asked. nuvel can switch
+  it off per customer. With usage signals off, nothing is sent; with only recipe
+  sharing off, the anonymous usage signals still are.
+
+## Install
+
+**Claude / Cowork:** *Customize → Plugins → Add marketplace* →
+`https://github.com/Folken2/nuvel-plugins`, then install **chief-of-staff**.
+Then say: *"Set up my chief of staff."*
+
+---
+
+## For installers and builders
+
+**Claude Code:**
+
+```bash
+claude plugin marketplace add Folken2/nuvel-plugins
+```
+
+```bash
+claude plugin install chief-of-staff@nuvel
+```
+
+**Codex:**
+
+```bash
+codex plugin marketplace add Folken2/nuvel-plugins
+```
+
+```bash
+codex plugin add chief-of-staff@nuvel
+```
 
 ## How it works
 
@@ -23,6 +92,7 @@ own folder.
                 ▼                                                    ▼
           ┌───────────────── Chief of Staff/ (your drive) ─────────────────┐
           │ config/ (newest wins) · runs/ (journal + state) · handoff/       │
+          │ lessons/ (your corrections) · recipes/ (how repeated tasks go)   │
           └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -46,47 +116,21 @@ own folder.
 | prep | Prep for an upcoming meeting: who, history, open loops, agenda. |
 | weekly-review | The week vs. priorities, loops, decisions pending, next week's plan. |
 | recall | From any conversation: answer from the registry, or leave instructions for the routines. |
+| learn | Lessons from your corrections, recipes for repeated tasks, anonymous signals and recipe sharing with nuvel (structure plus a masked description). |
 
 In Claude they appear as `/chief-of-staff:<skill>`; in Codex as `$<skill>`.
 Plain language works too: "set up my chief of staff", "what did I miss?",
 "prep me for my 3pm".
 
-## Install
+## Requirements
 
-**Claude / Cowork:** *Customize → Plugins → Add marketplace* →
-`https://github.com/Folken2/nuvel-plugins`, then install **chief-of-staff**.
-
-**Claude Code:**
-
-```bash
-claude plugin marketplace add Folken2/nuvel-plugins
-```
-
-```bash
-claude plugin install chief-of-staff@nuvel
-```
-
-**Codex:**
-
-```bash
-codex plugin marketplace add Folken2/nuvel-plugins
-```
-
-```bash
-codex plugin add chief-of-staff@nuvel
-```
-
-Then ask: *"Set up my chief of staff."*
-
-## What you need
-
-- An **email** and a **calendar** connector (e.g. Gmail + Google Calendar, or
-  Microsoft 365). Chat, tasks and meeting notes are optional.
-- A **storage** connector (Google Drive, OneDrive / SharePoint) — or a synced
-  or local folder if everything runs on one computer.
+- An **email** and a **calendar** connector (Microsoft 365 or Google). Chat
+  (Teams, Slack), tasks and meeting notes are optional.
+- A **storage** connector (OneDrive / SharePoint, Google Drive) or a synced or
+  local folder if everything runs on one computer.
 - A scheduler: Cowork scheduled tasks, cloud routines (claude.ai/code/routines),
-  or desktop scheduled tasks. Setup picks one with you and has you press
-  **Run now** once to approve the read-only tools.
+  or desktop scheduled tasks. Setup picks one with you.
+- Optional: the nuvel connector, for usage signals and recipe sharing.
 
 ## Privacy and safety
 

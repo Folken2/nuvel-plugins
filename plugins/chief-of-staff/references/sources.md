@@ -6,12 +6,12 @@ has no tool, it is simply off — say so in the radar journal rather than guessi
 
 | Kind | What to pull | Typical tools (any one is enough) |
 |---|---|---|
-| `email` | New messages since the cursor in inbox + sent; flagged/starred; threads the user is waiting on | Gmail connector, Microsoft 365 / Outlook connector, Composio `gmail` / `outlook` |
-| `calendar` | Today + next 2 working days; changes since the cursor (new, moved, cancelled, RSVP changes) | Google Calendar connector, Outlook calendar connector, Composio `googlecalendar` / `outlookcalendar` |
-| `chat` | DMs and mentions since the cursor; threads the user posted in | Slack connector, Microsoft Teams connector, Composio `slack` / `microsoft_teams` |
+| `email` | New messages since the cursor in inbox + sent; flagged/starred; threads the user is waiting on | Microsoft 365 connector (Outlook mail), then Gmail connector |
+| `calendar` | Today + next 2 working days; changes since the cursor (new, moved, cancelled, RSVP changes) | Microsoft 365 connector (Outlook calendar), then Google Calendar connector |
+| `chat` | DMs and mentions since the cursor; threads the user posted in | Microsoft 365 connector (Teams chats and channels), then Slack connector |
 | `tasks` | Items assigned to the user that changed or fall due | Linear, Jira, Asana, Notion, Todoist, GitHub issues/PRs |
 | `meetings` | Notes/transcripts of meetings that ended since the cursor | Granola, Fireflies, Otter, Teams/Meet recordings, Notion meeting notes |
-| `docs` | Files shared with the user or comments that mention them | Google Drive / OneDrive / SharePoint connector |
+| `docs` | Files shared with the user or comments that mention them | Microsoft 365 connector (OneDrive / SharePoint files), then Google Drive connector |
 
 ## Discovering tools
 
@@ -21,11 +21,38 @@ has no tool, it is simply off — say so in the radar journal rather than guessi
 2. If a kind the user wants has no tool, offer the host's way to add one, in this
    order: the host's own connector directory (Claude: Settings → Connectors /
    the connector registry; Codex: Plugins / Apps), then an MCP server the user
-   already trusts, then Composio (`composio link <toolkit>`). Never install
-   anything without the user saying yes.
+   already trusts. Never install anything without the user saying yes.
 3. Make one tiny read call per source (e.g. "1 most recent email") to prove it
    works before saving it in the `config` document. Record `via` as the tool or connector
    name you used.
+
+## Microsoft 365 (first-class)
+
+**Unverified (no tenant yet)**: the connector's exact tool names are not
+published and nothing here has been run against a real tenant. Describe and
+discover tools by function ("Outlook mail search", "calendar events in a date
+range", "Teams chat messages", "OneDrive file search"); never hard-code a tool
+name. The first real tenant run must confirm each point below.
+
+- **Email (Outlook).** Triage like the Gmail rules, using Outlook's own signals:
+  - *Focused* is the equivalent of Gmail's Primary; *Other* is skimmed like
+    Promotions: count it, read only when a VIP or priority matches.
+  - Categories (colour labels) replace Gmail labels. Read them as hints; never
+    create or change one.
+  - `isRead = false` is the unread signal; flagged messages are the starred
+    signal. Never mark anything read.
+  - Conversation IDs (`conversationId`) are opaque strings: store them as
+    `seen` IDs and compare for equality only, never parse them.
+  - Shared mailboxes are read only when the user names them in `config`.
+- **Calendar.** Same window as always (today + 2 working days). Meeting
+  responses are read, never sent.
+- **Chat (Teams).** DMs, group chats and mentions since the cursor; channel
+  posts only in channels the user named. Never post or react.
+- **Docs.** OneDrive and SharePoint files shared with the user or that mention
+  them. Read-only: no create, update, rename, move or delete outside the
+  registry (`safety.md` §1).
+
+For builders: the tool-selection logic is host-neutral, so any tool provider the host exposes can fill a kind; the user-facing flow never mentions one.
 
 ## How much to read
 

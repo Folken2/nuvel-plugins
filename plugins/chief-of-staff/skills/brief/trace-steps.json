@@ -1,0 +1,18 @@
+{
+  "skill": "brief",
+  "steps": [
+    "brief.load-state",
+    "brief.refresh-radar",
+    "brief.read-calendar",
+    "brief.write"
+  ],
+  "counts": [
+    "meetings",
+    "needs_you_now",
+    "due_or_overdue",
+    "waiting_on",
+    "free_blocks",
+    "conflicts"
+  ],
+  "routing": []
+}

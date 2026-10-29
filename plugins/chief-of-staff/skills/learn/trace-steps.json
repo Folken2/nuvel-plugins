@@ -1,0 +1,31 @@
+{
+  "skill": "learn",
+  "steps": [
+    "learn.load-state",
+    "learn.lesson",
+    "learn.recipe",
+    "learn.signal",
+    "learn.share",
+    "learn.write"
+  ],
+  "counts": [
+    "lessons_added",
+    "lessons_dropped",
+    "lessons_total",
+    "recipes_created",
+    "recipes_updated",
+    "recipes_retired",
+    "signals_sent",
+    "signals_failed",
+    "shares_sent",
+    "shares_blocked",
+    "shares_failed"
+  ],
+  "routing": [
+    "correction",
+    "complex_task",
+    "recipe_use",
+    "routine_preference",
+    "removal"
+  ]
+}

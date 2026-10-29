@@ -1,0 +1,5 @@
+interface:
+  display_name: "Learn"
+  short_description: "Keep lessons from corrections and reusable recipes"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $learn to note what I just corrected."
