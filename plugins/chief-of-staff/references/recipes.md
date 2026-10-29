@@ -15,7 +15,8 @@ by `learn` (create, promote, update, retire, index) and by `weekly-review`
 - **Promote.** After a later complex task, before creating a draft, compare
   the task with the drafts' *When to use*. A match → a new version of that
   recipe with `status: active`, steps refined from both runs, `version` +1.
-  This comparison happens after the task, so it never delays the user.
+  The task that promotes it counts as a use (*Stats*: the use). This
+  comparison happens after the task, so it never delays the user.
 - **Direct active.** The user says the task will recur ("cada mes", "every
   Monday", "lo haremos más veces") → write it `active` straight away (new
   recipe, or a draft promoted).
@@ -51,20 +52,45 @@ Kept in the recipe's `## Stats`: `uses`, `successes`, `corrections`,
 `corrected`), plus `recipe_id`, `category`, `status`, `version`,
 `shared_version`, `blocked_version`.
 
-After a task that followed a recipe, write a new version with the stats
-carried forward and changed:
+A use is recorded in two steps, each its own `learn` run with its own new
+version.
 
-- `uses` +1, every time. `days_used` +1 when today is a different date from
-  `last_used`. Then `last_used` = today.
+**1. The use, written once, at the end of the task** that followed the recipe
+(or promoted the draft), with the stats carried forward and changed:
+
+- `uses` +1. `days_used` +1 when today is a different date from `last_used`.
+  Then `last_used` = today.
+- `last_outcome: silent`. Nobody has reacted yet.
+
+The use is written once: a later run never adds to `uses` or `days_used` for
+the same use.
+
+**2. The outcome, written when the user reacts** later in the same
+conversation. That reaction triggers a separate `learn` run, whose new version
+changes only `successes` or `corrections` and `last_outcome`, never `uses` or
+`days_used`:
+
 - **Success = explicit approval only.** In an interactive run the user says
   the result worked ("perfecto", "esto es lo que quería", "this worked",
   "great, thanks" about the result) → `successes` +1, `last_outcome: success`.
 - **Silence is not a success.** No reply, the user leaving, a change of
-  subject or a scheduled run (nobody sees the result) → `last_outcome:
-  silent`, no success and no correction.
+  subject or a scheduled run (nobody sees the result) → nothing more is
+  written; the use stays `last_outcome: silent`, no success and no correction.
 - **Correction** → `corrections` +1, `last_outcome: corrected`, and fold the
-  fix into *Steps* or *Pitfalls*. A correction after an approval in the same
-  conversation keeps the success and sets `last_outcome: corrected`.
+  fix into *Steps* or *Pitfalls*. A correction after an approval keeps the
+  success (`successes` is never lowered).
+- `last_outcome` is always the latest outcome: an approval after a correction
+  sets it back to `success`.
+
+Example: the user asks for a proposal and the recipe `propuesta-cliente` is
+followed. At the end of the task, `learn` writes version A: `uses` 4 → 5,
+`days_used` 3 → 4, `last_outcome: silent`. Ten minutes later the user says
+"perfecto": a new `learn` run writes version B from A: `successes` 2 → 3,
+`last_outcome: success`, `uses` and `days_used` unchanged. Two runs, one
+document each.
+
+In both steps:
+
 - `version` +1 only when *When to use*, *Steps* or *Pitfalls* change (or the
   status changes); a stats-only update keeps it.
 - `shared_version` and `blocked_version` are carried forward unchanged. Only
@@ -81,7 +107,8 @@ weekly review applies it (`recipe-sharing.md`); `learn` never does.
 Work out the new version in memory first (state, stats, steps), then write
 **one** recipe document. Never write a second version of the same recipe in
 the same run: registry names have minute precision and the registry never
-overwrites.
+overwrites. The rule is per run: the use and a later approval or correction
+are two runs, so two versions (example above).
 
 ## Migration of older recipes
 
@@ -90,7 +117,8 @@ gets the missing fields on its next write, and its status is unchanged:
 
 - missing `days_used` → `1` if `uses` > 0, else `0`;
 - missing `last_outcome` → `silent`;
-- missing `recipe_id` or `category` → set them now (counts as created);
+- missing `recipe_id` or `category` → set them now. A migrated recipe is not
+  a new recipe: it never counts in `recipes_created` or `drafts_created`;
 - missing `version` → `1`; missing `shared_version` or `blocked_version` → `0`.
 
 ## Index
@@ -121,5 +149,6 @@ version.
 of active recipes or an active recipe's *When to use* changes (promote,
 direct active, retire, a new *When to use*). Stats-only updates never touch
 it. `learn` writes the first `index` when none exists and active recipes do,
-so a registry from v0.3 gets one at the next `learn` run. The weekly review
+so a registry from v0.3 gets one at the next `learn` run, whatever triggered
+that run. Until then *Before a task* finds no index and does no lookup. The weekly review
 rebuilds it every week and so heals any drift.

@@ -51,7 +51,7 @@ recipe before starting, even if no routine skill is running:
 3. Match the task against the one-line *When to use* lines, under the
    likeliest category first, then the rest. A match → open only that recipe's
    newest version, follow its *Steps* and *Pitfalls*, and remember it was
-   used: after the task, §3 *Update* records the use.
+   used: after the task, §3 *Use* records it.
 4. No match → do the task normally; after it, §3 may write a draft.
 
 This is read-only, costs one small read, and never delays the task. Drafts are
@@ -66,8 +66,11 @@ not in the `index`, so they are never followed.
   (§3).
 - **Recurring task.** The user says the task will recur ("cada mes", "every
   Monday", "lo haremos más veces") → write the recipe `active` straight away.
-- **Recipe used.** A task followed a recipe. Update its stats (§3); the user's
-  explicit approval or correction decides the outcome.
+- **Recipe used.** A task followed a recipe. At the end of the task, record
+  the use (§3 *Use*).
+- **Outcome.** Later in the same conversation the user approves or corrects
+  the result of a task that followed a recipe. Record the outcome in a
+  separate run (§3 *Outcome*).
 - **Routine preference.** In a scheduled run, an open handoff or a `config`
   change shows a lasting preference ("from now on ignore X"). Add it as a
   lesson.
@@ -84,9 +87,9 @@ numbers, health details) — those are never written.
    write nothing and say nothing (unless the user asked to remember something:
    then one line saying the notes folder is not set up).
 2. Read the newest `config`. `paused: true` → do nothing.
-3. Read the newest document in `lessons/`. When recipes are involved, list
-   `recipes/` (newest version per slug wins, drafts included) and read the
-   newest `index`. An older registry may lack these folders (not in
+3. Read the newest document in `lessons/`. List `recipes/` (newest version
+   per slug wins, drafts included) and read the newest `index`, only to know
+   whether this run must write one (§3 *Index*). An older registry may lack these folders (not in
    `storage.folders`): create `lessons/` and `recipes/` inside the registry
    root and write a new `config` that lists them, carrying everything else
    forward unchanged.
@@ -126,16 +129,23 @@ the newest version per slug wins and keeps the same `recipe_id` forever
   starting stats as in `recipes.md` *Create*). Write the steps as they
   actually worked, folding in what the user corrected along the way.
 - **Promote** when a later complex task matches a draft's *When to use*: a
-  new version with `status: active`, steps refined from both runs. Compare
-  only after the task, never before it.
+  new version with `status: active`, steps refined from both runs, and that
+  task counted as a use (*Use*). Compare only after the task, never before it.
 - **Active** straight away when the user says the task will recur (a new
   recipe, or the matching draft promoted).
-- **Update** after a task that followed a recipe: `uses` +1, `days_used` +1
-  on a new date, `last_used` = today. **Success is explicit approval only**:
-  the user says the result worked ("perfecto", "esto es lo que quería") →
-  `successes` +1, `last_outcome: success`. Silence, leaving or a scheduled
-  run → `last_outcome: silent`, no success. A correction → `corrections` +1,
-  `last_outcome: corrected`, the fix folded into *Steps* or *Pitfalls*.
+- **Use**, written once, at the end of a task that followed a recipe:
+  `uses` +1, `days_used` +1 on a new date, `last_used` = today,
+  `last_outcome: silent`. No later run adds to `uses` or `days_used` for
+  that use.
+- **Outcome**, when the user reacts later in the same conversation: a
+  separate run whose new version changes only `successes` or `corrections`
+  and `last_outcome`. **Success is explicit approval only**: the user says
+  the result worked ("perfecto", "esto es lo que quería") → `successes` +1,
+  `last_outcome: success`. A correction → `corrections` +1, `last_outcome:
+  corrected`, the fix folded into *Steps* or *Pitfalls*; a correction after
+  an approval keeps the success. `last_outcome` is always the latest
+  outcome. Silence, leaving or a scheduled run → nothing more; the use
+  stays `silent`, no success.
 - **Retire** on "bórrala" / "esa no": a new version with `status: retired`.
 - **Migrate** a recipe written before v0.4 on its next write (`recipes.md`
   *Migration*).
@@ -146,13 +156,15 @@ version you write; only the weekly review changes them.
 **One document per recipe per run.** Work out the new version in memory
 first, then write **one** recipe document. Never write a second version of
 the same recipe in the same run: registry names have minute precision and
-the registry never overwrites.
+the registry never overwrites. The use and its later outcome are two runs,
+so two versions (example in `recipes.md` *Stats*).
 
 **Index.** Write a new `recipes/YYYY-MM-DD HHMM index` (format in
 `recipes.md` *Index*, active recipes only) in the same run whenever the set of
 active recipes or an active recipe's *When to use* changed (promote, direct
-active, retire, a new *When to use*), and also when no `index` exists yet but
-active recipes do. Stats-only updates never touch it.
+active, retire, a new *When to use*), and also in any run that finds active
+recipes but no `index` (a registry from v0.3). Stats-only updates never touch
+it.
 
 ## 4. Journal and tell the user
 

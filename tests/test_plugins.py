@@ -246,6 +246,26 @@ def test_success_is_explicit_approval() -> None:
     assert "move the success" not in text and "successes` −1" not in text
 
 
+def test_use_is_written_once() -> None:
+    """The use is written at task end; a later approval or correction is a separate
+    run that never touches uses or days_used (no double counting)."""
+    text = " ".join((COS / "references/recipes.md").read_text(encoding="utf-8").split())
+    for token in ("**1. The use, written once, at the end of the task**",
+                  "a later run never adds to `uses` or `days_used` for the same use",
+                  "triggers a separate `learn` run",
+                  "changes only `successes` or `corrections` and `last_outcome`, never `uses` or `days_used`",
+                  "Two runs, one document each",
+                  "an approval after a correction sets it back to `success`",
+                  "The task that promotes it counts as a use",
+                  "A correction after an approval keeps the success",
+                  "it never counts in `recipes_created`"):
+        assert token in text, token
+    skill = " ".join((COS / "skills/learn/SKILL.md").read_text(encoding="utf-8").split())
+    for token in ("**Use**, written once, at the end of a task", "No later run adds to `uses` or `days_used`",
+                  "a correction after an approval keeps the success", "any run that finds active recipes but no `index`"):
+        assert token in skill, token
+
+
 def test_registry_layout_index_and_text_switch() -> None:
     text = (COS / "references/registry-layout.md").read_text(encoding="utf-8")
     for token in ("- days_used:", "- last_outcome:", "draft|active|retired", "index`",
