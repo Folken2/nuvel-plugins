@@ -1,0 +1,44 @@
+name: release
+# Push a per-plugin tag, e.g. `git tag chief-of-staff-v0.3.0 && git push origin chief-of-staff-v0.3.0`.
+# Users install from the marketplace (git), so a release is a checked, tagged
+# snapshot: notes from CHANGELOG.md plus a zip of the plugin directory.
+on:
+  push:
+    tags: ["*-v*.*.*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Tag matches manifests and CHANGELOG
+        run: python scripts/release.py check "$GITHUB_REF_NAME"
+      - name: Tests
+        run: |
+          pip install pytest
+          pytest tests -q
+      - name: Validate (strict)
+        run: |
+          npm install --global @anthropic-ai/claude-code@2.1.288
+          claude plugin validate --strict .
+          for plugin in plugins/*/; do
+            claude plugin validate --strict "$plugin"
+          done
+      - name: Build zip and notes
+        run: |
+          plugin="${GITHUB_REF_NAME%-v*}"
+          git archive --format=zip --prefix="$plugin/" -o "$GITHUB_REF_NAME.zip" "HEAD:plugins/$plugin"
+          python scripts/release.py notes "$GITHUB_REF_NAME" > notes.md
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" "$GITHUB_REF_NAME.zip" \
+            --title "$GITHUB_REF_NAME" --notes-file notes.md --verify-tag
