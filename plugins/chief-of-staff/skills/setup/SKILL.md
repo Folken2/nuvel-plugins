@@ -38,8 +38,12 @@ Jump to the matching step below, then write a new `config`. If the newest
 `- telemetry: on` and a new `telemetry.install_id` in that new `config`; if its
 `telemetry.install_id` is not in the format in `telemetry.md` *Formats* (lowercase
 UUIDv4), replace it with a new valid one; if it
-lacks `sharing.recipes`, add `- sharing.recipes: on`; if `storage.folders` has
-no `lessons` or `recipes`, create those folders and list them.
+lacks `sharing.recipes`, add `- sharing.recipes: on`; if it lacks
+`sharing.recipe_text`, add `- sharing.recipe_text: off`; if `storage.folders`
+has no `lessons` or `recipes`, create those folders and list them.
+Reconfigure never turns it on without asking: `sharing.recipe_text` becomes
+`on` only when the user answers yes to question 6, asked again only if they
+want to change it.
 
 Also read the newest document in `lessons/`, if any, and apply the lessons
 scoped to `setup` or `all` (`registry-layout.md` *`lessons`*). When the user
@@ -73,8 +77,8 @@ folder: it never sends, deletes or changes anything for them.
 
 ## 2. Questions
 
-Six questions at most, one per message, in the user's language. Questions 1–5
-are about them; the timezone, working hours and frequent contacts are not
+Six questions, one per message, in the user's language. Questions 1–5
+are about them, question 6 about what is shared with nuvel; the timezone, working hours and frequent contacts are not
 asked: infer them from the calendar and mail and confirm in a single message
 ("¿Correcto?").
 
@@ -85,6 +89,13 @@ asked: infer them from the calendar and mail and confirm in a single message
 4. In which language should the notes be written? (default: the chat language)
 5. When should it not disturb you? (default: from the working hours seen in the
    calendar)
+6. Whether to share the text of recipes too, not only their outline. Ask it in
+   these words (in the user's language), default no:
+
+   > Cuando una forma de trabajar te funciona varias veces, puedo enviar a nuvel su esquema (qué pasos, en qué orden, sin ningún texto tuyo) para mejorar el producto. ¿Quieres que además envíe la descripción en tus palabras, con los nombres y las cifras sustituidos? Por defecto, no.
+
+   A clear yes → `sharing.recipe_text: on`. No, unsure or no answer → `off`.
+   Sharing the outline itself is told in the wrap-up, not asked.
 
 Then one confirmation message with what you inferred:
 
@@ -220,12 +231,17 @@ Telemetry is part of setup. When writing the first `config`, add
 `- telemetry: on` and `- telemetry.install_id: <a new random UUIDv4>`
 (lowercase, format in `../../references/telemetry.md` *Formats*; generate it with
 code when a code tool exists); on any later `config`, carry both forward unchanged (add them if an older `config`
-lacks them). Add `- sharing.recipes: on` to the first `config` too, and carry
-it forward. Mention both once, in plain words, in the wrap-up:
+lacks them). Add `- sharing.recipes: on` and `- sharing.recipe_text: <on|off>`
+(question 6; `off` unless the user said yes) to the first `config` too, and
+carry both forward. Mention them once, in plain words, in the wrap-up:
 
 > Se envían solo recuentos anónimos de cómo funciono, nunca contenido; se puede apagar.
 
-> Las recetas útiles se comparten con nuvel como estructura más una descripción en la que los nombres y las cifras se sustituyen antes de guardarse; se puede apagar.
+> Las recetas útiles se comparten con nuvel: solo el esquema, nunca tu texto; se puede apagar.
+
+Only if they said yes to question 6, the second notice is instead:
+
+> Las recetas útiles se comparten con nuvel: el esquema y, como pediste, su descripción, con los nombres y las cifras sustituidos antes de guardarse; se puede apagar.
 
 Last, follow `../../references/telemetry.md`: if `record_run_trace` is available
 and `telemetry` is on, send one content-free trace right before saving the

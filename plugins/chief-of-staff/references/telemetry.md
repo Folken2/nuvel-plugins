@@ -121,58 +121,32 @@ forward unchanged in every later `config`. See `registry-layout.md`.
 
 ## Recipe signals and recipe sharing
 
-The `learn` skill sends two more kinds of object, through the same nuvel
-connector. The full procedure is in `learn`'s skill; these are the rules.
+The weekly review sends two more kinds of object through the same nuvel
+connector; the full procedure is in `recipe-sharing.md`.
 
 - **`record_recipe_signal`** — argument `{"signal": {...}}`, schema
-  `nuvel.recipe_signal/1`. One per recipe event (`created`, `used`,
-  `succeeded`, `corrected`, `retired`), content-free like a trace: `signal_id`
-  (new UUIDv4), `recipe_id`, `install_id`, `plugin`, `category` (from
-  `recipe-categories.md`), `event`, `at` (RFC 3339 UTC) and the cumulative
-  `uses`, `successes`, `corrections` after the event.
-- **`share_recipe`** — argument `{"recipe": {...}}`, schema `nuvel.recipe/2`.
-  A recipe that has had at least 3 successful uses, sent again on each later
-  version whose text changed: `recipe_id`, `install_id`, `plugin`, `version`,
-  `category`, `language`, `title` (≤ 80), `when_to_use` (≤ 200), `steps` (1-15
-  of `action` from `recipe-actions.md`, `tool_kind`, `slots` of placeholder
-  types, optional `note` ≤ 160), optional `pitfalls` (≤ 5 × 160) and an
-  optional `narrative` (≤ 2000) in the owner's own words. It is the structure
-  plus a masked description: the free text is written with placeholders
-  (`{person}`, `{amount}`, ...) and nuvel's server replaces names and figures
-  before anything is stored, relayed or logged. In detail:
-  - Spanish (`es`), English (`en`) and Catalan (`ca`) free text is masked word
-    by word: only common words survive; anything else becomes `{?}`. Known
-    limit: a name spelled exactly like an everyday word (e.g. March, or Sala
-    in Catalan, or a lowercase common word used as a brand) can pass through, so never put
-    personal names in free text.
-  - Every other language is shared as **structure only**: the server has no
-    way to mask its free text, so it drops it and lists the dropped fields in
-    its reply. `learn` still sends these recipes.
-  - A field the server judges mostly names or figures is dropped whole.
-  - The reply is `{"status": "recorded", "recipe_id", "version", "masked",
-    "words", "dropped"}`, or `"duplicate"`, or `"rejected"` with field paths
-    only. Nothing else goes in the object, and never a `tenant` or `masking`
-    field: the server sets those and rejects a client that sends them.
+  `nuvel.recipe_signal/2`: a weekly, content-free snapshot of a changed
+  recipe (status and counters).
+- **`share_recipe`** — argument `{"recipe": {...}}`, schema `nuvel.recipe/3`:
+  the structure of a recipe that passes the quality bar (category, steps,
+  counters) and, only with `sharing.recipe_text: on`, its text written with
+  placeholders. The server masks that text before anything is stored: Spanish
+  (`es`), English (`en`) and Catalan (`ca`) free text is masked word by word.
+  Known limit: a name spelled exactly like an everyday word (e.g. March, or
+  Sala in Catalan) can pass through, so never put personal names in free
+  text.
 
-Switches, both read from the newest `config`:
+Switches, all read from the newest `config`:
 
-| setting | signals | sharing |
+| key | default | meaning |
 |---|---|---|
-| `telemetry: off`, or no `telemetry.install_id` | not sent | not sent |
-| `telemetry: on` and `sharing.recipes: off` | sent | not sent |
-| `telemetry: on` and `sharing.recipes: on` (or missing) | sent | sent |
+| `telemetry` | `on` | traces and recipe signals (content-free) |
+| `sharing.recipes` | `on` | share the **structure** of recipes that pass the quality bar |
+| `sharing.recipe_text` | `off` | also share their text, masked on the server; `on` only when the user said yes at setup |
 
 As with traces: no tool, no send, silently; never a `tenant` field; never
-block or change the user's task; retry an error once, then journal one line
-in the `learn` run document: `signal: not sent (<class>)`,
-`share: not sent (<class>)`, `share: recorded (masked N/M)` (and
-`share: recorded, <fields> dropped` when the server dropped some text), or
-`share: rejected (<paths>)` when the server rejects it (the paths are field
-names only, never content). A rejected share is recorded as the recipe's
-`blocked_version` and retried only at the recipe's next `version` (text
-change), never on a stats-only update. The user is told once, at setup, that
-useful recipes are shared as structure plus a masked description; they are
-never asked per recipe.
+block or change the review; retry an error once, then journal one line in the
+`weekly-review` run document (lines in `recipe-sharing.md`).
 
 ## Approvals (for installers)
 

@@ -1,9 +1,9 @@
 # Recipe actions and placeholders
 
-Two fixed vocabularies owned by nuvel, used when `learn` shares a recipe
-(`nuvel.recipe/2`). Every step's `action` is exactly one identifier from the
+Two fixed vocabularies owned by nuvel, used when the weekly review shares a recipe
+(`nuvel.recipe/3`). Every step's `action` is exactly one identifier from the
 first list; every entry of a step's `slots`, and every `{placeholder}` written in
-a note or the narrative, is one type from the second. Pick the closest; use
+a step note or the narrative, is one type from the second. Pick the closest; use
 `other` only when nothing fits. Never invent one: the lists grow with plugin
 releases, not per user, and the server rejects anything else.
 

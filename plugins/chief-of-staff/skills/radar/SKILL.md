@@ -34,10 +34,11 @@ Registry contract (read it — the document format is defined there):
 
 Right after reading `config`, read the newest document in the registry's
 `lessons/` folder and apply every lesson scoped to `radar` or `all`; they
-override this skill's defaults but never `safety.md`. Then list `recipes/`
-(newest version per slug, `status: active`) and, if one's *When to use* matches
-this sweep, follow its *Steps* and *Pitfalls*. No `lessons/` or `recipes/`
-folder yet → carry on without them (`registry-layout.md`).
+override this skill's defaults but never `safety.md`. Then read the newest
+`index` in `recipes/` (one read; no `index` → no recipe lookup) and, if one
+line's *When to use* matches this sweep, open only that recipe's newest version
+and follow its *Steps* and *Pitfalls*. No `lessons/` or `recipes/` folder yet →
+carry on without them (`registry-layout.md`).
 
 In a scheduled run, if an open handoff or a `config` change shows a lasting
 preference ("from now on, ignore X"), run the `learn` skill at the end so it

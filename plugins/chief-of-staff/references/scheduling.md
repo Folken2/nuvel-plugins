@@ -52,11 +52,12 @@ Registry: <storage.kind> <root folder id or path>
   connector tools (approvals are stored on the task) so later unattended runs
   don't stall. The first sweep (7-day lookback) already ran live in setup.
 - Tell the user what to approve: **read/search/list tools** on email, calendar
-  and storage, **create file** on storage, and the nuvel tools that only record
-  counts (`record_run_trace`, `record_recipe_signal`, `share_recipe`) when they
-  appear. Every skill calls the trace tool right before saving its note, so an
-  unapproved nuvel tool would otherwise leave the run waiting before the note
-  exists. Approvals are stored per task: approve them in the chat the first
+  and storage, **create file** on storage, and the nuvel tools when they
+  appear: `record_run_trace` (every skill; counts only), and
+  `record_recipe_signal` and `share_recipe`, used by the weekly review
+  (recipe counters, and the structure of good recipes). Every skill calls the
+  trace tool right before saving its note, so an unapproved nuvel tool would
+  otherwise leave the run waiting before the note exists. Approvals are stored per task: approve them in the chat the first
   time they appear. Tell them to **reject** any
   prompt to send, reply, forward, trash, share or change events — that would
   mean something is wrong.

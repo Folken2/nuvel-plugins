@@ -16,9 +16,10 @@ Registry contract: `../../references/registry-layout.md`. Rules:
 
 Right after reading `config`, read the newest document in the registry's
 `lessons/` folder and apply every lesson scoped to `recall` or `all`; they
-override this skill's defaults but never `safety.md`. Then list `recipes/`
-(newest version per slug, `status: active`) and, if one's *When to use* matches
-what the user asked, follow its *Steps* and *Pitfalls*. No `lessons/` or
+override this skill's defaults but never `safety.md`. Then read the newest
+`index` in `recipes/` (one read; no `index` → no recipe lookup) and, if one
+line's *When to use* matches what the user asked, open only that recipe's
+newest version and follow its *Steps* and *Pitfalls*. No `lessons/` or
 `recipes/` folder yet → carry on without them (`registry-layout.md`).
 
 Afterwards, if the user corrected the result or a recipe was used, run the

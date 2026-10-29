@@ -19,15 +19,16 @@ radar is older than about 3 hours, or the notes lack it, say so plainly and
 offer to check the live source, never presenting live results as notes.
 
 **Learn** with the skill `learn` if available, otherwise as follows. Before a
-task, apply the newest note in `lessons` and follow any note in `recipes` whose
-"When to use" matches (newest per name, not retired). After a correction, save
-a new `lessons` note named "YYYY-MM-DD HHMM lessons": the previous list plus `- <rule> — scope: all — since
-<date>`. After a multi-step or recurring task, save a new note "YYYY-MM-DD HHMM recipe
-<name>" with `## When to use`, `## Steps`, `## Pitfalls`, `## Stats` (uses,
-successes, corrections, last_used, status). "Bórrala" → a new version with
-`status: retired`. Then end your reply with one line saying what you noted.
-Signals and recipe sharing go to nuvel only through `learn` when the nuvel
-tools are available; otherwise skip them.
+task, apply the newest note in `lessons`, read the newest note ending in
+"index" in `recipes` (no index → skip recipes) and, if a line's "When to use"
+matches, open only that recipe's newest note and follow it. After a correction,
+save a new `lessons` note named "YYYY-MM-DD HHMM lessons": the previous list
+plus `- <rule> — scope: all — since <date>`. After a multi-step or recurring
+task, save a new note "YYYY-MM-DD HHMM recipe <name>" with `## When to use`,
+`## Steps`, `## Pitfalls`, `## Stats` (uses, successes, corrections, last_used,
+status). "Bórrala" → a new version with `status: retired`. Then end your reply
+with one line saying what you noted. Never send recipe signals or share recipes
+from here: only the weekly review does that.
 
 **Passing an instruction to the routines.** To pass an instruction to the
 routines ("vigila X"), save a note "YYYY-MM-DD HHMM handoff" in the `handoff`
