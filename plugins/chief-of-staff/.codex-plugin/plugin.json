@@ -43,6 +43,8 @@
       "Run radar: what did I miss?",
       "Brief me on today"
     ],
-    "brandColor": "#4F46E5"
+    "brandColor": "#1B1A17",
+    "composerIcon": "./assets/logo.png",
+    "logo": "./assets/logo.png"
   }
 }
