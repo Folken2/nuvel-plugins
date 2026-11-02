@@ -171,6 +171,9 @@ state forward, even when nothing changed.
 ```markdown
 # Radar · 2026-10-20 19:40 · scheduled · claude — ok
 
+## Owner
+- <owner.name from config>
+
 ## Journal
 - Window: email since 2026-10-20 17:40 · calendar today + 2 working days
 - Read: 14 emails (3 relevant), 2 calendar changes.
@@ -179,10 +182,10 @@ state forward, even when nothing changed.
 - Errors: none.
 
 ## Needs you now
-- <what> — <why it matters> — <link>        (max 5)
+- <what> — <why it matters> — due <YYYY-MM-DD> — <link>        (max 5)
 
 ## Decide
-- <unsolicited proposal / invitation / opportunity> — <who> — <why it may matter> — <link> — since <date>
+- <unsolicited proposal / invitation / opportunity> — <who> — <why it may matter> — due <YYYY-MM-DD> — <link> — since <date>
 
 ## Today
 - 11:00 <meeting> — <one-line context>
@@ -191,7 +194,7 @@ state forward, even when nothing changed.
 ### I owe
 - <what> — <who> — due <date> — <link> — since <date>
 ### Waiting on
-- …
+- <what> — <who> — due <YYYY-MM-DD> — <link> — since <date>
 ### Closed (last 14 days)
 - <what> — <who> — closed <date>
 
@@ -217,6 +220,15 @@ state forward, even when nothing changed.
 ```
 
 Rules:
+- `## Owner` holds one bullet: `owner.name` from the newest `config`, copied
+  as written. It lets readers of the run (the dashboard, a brief) greet the
+  user by name. No name in the config → leave the section out.
+- **Deadlines:** an item with a deadline carries `due YYYY-MM-DD` (the word
+  `due` in English whatever `owner.language` is, the date in
+  `owner.timezone`). Turn relative dates into a date ("by Friday" → that
+  Friday; "end of month" → its last day; "today" → today). No deadline → leave
+  `due` out; never invent one. It goes in *Needs you now*, *Decide*, *I owe*
+  and *Waiting on*, and is carried forward unchanged unless the source moves it.
 - `## Trace` is the last section of every run document: exactly what was sent to
   `record_run_trace` (ids, counts, outcome) or one line saying why nothing was
   sent (`telemetry.md`). It never contains content.
