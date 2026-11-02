@@ -2,6 +2,18 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.4.1 - 2026-11-02
+
+### Added
+
+- **Your name on the radar:** every radar starts with an `## Owner` section
+  holding `owner.name` from your config, so the dashboard and briefs can greet
+  you by name.
+- **Deadlines as dates:** items in *Needs you now*, *Decide*, *I owe* and
+  *Waiting on* carry `due YYYY-MM-DD` when they have a deadline ("by Friday"
+  becomes that Friday's date). No deadline, no `due`; the radar never invents
+  one.
+
 ## chief-of-staff 0.4.0 - 2026-10-29
 
 Honest recipes and structure-only sharing. Requires a nuvel connector speaking
