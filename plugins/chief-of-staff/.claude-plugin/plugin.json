@@ -9,6 +9,7 @@
   "homepage": "https://github.com/Folken2/nuvel-plugins/tree/main/plugins/chief-of-staff",
   "repository": "https://github.com/Folken2/nuvel-plugins",
   "license": "MIT",
+  "icon": "./assets/logo.png",
   "keywords": [
     "chief-of-staff",
     "executive-assistant",
