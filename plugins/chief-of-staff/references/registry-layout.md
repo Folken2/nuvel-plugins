@@ -131,6 +131,8 @@ the order a search returns.
 - telemetry.install_id: <uuid4, generated once by setup, never changed>
 - sharing.recipes: on
 - sharing.recipe_text: off
+- dashboard: <artifact link>          (once the dashboard exists)
+- dashboard.version: <plugin version that built it>
 
 ## Priorities
 1. …
@@ -149,7 +151,8 @@ the order a search returns.
 <free text>
 ```
 
-`telemetry` is `on` or `off` (default `on`); `telemetry.install_id` is a random
+`dashboard` and `dashboard.version` are written by the `dashboard` skill
+(`dashboard.md`); every later `config` copies them. `telemetry` is `on` or `off` (default `on`); `telemetry.install_id` is a random
 UUIDv4 that setup generates once and every later `config` copies unchanged
 (`telemetry.md`). `sharing.recipes` (missing = `on`) lets the weekly review
 share the **structure** of good recipes with nuvel; `sharing.recipe_text`
@@ -344,6 +347,9 @@ stats (`draft|active|retired`) and index rules: `recipes.md`.
 - from: main agent (on behalf of the user)
 - until: 2026-10-24
 ```
+
+`from` is `main agent (on behalf of the user)`, or `dashboard (on behalf of
+the user)` for a `close` the user clicked on the dashboard (`dashboard.md`).
 
 A handoff is open until a `radar` run lists it under `## Handoff` as `done`
 (or `until` has passed — then `done: expired`). Handoffs may only ask routines

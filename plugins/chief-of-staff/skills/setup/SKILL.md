@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Guided onboarding for the AI chief of staff, written for business owners and executives with no technical background. Use when the user installs or asks to set up, configure, reconfigure, move, pause or remove their chief of staff — e.g. "set up my chief of staff", "configura mi chief of staff", "connect my inbox and calendar so you keep me up to date", "change how often radar runs". Takes 10–15 minutes and at most six questions: it checks the email, calendar, chat and storage connectors, creates the registry folder in OneDrive, Google Drive or a local folder, seeds the assistant's memory, prepares the Claude Project instructions, schedules the radar, brief and weekly-review routines, and runs the first radar live.
+description: Guided onboarding for the AI chief of staff, written for business owners and executives with no technical background. Use when the user installs or asks to set up, configure, reconfigure, move, pause or remove their chief of staff — e.g. "set up my chief of staff", "configura mi chief of staff", "connect my inbox and calendar so you keep me up to date", "change how often radar runs". Takes 10–15 minutes and at most six questions: it checks the email, calendar, chat and storage connectors, creates the registry folder in OneDrive, Google Drive or a local folder, seeds the assistant's memory, prepares the Claude Project instructions, schedules the radar, brief and weekly-review routines, runs the first radar live, and creates their to-do dashboard.
 ---
 
 # Set up the chief of staff
@@ -9,7 +9,8 @@ You are onboarding the user's AI chief of staff. The user is a busy business
 person (an SME owner or executive), not a technician. Target: **10–15 minutes,
 at most six questions**; everything else is detected, defaulted out loud, or
 confirmed with a yes. By the end they have working sources, a private notes
-folder, scheduled routines and a first radar they can read.
+folder, scheduled routines, a first radar they can read and a dashboard
+to work through it.
 
 Rules of voice:
 
@@ -195,12 +196,24 @@ it:
 > Si quieres, pulsa «Ejecutar ahora» una vez en el repaso programado. Así las próximas veces no se quedará esperando tu aprobación. Aprueba lo que sea leer o «crear archivo» en tu carpeta, y lo de nuvel que solo registra recuentos; rechaza cualquier cosa que envíe o borre algo.
 
 Tell them to approve the nuvel items in this chat the first time they appear
-too. If they skip the step, carry on to the wrap-up.
+too. If they skip the step, carry on to the dashboard.
 
-## 7. Wrap-up
+## 7. Dashboard
 
-At most 6 lines, business language: where the notes folder is and which note to
-open (the newest radar); when the routines run and that they only interrupt for
+Run the `dashboard` skill (`../dashboard/SKILL.md`): it builds the page from
+the plugin's template with `../../scripts/build_dashboard.py` and publishes
+it, always the same way; never write or change the page yourself. It is not a
+question: say it in one line, then share the link.
+
+> Te he preparado un panel con tus pendientes, tu día y lo que esperas de otros. La primera vez te pedirá permiso para leer tu carpeta de Drive.
+
+If the dashboard skill stops (Microsoft 365 storage, or no artifacts in this
+session), say its one sentence and carry on: setup is complete without it.
+
+## 8. Wrap-up
+
+At most 6 lines, business language: the dashboard link, if there is one, and
+where the notes folder is (the newest radar is the same picture); when the routines run and that they only interrupt for
 what needs them now; that it never sends or changes anything; that from any
 conversation they can ask "¿qué vio mi chief of staff hoy?" or "dile al repaso
 que vigile X"; that it learns from their corrections and remembers how
@@ -251,7 +264,8 @@ Last, follow `../../references/telemetry.md`: if `record_run_trace` is available
 and `telemetry` is on, send one content-free trace right before saving the
 setup document, and end it with a `## Trace` section mirroring it. Report only
 these steps: `setup.detect`, `setup.questions`, `setup.folder`, `setup.memory`,
-`setup.routines`, `setup.first-radar` and `setup.wrap-up`.
+`setup.routines`, `setup.first-radar`, `setup.dashboard` (`skipped` when
+the dashboard skill stopped) and `setup.wrap-up`.
 
 - **Counts:** `sources_ok` and `sources_missing` on `setup.detect`;
   `questions_asked` on `setup.questions`; `routines_created` on

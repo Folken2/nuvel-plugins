@@ -100,7 +100,8 @@ Afterwards, if the user corrected the result or a recipe was used, run the
 
 ## Registry health
 - <sources failing, routines that didn't run (gaps between radars), priorities
-  with no activity for 3 weeks — ask the user, don't change `config` yourself>
+  with no activity for 3 weeks, a dashboard built by an older plugin version
+  (suggest "update my dashboard") — ask the user, don't change `config` yourself>
 ```
 
    Items taken from the radar keep their task ID (`T-42 — …`). Drop *What I

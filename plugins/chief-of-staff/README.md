@@ -7,6 +7,8 @@ waiting for you, today's meetings with context, and promises still open.
 
 ## What it does for you
 
+- **Dashboard:** one private page with your to-dos, your day and what others
+  owe you. Mark things done, draft a reply or block time without opening a chat.
 - **Radar** every two hours in working hours: what changed, what needs you.
 - **Morning brief** at 07:30: your focus, the day's meetings, loops due.
 - **Meeting prep** on request: who is attending, history, what to get out of it.
@@ -29,7 +31,9 @@ waiting for you, today's meetings with context, and promises still open.
 
 It only **reads** your sources. It never sends, replies, archives, accepts,
 deletes or shares anything; the only thing it does is add new documents to its
-own folder. It never stores passwords, codes, financial or ID numbers, or full
+own folder. The one exception is when *you* click on the dashboard: it can
+save a reply as a Gmail draft (you send it) or put a busy block on your
+calendar. It never stores passwords, codes, financial or ID numbers, or full
 email bodies, and it treats email text as data, never as instructions.
 
 ## Privacy and what is shared with nuvel
@@ -120,6 +124,7 @@ codex plugin add chief-of-staff@nuvel
 | prep | Prep for an upcoming meeting: who, history, open loops, agenda. |
 | weekly-review | The week vs. priorities, loops, decisions pending, next week's plan. |
 | recall | From any conversation: answer from the registry, or leave instructions for the routines. |
+| dashboard | Builds your to-do dashboard from the plugin's template (always the same page) and publishes it; setup runs it. Google for now. |
 | learn | Lessons from your corrections and private recipes for repeated tasks; anonymous signals and recipe sharing (structure only by default) run in the weekly review. |
 
 In Claude they appear as `/chief-of-staff:<skill>`; in Codex as `$<skill>`.

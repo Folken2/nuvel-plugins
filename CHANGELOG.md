@@ -4,7 +4,7 @@ All notable changes to the plugins in this repo. Versions are per plugin.
 
 ## chief-of-staff 0.5.0 - 2026-11-17
 
-Task IDs: every item on the radar has a short ID you can point at.
+Task IDs on every radar item, and a dashboard to work through them without a chat.
 
 ### Added
 
@@ -24,6 +24,16 @@ Task IDs: every item on the radar has a short ID you can point at.
   them, and notes any failure it couldn't fix in the journal. Sample radars
   in `tests/fixtures/task-ids/` let other readers (the board) run the same
   checks.
+- **Dashboard:** a private page to work through your to-dos without a chat:
+  *Today* (focus, what needs you, calendar with free blocks), *To-do*,
+  *Delegated* and *Nice to know*, in English, Catalan or Spanish. It reads the
+  registry live with your own Google connectors. Mark a task done or not
+  yours (it writes a close handoff), save a reply as a Gmail draft, or block
+  time on your calendar; nothing is ever sent. New `dashboard` skill, run by
+  setup: `scripts/build_dashboard.py` fills the template in
+  `templates/dashboard/` from your config, so every dashboard is built the
+  same way. Microsoft 365 storage isn't supported yet (setup says so and
+  carries on).
 - Radar traces count `tasks_new` and `tasks_closed`, plus `id_errors` and
   `id_fixes` on the new `radar.check-ids` step; IDs are never sent.
 
@@ -33,10 +43,14 @@ Task IDs: every item on the radar has a short ID you can point at.
   gone. Tools are still discovered by function, since their names are not
   published.
 - Anything that parses radar bullets must allow the leading `T-<n> — ` field.
+- Safety: one exception to read-only, only on your click on the dashboard:
+  Gmail drafts (never sent) and busy blocks on your own calendar.
+- `config` gains `dashboard` and `dashboard.version`; handoffs can come
+  `from: dashboard (on behalf of the user)`.
 - Open tasks never just drop off: *Decide* items after 14 days and *Watching*
   notices past their date move to *Closed* as `expired`.
 
-Design: `docs/specs/2026-11-17-task-ids.md`.
+Design: `docs/specs/2026-11-17-task-ids.md`, `docs/specs/2026-11-17-dashboard.md`.
 
 ## chief-of-staff 0.4.1 - 2026-11-02
 

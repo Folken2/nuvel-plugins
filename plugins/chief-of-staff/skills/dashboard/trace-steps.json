@@ -1,0 +1,14 @@
+{
+  "skill": "dashboard",
+  "steps": [
+    "dashboard.load-config",
+    "dashboard.build",
+    "dashboard.publish",
+    "dashboard.record"
+  ],
+  "counts": [
+    "connectors",
+    "updated"
+  ],
+  "routing": []
+}
