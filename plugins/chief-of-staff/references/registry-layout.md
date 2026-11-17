@@ -284,7 +284,7 @@ run, so the user, the main agent and any other reader can point at it
 - IDs are local counters: never sent in telemetry (`telemetry.md`).
 - **Checked by a script** where code can run: `scripts/check_task_ids.py` in
   the plugin compares the new radar with the previous one before it is saved
-  (radar skill, *Check the task IDs*). The same sample radars in the repo's
+  (radar skill, *Check the radar*, which runs these rules inside `scripts/check_radar.py`). The same sample radars in the repo's
   `tests/fixtures/task-ids/` let any other reader (e.g. a board) run the same
   checks.
 

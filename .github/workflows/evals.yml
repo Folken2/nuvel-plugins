@@ -1,0 +1,57 @@
+name: evals
+# Regression evals: run the real radar skill on Haiku against fixture inboxes
+# (plugins/chief-of-staff/evals/) and grade what it writes. Each run is a paid
+# model call, so this only runs when the radar's behaviour can change, and on demand.
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: Model the skills run on
+        default: claude-haiku-5-5
+  pull_request:
+    paths:
+      - plugins/chief-of-staff/skills/radar/**
+      - plugins/chief-of-staff/references/**
+      - plugins/chief-of-staff/scripts/**
+      - plugins/chief-of-staff/evals/**
+      - .github/workflows/evals.yml
+permissions:
+  contents: read
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      MODEL: ${{ inputs.model || 'claude-haiku-5-5' }}
+    steps:
+      - name: Skip without an API key
+        if: env.ANTHROPIC_API_KEY == ''
+        run: echo "::notice::Add an ANTHROPIC_API_KEY repository secret to run the radar evals."
+      - uses: actions/checkout@v4
+        if: env.ANTHROPIC_API_KEY != ''
+      - uses: actions/setup-node@v4
+        if: env.ANTHROPIC_API_KEY != ''
+        with:
+          node-version: "22"
+      - name: Sandbox for the shell tool (the radar runs its check script)
+        if: env.ANTHROPIC_API_KEY != ''
+        run: |
+          sudo apt-get install -y -q bubblewrap socat
+          # Ubuntu 24.04 blocks the unprivileged user namespaces bubblewrap needs
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+      - name: Run the evals
+        if: env.ANTHROPIC_API_KEY != ''
+        run: |
+          npm install --global @anthropic-ai/claude-code@2.1.326
+          claude plugin eval plugins/chief-of-staff --trust-plugin --no-publish --scaffold \
+            --allow-tools Bash Write --model "$MODEL" --ablation none -j 2 \
+            --threshold 0.8 --max-cost-usd 5 --json eval-results.json
+      - uses: actions/upload-artifact@v4
+        if: always() && env.ANTHROPIC_API_KEY != ''
+        with:
+          name: radar-evals
+          path: |
+            eval-results.json
+            plugins/chief-of-staff/evals/results/
+          if-no-files-found: ignore

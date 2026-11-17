@@ -2,6 +2,32 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.5.1 - 2026-11-17
+
+A safety net for unattended runs, now that the routines run on Haiku.
+
+### Added
+
+- **Whole-radar check:** `scripts/check_radar.py` checks a new radar against
+  the contract before it is saved: header, sections and their order, at most 5
+  items in *Needs you now*, `due` written as a real date, cursors and `seen`,
+  nothing secret or copied from an email (IBAN, card number, one-time code,
+  password, API key, quoted email text), plus every task-ID rule. The radar
+  runs it instead of the ID-only check and notes `Radar check: ok` in its
+  journal.
+- **Radar evals:** `plugins/chief-of-staff/evals/` runs the real radar skill on
+  Haiku against a fixture inbox and registry, and grades sorting, closes,
+  task IDs, deadlines, secrets and a prompt-injection email. A new `evals`
+  workflow runs it on pull requests that touch the radar (needs an
+  `ANTHROPIC_API_KEY` secret).
+
+### Changed
+
+- The radar's trace step `radar.check-ids` is now `radar.check`, with
+  `check_errors` and `check_fixes` (`id_errors` stays, for task-ID rules).
+
+Design: `docs/specs/2026-11-17-radar-safety-net.md`.
+
 ## chief-of-staff 0.5.0 - 2026-11-17
 
 Task IDs on every radar item, and a dashboard to work through them without a chat.

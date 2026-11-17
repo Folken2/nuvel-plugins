@@ -5,7 +5,7 @@
     "radar.sweep.email",
     "radar.sweep.calendar",
     "radar.sweep.chat",
-    "radar.check-ids",
+    "radar.check",
     "radar.write",
     "radar.notify"
   ],
@@ -20,7 +20,8 @@
     "tasks_new",
     "tasks_closed",
     "id_errors",
-    "id_fixes"
+    "check_errors",
+    "check_fixes"
   ],
   "routing": [
     "vip",

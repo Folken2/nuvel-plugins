@@ -1,0 +1,132 @@
+{
+  "bad-header": {
+    "description": "Header without mode and status.",
+    "exit": 1,
+    "errors": [
+      "first line is not"
+    ],
+    "warnings": []
+  },
+  "card-copied": {
+    "description": "A card number copied from a receipt.",
+    "exit": 1,
+    "errors": [
+      "looks like a card number"
+    ],
+    "warnings": []
+  },
+  "cursor-not-iso": {
+    "description": "A cursor written as a phrase.",
+    "exit": 1,
+    "errors": [
+      "cursor email is not an ISO timestamp"
+    ],
+    "warnings": []
+  },
+  "due-not-a-date": {
+    "description": "A deadline left as a word.",
+    "exit": 1,
+    "errors": [
+      "'due' must be followed by a date"
+    ],
+    "warnings": []
+  },
+  "email-quoted": {
+    "description": "Two quoted lines of an email.",
+    "exit": 1,
+    "errors": [
+      "more than one quoted line"
+    ],
+    "warnings": []
+  },
+  "good": {
+    "description": "A radar that follows the contract, carried forward unchanged.",
+    "exit": 0,
+    "errors": [],
+    "warnings": []
+  },
+  "google-doc-readback": {
+    "description": "The same radar as Google Docs reads it back: indented bullets, escaped `next\\_task`.",
+    "exit": 0,
+    "errors": [],
+    "warnings": []
+  },
+  "iban-copied": {
+    "description": "An IBAN copied from an invoice email.",
+    "exit": 1,
+    "errors": [
+      "looks like an IBAN"
+    ],
+    "warnings": []
+  },
+  "long-line": {
+    "description": "A 650-character line: allowed, flagged to summarise.",
+    "exit": 0,
+    "errors": [],
+    "warnings": [
+      "summarise and link instead of copying"
+    ]
+  },
+  "missing-section": {
+    "description": "No ## Handoff section.",
+    "exit": 1,
+    "errors": [
+      "missing sections: Handoff"
+    ],
+    "warnings": []
+  },
+  "otp-copied": {
+    "description": "A verification code copied from a sign-in email.",
+    "exit": 1,
+    "errors": [
+      "looks like a one-time code"
+    ],
+    "warnings": []
+  },
+  "out-of-order": {
+    "description": "Watching before Moving.",
+    "exit": 1,
+    "errors": [
+      "sections out of order"
+    ],
+    "warnings": []
+  },
+  "seen-has-address": {
+    "description": "An address in the seen list.",
+    "exit": 1,
+    "errors": [
+      "seen holds something that is not an opaque id"
+    ],
+    "warnings": []
+  },
+  "six-needs": {
+    "description": "Six items in Needs you now.",
+    "exit": 1,
+    "errors": [
+      "Needs you now has 6 items (max 5)"
+    ],
+    "warnings": []
+  },
+  "thread-link-not-a-card": {
+    "description": "A Gmail thread-f number that passes the card check is a link, not a card.",
+    "exit": 0,
+    "errors": [],
+    "warnings": []
+  },
+  "trace-empty": {
+    "description": "Trace section with nothing in it.",
+    "exit": 1,
+    "errors": [
+      "## Trace must say"
+    ],
+    "warnings": []
+  },
+  "trace-not-last": {
+    "description": "Trace before Cursors.",
+    "exit": 1,
+    "errors": [
+      "## Trace must be the last section"
+    ],
+    "warnings": []
+  }
+}
