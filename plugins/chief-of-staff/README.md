@@ -20,8 +20,7 @@ waiting for you, today's meetings with context, and promises still open.
 
 - Your **Microsoft 365** account (Outlook, Teams, OneDrive) or your **Google**
   account (Gmail, Calendar, Drive) connected in Claude. Microsoft 365 is the
-  first-class path in 0.3.0 (not yet verified on a real tenant, see the
-  changelog).
+  first-class path and has been tested on a real tenant.
 - About **15 minutes** for setup: a guided conversation of at most six
   questions. Optionally you then press **Run now** once on the scheduled
   review, so later runs do not wait for your approval.

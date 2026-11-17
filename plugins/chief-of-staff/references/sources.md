@@ -28,11 +28,10 @@ has no tool, it is simply off — say so in the radar journal rather than guessi
 
 ## Microsoft 365 (first-class)
 
-**Unverified (no tenant yet)**: the connector's exact tool names are not
-published and nothing here has been run against a real tenant. Describe and
-discover tools by function ("Outlook mail search", "calendar events in a date
-range", "Teams chat messages", "OneDrive file search"); never hard-code a tool
-name. The first real tenant run must confirm each point below.
+**Tested on a real tenant (2026-11).** The connector's exact tool names are
+not published, so describe and discover tools by function ("Outlook mail
+search", "calendar events in a date range", "Teams chat messages", "OneDrive
+file search"); never hard-code a tool name.
 
 - **Email (Outlook).** Triage like the Gmail rules, using Outlook's own signals:
   - *Focused* is the equivalent of Gmail's Primary; *Other* is skimmed like

@@ -12,7 +12,7 @@ setup removes right after the check; if delete is unavailable, leave it.
 The only place this plugin writes is the registry folder (`storage.root`), and
 only by **creating** new documents there. Many connectors expose write tools
 (send, reply, forward, trash, share, create/update events) — never call them.
-On Microsoft 365 (**Unverified (no tenant yet)**: tool names are not
+On Microsoft 365 (**Tested on a real tenant (2026-11)**; tool names are not
 published, so this list is by function) never call: send mail, reply or
 forward, create or update drafts, flag, categorize, mark read, move or archive
 mail, create/update/delete/respond to calendar

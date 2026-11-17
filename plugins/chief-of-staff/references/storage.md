@@ -35,8 +35,8 @@ At setup:
 
 ### OneDrive / SharePoint (Microsoft 365 connector)
 
-**Unverified (no tenant yet)**: exact tool names are not published and no
-tenant has run this. Use tools by function ("OneDrive create file", "list
+**Tested on a real tenant (2026-11).** Exact tool names are not published,
+so use tools by function ("OneDrive create file", "list
 folder children", "read file content"). The Microsoft 365 connector can write
 files since 2026-07-07, but only after a Global or Application Administrator
 re-consents the write scopes; if file creation is refused, tell the user that
