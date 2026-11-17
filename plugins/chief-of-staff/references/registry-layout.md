@@ -195,7 +195,7 @@ state forward, even when nothing changed.
 ### Waiting on
 - T-<n> — <what> — <who> — due <YYYY-MM-DD> — <link> — since <date>
 ### Closed (last 14 days)
-- T-<n> — <what> — <who> — closed <date> — <done | not mine | resolved>
+- T-<n> — <what> — <who> — closed <date> — <done | not mine | resolved | expired>
 
 ## Moving
 - [project] <what changed recently>
@@ -243,10 +243,13 @@ Rules:
 - `seen` holds raw opaque item IDs (e.g. Gmail thread IDs) — never subjects,
   names or addresses — so overlapping windows don't log an item twice.
 - `Closed` keeps 14 days; older items drop off the snapshot (they stay in history).
+  An open task never just disappears: it moves to `Closed` first, with one of
+  the reasons above (`expired` for a *Decide* item left 14 days without action
+  or a *Watching* notice whose date has passed).
 - `I owe` is only for real commitments: something the user promised, or a
   direct ask from someone they work with. Inbound the user never asked for
   (cold proposals, partnership offers, invitations) goes to `Decide`; items
-  there drop off after 14 days without action (they stay in history).
+  there move to `Closed` as `expired` after 14 days without action.
 
 ### Task IDs
 
@@ -276,6 +279,11 @@ run, so the user, the main agent and any other reader can point at it
   *Waiting on*, *Watching*, *Closed*) from `T-1`, the same task once, and say
   so in the journal ("Task IDs assigned: T-1…T-12").
 - IDs are local counters: never sent in telemetry (`telemetry.md`).
+- **Checked by a script** where code can run: `scripts/check_task_ids.py` in
+  the plugin compares the new radar with the previous one before it is saved
+  (radar skill, *Check the task IDs*). The same sample radars in the repo's
+  `tests/fixtures/task-ids/` let any other reader (e.g. a board) run the same
+  checks.
 
 ### Other runs (`brief`, `prep`, `weekly-review`, `recall`, `setup`, `learn`)
 

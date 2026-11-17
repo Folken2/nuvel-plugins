@@ -18,7 +18,14 @@ Task IDs: every item on the radar has a short ID you can point at.
   instruction (done or not mine), which the next radar applies by moving the
   task to *Closed*. Brief, prep and weekly review keep the IDs on the items
   they copy.
-- Radar traces count `tasks_new` and `tasks_closed`; IDs are never sent.
+- **Task IDs are checked by a script:** where code can run, the radar runs
+  `scripts/check_task_ids.py` on its draft against the previous radar before
+  saving. It catches renumbered, duplicated, reused or dropped tasks, fixes
+  them, and notes any failure it couldn't fix in the journal. Sample radars
+  in `tests/fixtures/task-ids/` let other readers (the board) run the same
+  checks.
+- Radar traces count `tasks_new` and `tasks_closed`, plus `id_errors` and
+  `id_fixes` on the new `radar.check-ids` step; IDs are never sent.
 
 ### Changed
 
@@ -26,6 +33,8 @@ Task IDs: every item on the radar has a short ID you can point at.
   gone. Tools are still discovered by function, since their names are not
   published.
 - Anything that parses radar bullets must allow the leading `T-<n> — ` field.
+- Open tasks never just drop off: *Decide* items after 14 days and *Watching*
+  notices past their date move to *Closed* as `expired`.
 
 Design: `docs/specs/2026-11-17-task-ids.md`.
 

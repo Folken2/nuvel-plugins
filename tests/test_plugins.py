@@ -510,3 +510,12 @@ def test_task_ids_in_skills() -> None:
         assert "T-" in (COS / f"skills/{skill}/SKILL.md").read_text(encoding="utf-8"), skill
     assert {"tasks_new", "tasks_closed"} <= set(_json(COS / "skills/radar/trace-steps.json")["counts"])
     assert "close" in _json(COS / "skills/recall/trace-steps.json")["routing"]
+
+
+def test_radar_runs_the_task_id_checker() -> None:
+    radar = (COS / "skills/radar/SKILL.md").read_text(encoding="utf-8")
+    assert "`python3 ../../scripts/check_task_ids.py --previous" in radar
+    assert "not checked (no code execution)" in radar and "check failed" in radar
+    layout = " ".join((COS / "references/registry-layout.md").read_text(encoding="utf-8").split())
+    assert "never just disappears" in layout and "as `expired`" in layout
+    assert "drop off after 14 days" not in layout

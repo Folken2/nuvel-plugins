@@ -1,0 +1,142 @@
+{
+  "carry-close-and-add": {
+    "description": "Carried IDs kept, T-2 closed, T-4 expired, one new task takes next_task; T-1 in Needs you now and I owe.",
+    "exit": 0,
+    "errors": [],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 1,
+      "tasks_closed": 2
+    }
+  },
+  "closed-and-open": {
+    "description": "T-2 is in Closed and Waiting on at once.",
+    "exit": 1,
+    "errors": [
+      "T-2 is both closed and open"
+    ],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 0,
+      "tasks_closed": 0
+    }
+  },
+  "dropped-task": {
+    "description": "Open T-3 disappears instead of moving to Closed.",
+    "exit": 1,
+    "errors": [
+      "T-3 was open and is gone"
+    ],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 0,
+      "tasks_closed": 0
+    }
+  },
+  "duplicate-id": {
+    "description": "Two different tasks share T-1.",
+    "exit": 1,
+    "errors": [
+      "T-1 is listed twice in I owe"
+    ],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 0,
+      "tasks_closed": 0
+    }
+  },
+  "first-run": {
+    "description": "No previous radar: numbering starts at T-1.",
+    "exit": 0,
+    "errors": [],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 2,
+      "tasks_closed": 0
+    }
+  },
+  "google-doc-plain-text": {
+    "description": "Previous radar read back from a Google Doc as plain text: no '#' headings, '•' bullets.",
+    "exit": 0,
+    "errors": [],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 0,
+      "tasks_closed": 0
+    }
+  },
+  "id-below-floor": {
+    "description": "A new task takes T-7, which was given out before (next_task was T-12) and is not in the previous radar.",
+    "exit": 1,
+    "errors": [
+      "T-7 was given out before"
+    ],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 1,
+      "tasks_closed": 0
+    }
+  },
+  "migration-from-0.4": {
+    "description": "Previous radar from before task IDs: carried items are numbered from T-1.",
+    "exit": 0,
+    "errors": [],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 2,
+      "tasks_closed": 0
+    }
+  },
+  "missing-id-and-cursor": {
+    "description": "An item without an ID, a malformed ID and no next_task.",
+    "exit": 1,
+    "errors": [
+      "item without a task ID in I owe",
+      "malformed task ID in Waiting on",
+      "no '- next_task: T-<n>'"
+    ],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 0,
+      "tasks_closed": 0
+    }
+  },
+  "renumbered": {
+    "description": "T-2 carried forward as T-5: the old ID vanishes and the new one has the same link.",
+    "exit": 1,
+    "errors": [
+      "T-2 was open and is gone"
+    ],
+    "warnings": [
+      "T-5 has the same link as T-2"
+    ],
+    "counts": {
+      "tasks_new": 1,
+      "tasks_closed": 0
+    }
+  },
+  "same-link-warning": {
+    "description": "A new task points at the same thread as carried T-1: allowed, but flagged as a possible missed match.",
+    "exit": 0,
+    "errors": [],
+    "warnings": [
+      "T-5 has the same link as T-1"
+    ],
+    "counts": {
+      "tasks_new": 1,
+      "tasks_closed": 0
+    }
+  },
+  "skipped-numbers": {
+    "description": "A new task jumps to T-9 when next_task was T-5.",
+    "exit": 1,
+    "errors": [
+      "skip numbers"
+    ],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 1,
+      "tasks_closed": 0
+    }
+  }
+}
