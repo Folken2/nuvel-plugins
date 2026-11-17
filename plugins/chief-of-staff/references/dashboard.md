@@ -89,6 +89,10 @@ Rules the page keeps:
 - Handoff names never repeat: if the name exists, the next minute is used.
 - A handoff write that failed ambiguously (timeout, upstream error) is looked
   for before it is written again, so a task is never closed twice.
+- A close the viewer made but the page couldn't save (the page was closed
+  during the undo window) is saved the next time the page opens, and never
+  silently: a note names the task while it is saved, its row reads
+  *Closing…*, and a toast confirms it with the task's title.
 - Items without a task ID (radars before 0.5) can't be closed from the page
   until the next radar numbers them.
 - Every text from the registry is shown as text, never as HTML; only `https`
