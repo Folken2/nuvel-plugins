@@ -11,6 +11,8 @@ skills tree with three manifests: `.claude-plugin/plugin.json`,
 - Every skill needs `agents/openai.yaml` (Codex UI metadata).
 - Run `uvx --with pytest pytest tests -q` and `claude plugin validate --strict .`
   (CI also validates each `plugins/<name>/`) before committing.
+- Changes to the radar, references, scripts or evals: also run the radar evals
+  (`plugins/chief-of-staff/evals/README.md`); CI runs them on such PRs.
 - Release per plugin: bump all three manifests, add `## <plugin> <version> - YYYY-MM-DD`
   to `CHANGELOG.md`, merge, then push tag `<plugin>-v<version>`. `release.yml`
   checks the tag (`scripts/release.py check`) and publishes a GitHub release

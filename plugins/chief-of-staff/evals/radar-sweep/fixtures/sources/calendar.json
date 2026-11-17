@@ -1,0 +1,5 @@
+{"timeZone": "Europe/Madrid", "events": [
+ {"id": "ev1", "summary": "Weekly ops sync", "start": "2026-11-18T10:00:00+01:00", "end": "2026-11-18T10:30:00+01:00", "attendees": ["ana@ferrer.example", "nuria@ferrer.example"]},
+ {"id": "ev2", "summary": "Lunch with Lumen Logistics", "start": "2026-11-18T13:00:00+01:00", "end": "2026-11-18T14:15:00+01:00", "location": "Can Fisher, Barceloneta", "attendees": ["ana@ferrer.example", "joan@lumen.example"]},
+ {"id": "ev3", "summary": "1:1 with Pau", "start": "2026-11-19T16:00:00+01:00", "end": "2026-11-19T16:30:00+01:00"}
+]}

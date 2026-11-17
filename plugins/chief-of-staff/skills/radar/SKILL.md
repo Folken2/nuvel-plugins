@@ -144,23 +144,27 @@ what you found:
   conversation IDs, message IDs) logged in this and the previous ~2 runs;
   `next_task` = the next unused task number.
 
-### Check the task IDs
+### Check the radar
 
 Before saving, if you can run code (Cowork, a cloud routine, Claude Code),
 write the previous radar's text and your new radar's text to two temporary
 files and run:
 
-`python3 ../../scripts/check_task_ids.py --previous <previous file> <new file>`
+`python3 ../../scripts/check_radar.py --previous <previous file> <new file>`
 
-(no `--previous` on the very first radar). `result: ok` → save. Each `error:`
-line names a broken rule: fix that line in your draft (restore a dropped
-task, put a renumbered task back on its old ID, take the next free number)
-and run it again, at most twice. Still failing → save anyway, with
-`Task IDs: check failed — <errors>` in the journal, and the run is `partial`.
-A `warning:` (a new task with the same link as an old one, a reopened task)
-means look again: merge into the old task if it is the same one, else keep it.
-Use its `tasks_new` and `tasks_closed` for the trace. Can't run code → skip
-the check and write `Task IDs: not checked (no code execution)` in the journal.
+(no `--previous` on the very first radar). It checks the whole document
+against the contract: header, sections and their order, at most 5 in *Needs
+you now*, `due` dates, cursors and `seen`, nothing secret or copied from an
+email (safety.md), and every task-ID rule. `result: ok` → save. Each `error:`
+line names a broken rule: fix that part of your draft (restore a dropped
+task, put a renumbered task back on its old ID, write the date, remove the
+copied code or number) and run it again, at most twice. Still failing → save
+anyway, with `Radar check: failed — <errors>` in the journal, and the run is
+`partial`. A `warning:` means look again (a new task with the same link as
+an old one: merge it if it is the same task; a very long line: summarise
+it). Then write `Radar check: ok` in the journal and use its `tasks_new` and
+`tasks_closed` for the trace. Can't run code → skip the check and write
+`Radar check: not checked (no code execution)` in the journal.
 
 Write it once. If the write fails, retry once; if it still fails, report the
 error — the next run will cover the same window because no new cursor was saved.
@@ -191,13 +195,14 @@ content-free trace right before saving the new radar document, and end that
 document with a `## Trace` section mirroring it. Report only these steps:
 `radar.load-state`, `radar.sweep.email`, `radar.sweep.calendar`,
 `radar.sweep.chat` (for the chat, task and document sources; `skipped` if none
-is configured), `radar.check-ids` (`skipped` without code execution, `error`
+is configured), `radar.check` (`skipped` without code execution, `error`
 if it still failed when saved), `radar.write` and `radar.notify` (`skipped` on interactive runs
 or when nothing was sent).
 
 - **Counts:** `read`, `relevant`, `skipped_noise` per sweep step;
-  `id_errors` (error lines on the last check) and `id_fixes` (checks re-run
-  after fixing) on `radar.check-ids`;
+  `check_errors` (error lines on the last check, of which `id_errors` are
+  task-ID rules) and `check_fixes` (checks re-run after fixing) on
+  `radar.check`;
   `needs_you_now`, `decide`, `open_loops`, `handoffs_applied`, `tasks_new`
   (IDs allocated this run) and `tasks_closed` (tasks moved to *Closed* this
   run) on `radar.write`. Never send a task ID.
