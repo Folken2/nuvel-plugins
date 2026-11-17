@@ -165,7 +165,11 @@ var COS_STRINGS = {
 "noCal": "Your calendar isn't connected to this dashboard.",
 "threadFail": "Couldn't load the thread. Fill in the address yourself.",
 "toMissing": "Add who it goes to.",
-"fixAllow": "Allow access"
+"fixAllow": "Allow access",
+"resumedOne": "Saved a close from earlier: {id} {title}. Your radar closes it on its next run.",
+"resumedMany": "Saved {n} closes from earlier ({ids}). Your radar closes them on its next run.",
+"pendingT": "Finishing what you closed earlier.",
+"pendingP": "{ids} will be handed to your radar in a moment."
 },
 "ca": {
 "today": "Avui",
@@ -331,7 +335,11 @@ var COS_STRINGS = {
 "noCal": "El calendari no està connectat a aquest tauler.",
 "threadFail": "No s'ha pogut carregar el fil. Escriu l'adreça tu.",
 "toMissing": "Indica a qui va.",
-"fixAllow": "Dona accés"
+"fixAllow": "Dona accés",
+"resumedOne": "S'ha desat un tancament d'abans: {id} {title}. El radar el tancarà a la propera passada.",
+"resumedMany": "S'han desat {n} tancaments d'abans ({ids}). El radar els tancarà a la propera passada.",
+"pendingT": "Acabant el que vas tancar abans.",
+"pendingP": "{ids} es passarà al radar d'aquí a un moment."
 },
 "es": {
 "today": "Hoy",
@@ -497,7 +505,11 @@ var COS_STRINGS = {
 "noCal": "El calendario no está conectado a este panel.",
 "threadFail": "No se ha podido cargar el hilo. Escribe la dirección tú.",
 "toMissing": "Indica a quién va.",
-"fixAllow": "Dar acceso"
+"fixAllow": "Dar acceso",
+"resumedOne": "Se ha guardado un cierre de antes: {id} {title}. El radar lo cerrará en la próxima pasada.",
+"resumedMany": "Se han guardado {n} cierres de antes ({ids}). El radar los cerrará en la próxima pasada.",
+"pendingT": "Terminando lo que cerraste antes.",
+"pendingP": "{ids} se pasará al radar en un momento."
 }
 },
 "DRAFT": {

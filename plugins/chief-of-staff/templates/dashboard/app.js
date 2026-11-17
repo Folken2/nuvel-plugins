@@ -148,7 +148,18 @@ function reconcile() {  // the radar closed it (or it left the lists): forget ou
 function stamp(d) {
   var p = parts(d); return { name: p.date + " " + p.hm.replace(":", "") + " handoff", human: p.date + " " + p.hm };
 }
-function writeClose(id) {
+var resumed = [], resumedTimer = null;
+function announceResumed(id) {  // a close from an earlier visit reached the registry: say so, never silently
+  resumed.push(id); clearTimeout(resumedTimer);
+  resumedTimer = setTimeout(function () {
+    var ids = resumed.slice(); resumed = [];
+    if (ids.length === 1) {
+      var x = todoAll().concat(ST.model ? ST.model.dele : []).filter(function (y) { return y.id === ids[0]; })[0];
+      toast(t("resumedOne", { id: ids[0], title: x ? x.title : "" }).replace(/\s+\./, "."));
+    } else toast(t("resumedMany", { n: ids.length, ids: ids.join(", ") }));
+  }, 400);
+}
+function writeClose(id, fromEarlier) {
   var c = MEM.closing[id]; if (!c || c.written || c.inflight || !mcp) return;
   c.inflight = true; save();
   var d = new Date(), tries = 0;
@@ -161,7 +172,7 @@ function writeClose(id) {
         contentMimeType: "text/markdown" });
     });
   }
-  attempt().then(function () { c.written = true; c.inflight = false; save(); render(); })
+  attempt().then(function () { c.written = true; c.inflight = false; save(); render(); if (fromEarlier) announceResumed(id); })
     .catch(function (e) {
       var ambiguous = e && (e.code === "server_unavailable" || e.code === "upstream_error" || e.code === "cancelled");
       if (ambiguous) { c.inflight = false; c.check = true; save(); }  // may exist: look before writing again
@@ -172,11 +183,11 @@ function writeClose(id) {
 function resumeCloses() {  // a close that never reached the registry (page closed during undo, or an unclear failure)
   Object.keys(MEM.closing).forEach(function (id) {
     var c = MEM.closing[id]; if (c.written) return;
-    if (!c.check && !c.inflight) { if (Date.now() - c.at > 6000) writeClose(id); return; }
+    if (!c.check && !c.inflight) { if (Date.now() - c.at > 6000) writeClose(id, true); return; }
     call(SRV.drive, "search_files", { query: "parentId = " + q(CFG.storage.handoff) + " and fullText contains " + q("task: " + id) +
       " and createdTime > " + q(new Date(c.at - 120000).toISOString().replace(/\.\d+Z$/, "Z")), excludeContentSnippets: true, pageSize: 5 }, true)
-      .then(function (p) { if ((p.files || []).length) { c.written = true; c.inflight = false; c.check = false; save(); render(); }
-        else { c.inflight = false; c.check = false; save(); writeClose(id); } }).catch(function () {});
+      .then(function (p) { if ((p.files || []).length) { c.written = true; c.inflight = false; c.check = false; save(); render(); announceResumed(id); }
+        else { c.inflight = false; c.check = false; save(); writeClose(id, true); } }).catch(function () {});
   });
 }
 function requestClose(x, reason) {
@@ -194,6 +205,7 @@ function requestClose(x, reason) {
 }
 
 /* ---------- model helpers ---------- */
+function pending(x) { var c = x.id && MEM.closing[x.id]; return !!(c && !c.written); }
 function status(x) {
   if (x.closedOn !== undefined) return "done";
   if (x.id && MEM.closing[x.id]) return "done";
@@ -238,7 +250,7 @@ function safeUrl(u) { return /^https:\/\//i.test(u || "") ? u : null; }
 function openUrl(u) { var s = safeUrl(u); if (s) window.open(s, "_blank", "noopener"); }
 function initials(n) { return String(n || "").split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join("").toUpperCase() || "·"; }
 function signal(x, dele) {
-  if (status(x) === "done") return h("span", { class: "sig", text: x.id && MEM.closing[x.id] && !MEM.closing[x.id].written ? t("closing") + "…" : t("st_done") });
+  if (status(x) === "done") return pending(x) ? h("span", { class: "sig amber", text: t("closing") + "…" }) : h("span", { class: "sig", text: t("st_done") });
   if (x.due) { var n = dd(today(), x.due); if (n < 0) return h("span", { class: "sig red", text: t("overdue", { n: -n }) });
     if (n === 0) return h("span", { class: "sig amber", text: t("dueToday") }); return h("span", { class: "sig", text: t("due", { d: n < 7 ? wk(x.due) : dlong(x.due) }) }); }
   if (dele && x.since) { var w = waited(x); return h("span", { class: "sig" + (w >= 7 ? " red" : ""), text: t("waiting", { n: w }) }); }
@@ -291,18 +303,23 @@ function renderNav() {
 
 /* ---------- shared pieces ---------- */
 function notice(kind, title, body, btn) {
-  return h("div", { class: "notice " + kind, role: kind === "red" ? "alert" : "status" }, h("span", { class: "ic", "aria-hidden": "true", text: "!" }),
+  return h("div", { class: "notice " + kind, role: kind === "red" ? "alert" : "status" }, h("span", { class: "ic", "aria-hidden": "true", text: kind === "calm" ? "i" : "!" }),
     h("div", { class: "tx" }, title ? h("b", { text: title + " " }) : null, body ? h("span", { text: body }) : null), btn || null);
 }
 function allowBtn(server) {
   return h("button", { class: "act nb", type: "button", text: t("fixAllow"), onclick: function () {
     claude.use("permissions").then(function (p) { return p && p.request(["mcp:" + server]); }).catch(function () {}).then(function () { refresh(); }); } });
 }
+function earlierPending() {  // closes from an earlier visit not yet in the registry (this visit's own sit in their undo window)
+  return Object.keys(MEM.closing).filter(function (id) { return !MEM.closing[id].written && !timers[id]; }).sort();
+}
 function stateNotice() {
   if (ST.phase === "nomcp") return notice("calm", t("noMcpT"), t("noMcpP"));
   if (ST.phase === "ms") return notice("calm", t("msT"), t("msP"));
   if (ST.err.drive) { var c = ST.err.drive.code;
     return notice("red", t("discT"), errText(ST.err.drive, SRV.drive), (c === "not_in_manifest" || c === "approval_required") ? allowBtn(SRV.drive) : null); }
+  var ep = earlierPending();
+  if (ep.length && mcp) return notice("calm", t("pendingT"), t("pendingP", { ids: ep.join(", ") }));
   if (stale()) return notice("amber", t("staleT", { w: dlong(radarDate()) }), t("staleP"), h("button", { class: "act nb", type: "button", onclick: function () { toast(t("staleFix")); }, text: t("fix") }));
   return null;
 }

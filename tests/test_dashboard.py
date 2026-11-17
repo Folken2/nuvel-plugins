@@ -203,3 +203,15 @@ def test_google_doc_export_of_config(tmp_path: Path) -> None:
     assert s["storage"]["runs"] == "1Runs_Folder_Example0000"
     assert s["owner"]["working_hours"] == "09:00-19:00 Mon-Fri"
     assert (s["email"], s["calendar"]) == ("gmail", "google")
+
+
+def test_closes_from_earlier_are_never_silent() -> None:
+    """A close saved on a later visit is shown while pending and announced when written."""
+    app = (TEMPLATE / "app.js").read_text()
+    assert "writeClose(id, true)" in app and "announceResumed(id)" in app
+    assert 'notice("calm", t("pendingT")' in app and 't("closing") + "…"' in app
+    strings = (TEMPLATE / "strings.js").read_text()
+    data = json.loads(strings.split("var COS_STRINGS = ", 1)[1].rstrip().rstrip(";"))
+    for lang in ("en", "ca", "es"):
+        for key in ("resumedOne", "resumedMany", "pendingT", "pendingP", "closing"):
+            assert data["S"][lang].get(key), (lang, key)
