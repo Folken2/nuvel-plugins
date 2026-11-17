@@ -45,7 +45,7 @@ jobs:
         run: |
           npm install --global @anthropic-ai/claude-code@2.1.326
           claude plugin eval plugins/chief-of-staff --trust-plugin --no-publish --scaffold \
-            --allow-tools Bash --model "$MODEL" --ablation none -j 2 \
+            --allow-tools Bash Write --model "$MODEL" --ablation none -j 2 \
             --threshold 0.8 --max-cost-usd 5 --json eval-results.json
       - uses: actions/upload-artifact@v4
         if: always() && env.ANTHROPIC_API_KEY != ''

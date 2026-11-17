@@ -12,7 +12,7 @@ Run locally (needs `bubblewrap` and `socat` for the shell tool's sandbox):
 
 ```bash
 claude plugin eval plugins/chief-of-staff --trust-plugin --no-publish --scaffold \
-  --allow-tools Bash --model claude-haiku-5-5 --ablation none -j 2 --max-cost-usd 5
+  --allow-tools Bash Write --model claude-haiku-5-5 --ablation none -j 2 --max-cost-usd 5
 ```
 
 CI runs the same command (`.github/workflows/evals.yml`) on pull requests that
