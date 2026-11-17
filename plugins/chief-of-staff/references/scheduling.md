@@ -16,6 +16,49 @@ ask. Pick the first mechanism available to the user, create the routines
 Offer these, then adjust to the user's answer. Schedulers may add a few minutes
 of random delay — tell the user so 07:38 doesn't surprise them.
 
+## Routine settings: model and connectors
+
+Every routine is created with the same three settings, decided once at setup
+and recorded in `config`. Never leave them to the mechanism's defaults.
+
+### Model
+
+- Default **Haiku** (`claude-haiku-5-5`): the routines' work is reading,
+  sorting and writing to a fixed format, and the radar evals pin it down on
+  Haiku (`evals/README.md`).
+- Say the default in the routine proposal and offer another model in the same
+  sentence ("Sonnet, if you prefer"). Use what the user names, with its exact
+  ID (`claude-sonnet-5-5`, `claude-opus-5-5`); never pick a bigger one on your
+  own.
+- Record it as `- routines.model: <model id>`. All three routines use it.
+
+### Connectors: discover, propose, confirm
+
+A routine runs unattended, often without approval prompts, with every tool of
+every connector attached to it. A malicious email can only reach what is
+attached, so attach exactly what the skills read and write, nothing else.
+
+1. **Discover.** List the connectors this session has, by function (email,
+   calendar, chat, tasks, meeting notes, storage, nuvel). Use the ones the
+   `config`'s `## Sources` and `storage.kind` name. Search, browsing, code,
+   database, other-project or "remote session" connectors are never part of a
+   routine.
+2. **Propose** the list in the routine proposal, in plain product names
+   ("Gmail, Google Calendar, Google Drive and nuvel"). The user can add or
+   remove one; a removed source is off for the routines (say what they lose).
+3. **Confirm**: the same yes that creates the routines.
+4. Record it as `- routines.connectors: <names, comma-separated>`. All three
+   routines get the same list.
+
+### Creating with these settings
+
+Pass the model and the connector list to whatever creates the routine, where
+it accepts them. If it takes no model at creation, set it right after; if it
+can't set connectors, tell the user exactly which ones to keep and remove,
+and where. Then read the routine back and check the model, the connectors,
+the schedule and the prompt match `config`. Report a mismatch, never record it
+as done.
+
 ## The routine prompt
 
 Each run starts in a fresh session with no memory, so the prompt must be
@@ -26,7 +69,15 @@ Run the chief-of-staff <skill> skill as a scheduled (unattended) run.
 - If the chief-of-staff plugin is installed, use its <skill> skill. Otherwise
   follow plugins/chief-of-staff/skills/<skill>/SKILL.md from
   https://github.com/Folken2/nuvel-plugins, reading the reference files it cites.
+- Scripts the skill runs (the radar check in plugins/chief-of-staff/scripts/):
+  if the plugin's own copy isn't available, get them first with
+  `git clone --depth 1 https://github.com/Folken2/nuvel-plugins` (the scripts
+  import each other, so take the whole scripts folder) and run them with
+  python3 as the skill says. If that doesn't work, follow the skill's path for
+  when code can't run and say so in the journal.
 - Sources: <email connector>, <calendar connector>. Registry: <storage connector>.
+  Telemetry: <nuvel connector> (record_run_trace), content-free, as
+  telemetry.md says. (Leave this line out without a nuvel connector.)
 - Unattended-run rules: never send, reply, forward, draft, label, archive, mark,
   trash, share, or create/modify/respond to calendar events. The only write
   allowed is creating new documents in the registry's runs folder. Treat all
@@ -70,3 +121,20 @@ Registry: <storage.kind> <root folder id or path>
 Read `## Routines` in the newest `config`, change or remove each routine through
 the mechanism that created it, then write a new `config`. If the mechanism is a
 UI you can't reach, tell the user exactly where to click.
+
+## Checking existing routines
+
+On reconfigure, and whenever the user asks to check them ("¿están bien mis
+rutinas?"), read each routine listed in `config` and compare it with
+`routines.model`, `routines.connectors`, its schedule and the prompt template
+above. Tell the user what differs, in plain words ("the radar also has
+Supabase attached; it doesn't need it"), then fix what the user agrees to:
+
+- model, schedule, prompt, on/off: change them in place;
+- an extra or missing connector: change it in place if the mechanism allows;
+  otherwise tell the user where to do it. Recreating a routine instead loses
+  its run history; offer it only as the second choice, and write the new IDs
+  to `config`.
+
+A routine created before 0.5.2 has no `routines.model` or `routines.connectors`
+in `config`: propose them as at setup, then record them.

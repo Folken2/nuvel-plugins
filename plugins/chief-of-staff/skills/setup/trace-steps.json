@@ -15,7 +15,9 @@
     "sources_missing",
     "questions_asked",
     "routines_created",
-    "corrections"
+    "corrections",
+    "routine_connectors",
+    "routines_fixed"
   ],
   "routing": []
 }

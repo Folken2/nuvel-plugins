@@ -519,3 +519,20 @@ def test_radar_runs_the_checker() -> None:
     layout = " ".join((COS / "references/registry-layout.md").read_text(encoding="utf-8").split())
     assert "never just disappears" in layout and "as `expired`" in layout
     assert "drop off after 14 days" not in layout
+
+
+def test_routines_get_a_model_and_only_needed_connectors() -> None:
+    sched = " ".join((COS / "references/scheduling.md").read_text(encoding="utf-8").split())
+    for token in ("Default **Haiku** (`claude-haiku-5-5`)", "`claude-sonnet-5-5`", "never pick a bigger one on your own",
+                  "attach exactly what the skills read and write, nothing else", "Search, browsing, code, database",
+                  "`- routines.model: <model id>`", "`- routines.connectors: <names, comma-separated>`",
+                  "read the routine back", "## Checking existing routines", "loses its run history",
+                  "`git clone --depth 1 https://github.com/Folken2/nuvel-plugins`"):
+        assert token in sched, token
+    setup = (COS / "skills/setup/SKILL.md").read_text(encoding="utf-8")
+    proposal = next(l for l in setup.splitlines() if l.startswith("> Propongo tres rutinas"))
+    assert "Haiku" in proposal and "Sonnet" in proposal and "solo podrán usar" in proposal
+    assert "This is a confirmation, not a seventh question" in setup
+    assert "Checking existing routines" in " ".join(setup.split())
+    layout = (COS / "references/registry-layout.md").read_text(encoding="utf-8")
+    assert "- routines.model: claude-haiku-5-5" in layout and "- routines.connectors:" in layout

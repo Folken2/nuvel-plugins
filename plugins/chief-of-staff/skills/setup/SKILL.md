@@ -33,9 +33,11 @@ folder's README from `../../templates/README.md`.
 
 Look for one (*Finding the registry* in `registry-layout.md`). If found, read the
 newest `config`, summarise the setup in 3–4 plain lines, and ask what to change:
-about them, their sources, where notes live, the schedule, what is shared
-with nuvel, pause, or remove. Jump to the matching step below, then write a
-new `config`. *What is shared*: ask question 6 again (a clear yes →
+about them, their sources, where notes live, the schedule or the routines'
+model and connectors, what is shared with nuvel, pause, or remove. Jump to the
+matching step below, then write a new `config`. Every reconfigure also checks
+the existing routines against `config` (`scheduling.md` *Checking existing
+routines*) and says what differs in one or two plain lines. *What is shared*: ask question 6 again (a clear yes →
 `sharing.recipe_text: on`, anything else → `off`), then ask whether to keep
 sharing useful recipes at all (no → `sharing.recipes: off`, yes → `on`).
 If the newest
@@ -163,12 +165,19 @@ Two things that make ordinary chats know about the chief of staff
 ## 5. Routines
 
 Follow `../../references/scheduling.md`: choose the mechanism that fits, create
-the routines only after a clear yes, record mechanism, schedule and ID in
-`config`. Say the three defaults in one message, in the user's timezone:
+the routines only after a clear yes, and record mechanism, schedule, ID,
+model and connectors in `config` (*Routine settings*). First discover which of
+the session's connectors the routines need: only the sources and storage chosen
+above, plus nuvel if it is connected; never search, browsing, database or other
+tools. Then say the three defaults, the model and that list in one message, in
+the user's timezone and with plain product names:
 
-> Propongo tres rutinas: un repaso cada 2 horas de 8 a 20 en días laborables, un resumen a las 7:30 y un balance el viernes a las 16:00. ¿Las activo?
+> Propongo tres rutinas: un repaso cada 2 horas de 8 a 20 en días laborables, un resumen a las 7:30 y un balance el viernes a las 16:00. Usarán el modelo Haiku, rápido y económico (si prefieres otro, como Sonnet, dímelo), y solo podrán usar Gmail, Google Calendar, Google Drive y nuvel. ¿Las activo?
 
-One yes creates all three. Mention once that start times can drift a few
+This is a confirmation, not a seventh question. A change ("también Slack",
+"mejor Sonnet") is applied and confirmed in one line. One yes creates all
+three with that model and only those connectors; then read them back and check
+(*Creating with these settings*). Mention once that start times can drift a few
 minutes. If you cannot create them yourself, give the user the exact name,
 text and schedule to paste, and record `manual`.
 
@@ -268,7 +277,9 @@ these steps: `setup.detect`, `setup.questions`, `setup.folder`, `setup.memory`,
 the dashboard skill stopped) and `setup.wrap-up`.
 
 - **Counts:** `sources_ok` and `sources_missing` on `setup.detect`;
-  `questions_asked` on `setup.questions`; `routines_created` on
+  `questions_asked` on `setup.questions`; `routines_created`,
+  `routine_connectors` (connectors attached to each routine) and
+  `routines_fixed` (settings corrected on existing routines) on
   `setup.routines`; `corrections` on `setup.first-radar`.
 - **Outcome:** `partial` if setup stopped at read-only storage or a step was
   skipped; `blocked` if a connector the user must enable is missing.

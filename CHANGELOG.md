@@ -2,6 +2,30 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.5.2 - 2026-11-17
+
+Setup owns the routines' settings, so nobody fixes them by hand.
+
+### Changed
+
+- **Model:** routines run on Haiku by default. Setup says so when it proposes
+  the routines and uses another model (Sonnet, for example) if you ask.
+  Recorded as `routines.model`.
+- **Connectors:** setup finds which of your connectors the routines need
+  (your email, calendar, chat, storage and nuvel), names them in the same
+  proposal, and attaches only those. Search, browsing, database and other
+  tools are never attached, so a malicious email has less to reach. Recorded
+  as `routines.connectors`.
+- **Read back:** after creating the routines, setup reads them back and
+  checks model, connectors, schedule and instructions against `config`.
+  Reconfigure does the same check on existing routines and offers to fix
+  what differs.
+- **Instructions:** the routine template now tells unattended runs how to
+  get the plugin's scripts (the radar check) and to use the nuvel connector
+  for telemetry.
+
+Design: `docs/specs/2026-11-17-routine-settings.md`.
+
 ## chief-of-staff 0.5.1 - 2026-11-17
 
 A safety net for unattended runs, now that the routines run on Haiku.

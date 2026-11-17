@@ -139,6 +139,8 @@ Plain language works too: "set up my chief of staff", "what did I miss?",
   local folder if everything runs on one computer.
 - A scheduler: Cowork scheduled tasks, cloud routines (claude.ai/code/routines),
   or desktop scheduled tasks. Setup picks one with you.
+  Routines run on Haiku unless you choose another model, and get only the
+  connectors they need; setup asks you to confirm both.
 - Optional: the nuvel connector, for usage signals and recipe sharing (requires a connector speaking `nuvel.recipe/3` and `nuvel.recipe_signal/2`).
 
 ## Privacy and safety
