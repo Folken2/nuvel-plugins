@@ -1,0 +1,5 @@
+interface:
+  display_name: "Chief of staff dashboard"
+  short_description: "Create or update your to-do dashboard"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $dashboard to create my chief of staff dashboard."

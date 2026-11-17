@@ -128,10 +128,11 @@ def test_composio_not_in_user_flow() -> None:
         assert not hits, f"{path.name}: {hits}"
 
 
-def test_microsoft_sections_marked_unverified() -> None:
-    for name in ("sources.md", "storage.md", "registry-layout.md"):
+def test_microsoft_sections_marked_tested() -> None:
+    for name in ("sources.md", "storage.md", "registry-layout.md", "safety.md"):
         text = (COS / "references" / name).read_text(encoding="utf-8")
-        assert "**Unverified (no tenant yet)**" in text, name
+        assert "Tested on a real tenant (2026-11)" in text, name
+        assert "Unverified" not in text, name
 
 
 JARGON = ("MCP", "cron", "scope", "OAuth", "Entra", "API", "token", "folder ID", "connector ID", "JSON")
@@ -484,3 +485,37 @@ def test_share_reply_maps_to_trace_counts() -> None:
                   "persists after the retry | `shares_failed`", "`shares_with_text` counts the shares sent with `text`",
                   "no `telemetry.install_id`", "`sharing.recipes: off` does not skip it: signals still go out"):
         assert token in sec, token
+
+
+def test_task_ids_contract() -> None:
+    """Radar items carry stable task IDs; only radar allocates them."""
+    layout = " ".join((COS / "references/registry-layout.md").read_text(encoding="utf-8").split())
+    radar_contract = _section(layout, "### `radar` run")
+    for section in ("## Needs you now - T-<n> —", "## Decide - T-<n> —", "### I owe - T-<n> —",
+                    "### Waiting on - T-<n> —", "## Watching - T-<n> —", "(last 14 days) - T-<n> —",
+                    "- next_task: T-<n>"):
+        assert section in radar_contract, section
+    ids = _section(layout, "### Task IDs")
+    for token in ("^- (T-\\d+) — ", "Only radar allocates", "Never reused", "before 0.5",
+                  "Match before allocating", "never sent in telemetry"):
+        assert token in ids, token
+    handoff = _section(layout, "### `handoff`")
+    assert "- task: T-42" in handoff and "close — not mine" in handoff and "done: task not found" in handoff
+
+
+def test_task_ids_in_skills() -> None:
+    radar = (COS / "skills/radar/SKILL.md").read_text(encoding="utf-8")
+    assert "next_task" in radar and "Never send a task ID" in radar
+    for skill in ("radar", "recall", "brief", "prep", "weekly-review"):
+        assert "T-" in (COS / f"skills/{skill}/SKILL.md").read_text(encoding="utf-8"), skill
+    assert {"tasks_new", "tasks_closed"} <= set(_json(COS / "skills/radar/trace-steps.json")["counts"])
+    assert "close" in _json(COS / "skills/recall/trace-steps.json")["routing"]
+
+
+def test_radar_runs_the_task_id_checker() -> None:
+    radar = (COS / "skills/radar/SKILL.md").read_text(encoding="utf-8")
+    assert "`python3 ../../scripts/check_task_ids.py --previous" in radar
+    assert "not checked (no code execution)" in radar and "check failed" in radar
+    layout = " ".join((COS / "references/registry-layout.md").read_text(encoding="utf-8").split())
+    assert "never just disappears" in layout and "as `expired`" in layout
+    assert "drop off after 14 days" not in layout
