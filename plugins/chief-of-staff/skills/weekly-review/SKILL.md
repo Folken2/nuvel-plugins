@@ -82,7 +82,7 @@ Afterwards, if the user corrected the result or a recipe was used, run the
 - …
 
 ## Loops
-- Closed: <n> · Still open: <n> · Overdue: <list>
+- Closed: <n> · Still open: <n> · Overdue: <T-<n> — … list>
 - Waiting on for > 1 week: <who, what — suggest a nudge>
 - Decide items still pending: <list — suggest yes/no/ignore>
 
@@ -103,7 +103,8 @@ Afterwards, if the user corrected the result or a recipe was used, run the
   with no activity for 3 weeks — ask the user, don't change `config` yourself>
 ```
 
-   Drop *What I learned this week* when nothing changed. The journal lists
+   Items taken from the radar keep their task ID (`T-42 — …`). Drop *What I
+   learned this week* when nothing changed. The journal lists
    the recipe batch: drafts expired, recipes merged, whether an `index` was
    written, and the `signal:` and `share:` lines from `recipe-sharing.md`
    (never a recipe's text).

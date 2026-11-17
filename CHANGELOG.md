@@ -2,6 +2,33 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.5.0 - 2026-11-17
+
+Task IDs: every item on the radar has a short ID you can point at.
+
+### Added
+
+- **Task IDs:** every item in *Needs you now*, *Decide*, *I owe*, *Waiting
+  on*, *Watching* and *Closed* starts with an ID like `T-42`. It stays the
+  same while the task moves between sections and runs, and is never reused.
+  Only the radar gives out IDs (`next_task` in its *Cursors*); the first 0.5
+  radar numbers the items it carries over from an older radar.
+- **Act on a task by its ID:** say "T-42 is done", "T-42 isn't mine" or "what's
+  T-42?" in any chat. Handoffs gain an optional `task` line and a new `close`
+  instruction (done or not mine), which the next radar applies by moving the
+  task to *Closed*. Brief, prep and weekly review keep the IDs on the items
+  they copy.
+- Radar traces count `tasks_new` and `tasks_closed`; IDs are never sent.
+
+### Changed
+
+- **Microsoft 365 tested on a real tenant:** the "unverified" markers are
+  gone. Tools are still discovered by function, since their names are not
+  published.
+- Anything that parses radar bullets must allow the leading `T-<n> — ` field.
+
+Design: `docs/specs/2026-11-17-task-ids.md`.
+
 ## chief-of-staff 0.4.1 - 2026-11-02
 
 ### Added

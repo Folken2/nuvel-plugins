@@ -61,7 +61,7 @@ Afterwards, if the user corrected the result or a recipe was used, run the
 - <3–6 bullets: history, decisions so far, numbers that matter>
 
 ## Open loops with them
-- I owe: … / Waiting on: …
+- I owe: T-<n> — … / Waiting on: T-<n> — …        (task IDs from the radar)
 
 ## Suggested agenda / questions
 1. …

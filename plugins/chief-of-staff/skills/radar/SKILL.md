@@ -55,7 +55,8 @@ becomes a lesson. Interactive run corrected by the user, or a recipe was used
    this is the first run: window = last 7 days.
 4. Read open handoffs: documents in `handoff/` newer than ~30 days that the
    previous radar does not list as `done`. Apply them during the sweep; they
-   rank as high as VIPs.
+   rank as high as VIPs. A handoff with `- task: T-<n>` applies to that task
+   only; `close` moves it to *Closed* with its reason (step 3).
 5. Window per source = from its cursor in the previous radar's `## Cursors` to
    now, minus 10 minutes of overlap (the `seen` list removes duplicates). Cap at
    7 days and say so in the journal if you had to cut it.
@@ -99,6 +100,13 @@ Create `runs/YYYY-MM-DD HHMM radar` (owner's timezone; Google Doc on Drive,
 `registry-layout.md`, in `owner.language`. Build it from the previous radar plus
 what you found:
 
+- **Task IDs:** every item in *Needs you now*, *Decide*, *I owe*, *Waiting
+  on*, *Watching* and *Closed* starts with `T-<n> — ` (*Task IDs* in
+  `registry-layout.md`). Carried tasks keep their ID in whatever section they
+  move to. Before giving a finding a new ID, match it to a carried task by
+  source thread or by the same commitment with the same person; only a new
+  task takes `next_task`. Previous radar without `next_task` → number its
+  items from `T-1` and say so in the journal.
 - **Owner:** one bullet with `owner.name` from the config (the run contract's
   *Owner* rule).
 - **Journal:** window, counts per source, one bullet per relevant item tagged
@@ -125,10 +133,13 @@ what you found:
   *Watching* with their **date and amount** taken from the snippet (open the
   body only if the snippet lacks them). Never copy card, IBAN or account numbers.
 - **Handoff:** every open handoff as `open` or `done` (with outcome) or
-  `done: expired`.
+  `done: expired`. A `close` handoff → its task moves to *Closed* with
+  `closed <today> — done` or `— not mine`, and the handoff is `done`; a
+  handoff whose `task` is no longer in the snapshot → `done: task not found`.
 - **Cursors:** new cursor per source (newest item processed); failed sources keep
   the old one with `— error: …`; `seen` = opaque IDs (Gmail thread IDs, Outlook
-  conversation IDs, message IDs) logged in this and the previous ~2 runs.
+  conversation IDs, message IDs) logged in this and the previous ~2 runs;
+  `next_task` = the next unused task number.
 
 Write it once. If the write fails, retry once; if it still fails, report the
 error — the next run will cover the same window because no new cursor was saved.
@@ -148,6 +159,7 @@ error — the next run will cover the same window because no new cursor was save
 - Don't edit or delete earlier documents — the registry is append-only.
 - Don't copy email bodies, codes, credentials or financial/ID numbers.
 - Don't log subjects, names or addresses in `seen` — opaque IDs only.
+- Don't renumber, reuse or swap task IDs: a task's ID never changes.
 - Don't let the snapshot grow past ~150 lines: summarise and link.
 
 ## Trace
@@ -162,8 +174,9 @@ is configured), `radar.write` and `radar.notify` (`skipped` on interactive runs
 or when nothing was sent).
 
 - **Counts:** `read`, `relevant`, `skipped_noise` per sweep step;
-  `needs_you_now`, `decide`, `open_loops` and `handoffs_applied` on
-  `radar.write`.
+  `needs_you_now`, `decide`, `open_loops`, `handoffs_applied`, `tasks_new`
+  (IDs allocated this run) and `tasks_closed` (tasks moved to *Closed* this
+  run) on `radar.write`. Never send a task ID.
 - **Routing:** how many relevant items fell in each bucket: `vip`, `priority`,
   `ask`, `waiting_on`, `decide`, `watching`, `noise`.
 - **Outcome:** `partial` if any source failed; `blocked` if the registry could

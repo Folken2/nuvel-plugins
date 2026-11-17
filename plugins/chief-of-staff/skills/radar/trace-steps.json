@@ -15,7 +15,9 @@
     "needs_you_now",
     "decide",
     "open_loops",
-    "handoffs_applied"
+    "handoffs_applied",
+    "tasks_new",
+    "tasks_closed"
   ],
   "routing": [
     "vip",

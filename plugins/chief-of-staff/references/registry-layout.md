@@ -91,7 +91,7 @@ Every skill locates it the same way, stopping at the first hit:
 Then resolve the subfolder IDs (`config`, `runs`, `handoff`, `lessons`,
 `recipes`) — they are listed in the newest `config` under `storage.folders`.
 
-**Unverified (no tenant yet)**: on Microsoft 365 use whatever the connector
+**Tested on a real tenant (2026-11)**: on Microsoft 365 use whatever the connector
 offers by function ("OneDrive search by name", "list folder children"); no
 Drive query syntax applies. Listing the children of a known folder is the
 most dependable path.
@@ -103,9 +103,8 @@ on Drive: `parentId = '<runs id>' and title contains 'radar' and createdTime > '
 On OneDrive / SharePoint, **list the children** of the target folder (for
 `runs`, a flat folder), keep the names that contain the kind (`radar`), and take
 the greatest name. Sort by name yourself; never by the order returned, by
-modified time, or by a search ranking. **Unverified (no tenant yet)**: paging
-and filter options of the Microsoft listing are unconfirmed, so page until the
-list is exhausted when a window is not available.
+modified time, or by a search ranking. On Microsoft 365, page until the list
+is exhausted when a window is not available.
 If nothing comes back, widen the window (14 days, then no limit). Never rely on
 the order a search returns.
 
@@ -182,27 +181,27 @@ state forward, even when nothing changed.
 - Errors: none.
 
 ## Needs you now
-- <what> — <why it matters> — due <YYYY-MM-DD> — <link>        (max 5)
+- T-<n> — <what> — <why it matters> — due <YYYY-MM-DD> — <link>        (max 5)
 
 ## Decide
-- <unsolicited proposal / invitation / opportunity> — <who> — <why it may matter> — due <YYYY-MM-DD> — <link> — since <date>
+- T-<n> — <unsolicited proposal / invitation / opportunity> — <who> — <why it may matter> — due <YYYY-MM-DD> — <link> — since <date>
 
 ## Today
 - 11:00 <meeting> — <one-line context>
 
 ## Open loops
 ### I owe
-- <what> — <who> — due <date> — <link> — since <date>
+- T-<n> — <what> — <who> — due <date> — <link> — since <date>
 ### Waiting on
-- <what> — <who> — due <YYYY-MM-DD> — <link> — since <date>
+- T-<n> — <what> — <who> — due <YYYY-MM-DD> — <link> — since <date>
 ### Closed (last 14 days)
-- <what> — <who> — closed <date>
+- T-<n> — <what> — <who> — closed <date> — <done | not mine | resolved>
 
 ## Moving
 - [project] <what changed recently>
 
 ## Watching
-- <slow signals; dated notices with their date/amount: renewals, expiries, invoices>
+- T-<n> — <slow signals; dated notices with their date/amount: renewals, expiries, invoices>
 
 ## Handoff
 - open: <handoff doc name> — <instruction>
@@ -212,6 +211,7 @@ state forward, even when nothing changed.
 - email: 2026-10-20T19:39:00+02:00 — ok
 - calendar: 2026-10-20T19:39:10+02:00 — ok
 - seen: <opaque source ids logged in the last ~3 runs, comma-separated>
+- next_task: T-<n>
 
 ## Trace
 - outcome: success · steps: radar.load-state ok, radar.sweep.email ok (read 14, relevant 3) …
@@ -229,6 +229,10 @@ Rules:
   Friday; "end of month" → its last day; "today" → today). No deadline → leave
   `due` out; never invent one. It goes in *Needs you now*, *Decide*, *I owe*
   and *Waiting on*, and is carried forward unchanged unless the source moves it.
+- **Task IDs:** see *Task IDs* below. Every item in *Needs you now*,
+  *Decide*, *I owe*, *Waiting on*, *Watching* and *Closed* starts with its
+  `T-<n> — `; *Today*, *Moving* and *Journal* items have none (the journal may
+  mention IDs: "T-42 new", "T-17 closed").
 - `## Trace` is the last section of every run document: exactly what was sent to
   `record_run_trace` (ids, counts, outcome) or one line saying why nothing was
   sent (`telemetry.md`). It never contains content.
@@ -243,6 +247,35 @@ Rules:
   direct ask from someone they work with. Inbound the user never asked for
   (cold proposals, partnership offers, invitations) goes to `Decide`; items
   there drop off after 14 days without action (they stay in history).
+
+### Task IDs
+
+A task ID names one task for as long as it exists, in every section and every
+run, so the user, the main agent and any other reader can point at it
+("T-42 is done") without describing it again.
+
+- **Format:** `T-<n>`, a positive integer with no padding (`T-1`, `T-42`). It
+  is the first field of the bullet: `- T-42 — <what> — …`; readers match
+  `^- (T-\d+) — `. The same in every `owner.language`.
+- **One task, one ID.** A task keeps its ID when it moves between sections
+  (Waiting on → Needs you now → Closed). *Needs you now* is a ranked view, so a
+  task there may also be listed in *I owe* or *Waiting on* with the **same**
+  ID; two different tasks never share one.
+- **Match before allocating.** A new finding belongs to a carried task when it
+  is the same source thread (thread / conversation ID or link) or the same
+  commitment with the same person: update that task's line. Only a new task
+  gets a new ID. When unsure, keep the existing task and note the merge in the
+  journal.
+- **Only radar allocates.** New task → the previous radar's `next_task`, then
+  +1. Each radar writes `next_task` as the greater of the previous
+  `next_task` and (the highest ID in the previous radar + 1).
+- **Never reused.** A closed task stays in *Closed* with its ID for 14 days and
+  then drops off; its number is never given out again.
+- **First run, or a radar from before 0.5** (no `next_task`): number the
+  carried items in section order (*Needs you now*, *Decide*, *I owe*,
+  *Waiting on*, *Watching*, *Closed*) from `T-1`, the same task once, and say
+  so in the journal ("Task IDs assigned: T-1…T-12").
+- IDs are local counters: never sent in telemetry (`telemetry.md`).
 
 ### Other runs (`brief`, `prep`, `weekly-review`, `recall`, `setup`, `learn`)
 
@@ -260,7 +293,8 @@ Rules:
 - errors: none
 ```
 
-They don't carry state; the newest `radar` stays the current picture.
+They don't carry state; the newest `radar` stays the current picture. Any
+item they copy from the radar keeps its `T-<n>`, so the user can reply with it.
 
 ### `lessons` — what the user has corrected
 
@@ -298,13 +332,19 @@ stats (`draft|active|retired`) and index rules: `recipes.md`.
 # Handoff · 2026-10-20 19:45
 
 - instruction: Watch for Acme's reply on the pricing proposal; put it in Needs you now.
+- task: T-42
 - from: main agent (on behalf of the user)
 - until: 2026-10-24
 ```
 
 A handoff is open until a `radar` run lists it under `## Handoff` as `done`
 (or `until` has passed — then `done: expired`). Handoffs may only ask routines
-to **watch, rank, ignore or remind** — never to send, reply, accept or delete.
+to **watch, rank, ignore, remind or close** — never to send, reply, accept or
+delete. `task` is optional: with it, the instruction applies to that task only.
+`close` needs a `task` and a reason — `- instruction: close — done` or
+`close — not mine` — and the next radar moves the task to *Closed* with that
+reason; it changes only the registry. A `task` that is no longer in the newest
+radar → the radar marks the handoff `done: task not found`.
 
 ## Searching history
 

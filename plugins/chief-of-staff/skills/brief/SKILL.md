@@ -70,7 +70,9 @@ Afterwards, if the user corrected the result or a recipe was used, run the
 7. Reply with the brief (interactive) or a short notification with the focus line
    and the link (scheduled).
 
-Keep it short: drop empty sections. Suggest, never act.
+Keep it short: drop empty sections. Suggest, never act. Every item taken from
+the radar keeps its task ID at the start (`- T-42 — …`) so the user can reply
+with it; meetings and free blocks have none.
 
 ## Trace
 
