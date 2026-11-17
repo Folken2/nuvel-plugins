@@ -193,3 +193,13 @@ def test_parser_agrees_with_checker_on_task_ids() -> None:
             f'const m=R.parseRadar(require("fs").readFileSync({json.dumps(str(new))},"utf8"));'
             'console.log(JSON.stringify([...m.todo,...m.dele,...m.closed,...m.info].map(x=>x.id).filter(Boolean)));'))
         assert {int(i[2:]) for i in js} <= py, new.parent.name
+
+
+def test_google_doc_export_of_config(tmp_path: Path) -> None:
+    """Configs read back from Google Docs escape underscores (`working\\_hours`, `1ow\\_DSN…`) and indent bullets."""
+    code, out, page, _ = build(FIX / "config-google-doc.md", tmp_path)
+    assert code == 0, out
+    s = settings_of(page.read_text())
+    assert s["storage"]["runs"] == "1Runs_Folder_Example0000"
+    assert s["owner"]["working_hours"] == "09:00-19:00 Mon-Fri"
+    assert (s["email"], s["calendar"]) == ("gmail", "google")

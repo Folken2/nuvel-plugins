@@ -65,6 +65,16 @@
       "tasks_closed": 0
     }
   },
+  "google-doc-readback": {
+    "description": "Both radars as Google Docs reads them back: `next\\_task`, `\\[tag\\]`, indented bullets. Nothing changed.",
+    "exit": 0,
+    "errors": [],
+    "warnings": [],
+    "counts": {
+      "tasks_new": 0,
+      "tasks_closed": 0
+    }
+  },
   "id-below-floor": {
     "description": "A new task takes T-7, which was given out before (next_task was T-12) and is not in the previous radar.",
     "exit": 1,

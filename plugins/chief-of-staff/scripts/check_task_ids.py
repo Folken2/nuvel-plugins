@@ -33,6 +33,7 @@ TASK_RE = re.compile(r"^T-(?P<n>[1-9]\d*)\s+—\s+(?P<rest>.*)$")
 LOOSE_ID_RE = re.compile(r"^T\s*-?\s*0*\d+\b")
 NEXT_RE = re.compile(r"^\s*[-*•]\s+next_task:\s*T-(?P<n>[1-9]\d*)\s*$", re.MULTILINE)
 LINK_RE = re.compile(r"https?://[^\s)>\]]+")
+MD_ESCAPE_RE = re.compile(r"\\([\\`*_{}\[\]()#+\-.!<>|])")  # Google Docs reads back `next\_task`, `\[infra\]`
 
 
 @dataclass
@@ -66,6 +67,7 @@ def _section_of(line: str) -> str | None:
 
 
 def parse(text: str, label: str) -> Radar:
+    text = MD_ESCAPE_RE.sub(r"\1", text)
     radar = Radar()
     section = None
     for raw in text.splitlines():

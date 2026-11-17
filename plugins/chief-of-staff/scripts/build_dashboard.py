@@ -39,6 +39,7 @@ MICROSOFT = None
 BULLET_RE = re.compile(r"^\s*[-*•]\s+([A-Za-z_.]+):\s*(.*?)\s*$")
 HEADING_RE = re.compile(r"^\s*#{1,6}\s*(.+?)\s*$")
 FOLDER_ID_RE = re.compile(r"^[A-Za-z0-9_-]{10,}$")
+MD_ESCAPE_RE = re.compile(r"\\([\\`*_{}\[\]()#+\-.!<>|])")  # Google Docs exports `working\_hours`, `1ow\_DSN…`
 
 
 def plugin_version() -> str:
@@ -50,7 +51,7 @@ def parse_config(text: str) -> tuple[dict[str, str], dict[str, str]]:
     keys: dict[str, str] = {}
     sources: dict[str, str] = {}
     section = ""
-    for line in text.splitlines():
+    for line in MD_ESCAPE_RE.sub(r"\1", text).splitlines():
         heading = HEADING_RE.match(line)
         if heading and not BULLET_RE.match(line):
             section = heading.group(1).strip().lower()
