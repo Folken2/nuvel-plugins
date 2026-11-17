@@ -215,3 +215,15 @@ def test_closes_from_earlier_are_never_silent() -> None:
     for lang in ("en", "ca", "es"):
         for key in ("resumedOne", "resumedMany", "pendingT", "pendingP", "closing"):
             assert data["S"][lang].get(key), (lang, key)
+
+
+def test_theme_switch_is_per_viewer_and_follows_claude_on_auto() -> None:
+    app = (TEMPLATE / "app.js").read_text()
+    assert 'theme: "auto"' in app and 'THEME_NEXT = { auto: "light", light: "dark", dark: "auto" }' in app
+    assert "HOST_THEME" in app and "MutationObserver" in app
+    css = (TEMPLATE / "app.css").read_text()
+    assert ':root[data-theme="dark"]' in css and ':root:not([data-theme="light"])' in css
+    data = json.loads((TEMPLATE / "strings.js").read_text().split("var COS_STRINGS = ", 1)[1].rstrip().rstrip(";"))
+    for lang in ("en", "ca", "es"):
+        for key in ("theme", "th_auto", "th_light", "th_dark", "th_next"):
+            assert data["S"][lang].get(key), (lang, key)

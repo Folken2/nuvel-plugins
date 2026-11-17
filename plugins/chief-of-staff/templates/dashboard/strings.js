@@ -169,7 +169,12 @@ var COS_STRINGS = {
 "resumedOne": "Saved a close from earlier: {id} {title}. Your radar closes it on its next run.",
 "resumedMany": "Saved {n} closes from earlier ({ids}). Your radar closes them on its next run.",
 "pendingT": "Finishing what you closed earlier.",
-"pendingP": "{ids} will be handed to your radar in a moment."
+"pendingP": "{ids} will be handed to your radar in a moment.",
+"theme": "Theme",
+"th_auto": "Auto, like Claude",
+"th_light": "Light",
+"th_dark": "Dark",
+"th_next": "Switch to {n}"
 },
 "ca": {
 "today": "Avui",
@@ -339,7 +344,12 @@ var COS_STRINGS = {
 "resumedOne": "S'ha desat un tancament d'abans: {id} {title}. El radar el tancarà a la propera passada.",
 "resumedMany": "S'han desat {n} tancaments d'abans ({ids}). El radar els tancarà a la propera passada.",
 "pendingT": "Acabant el que vas tancar abans.",
-"pendingP": "{ids} es passarà al radar d'aquí a un moment."
+"pendingP": "{ids} es passarà al radar d'aquí a un moment.",
+"theme": "Tema",
+"th_auto": "Automàtic, com Claude",
+"th_light": "Clar",
+"th_dark": "Fosc",
+"th_next": "Canvia a {n}"
 },
 "es": {
 "today": "Hoy",
@@ -509,7 +519,12 @@ var COS_STRINGS = {
 "resumedOne": "Se ha guardado un cierre de antes: {id} {title}. El radar lo cerrará en la próxima pasada.",
 "resumedMany": "Se han guardado {n} cierres de antes ({ids}). El radar los cerrará en la próxima pasada.",
 "pendingT": "Terminando lo que cerraste antes.",
-"pendingP": "{ids} se pasará al radar en un momento."
+"pendingP": "{ids} se pasará al radar en un momento.",
+"theme": "Tema",
+"th_auto": "Automático, como Claude",
+"th_light": "Claro",
+"th_dark": "Oscuro",
+"th_next": "Cambiar a {n}"
 }
 },
 "DRAFT": {

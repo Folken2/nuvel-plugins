@@ -17,7 +17,7 @@ function t(k, v) { var s = STR.S[LANG][k] || STR.S.en[k] || k; if (v) for (var x
 
 /* ---------- per-viewer memory (never shared, never read by Claude) ---------- */
 var KEY = "cos.dash." + CFG.storage.root;
-var MEM = { doing: {}, closing: {}, read: {}, side: false };
+var MEM = { doing: {}, closing: {}, read: {}, side: false, theme: "auto" };
 try { var m0 = JSON.parse(localStorage.getItem(KEY) || "{}"); for (var k0 in MEM) if (m0[k0] != null) MEM[k0] = m0[k0]; } catch (e) {}
 function save() { try { localStorage.setItem(KEY, JSON.stringify(MEM)); } catch (e) {} }
 
@@ -589,6 +589,29 @@ var TOG = { open: '<rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d=
 function setSide(c) { var a = document.getElementById("app"), b = document.getElementById("tog"); a.classList.toggle("collapsed", c); b.replaceChildren(svg(c ? TOG.shut : TOG.open));
   b.setAttribute("aria-label", c ? t("expand") : t("collapse")); b.setAttribute("aria-expanded", String(!c)); b.title = c ? t("expand") : t("collapse"); }
 document.getElementById("tog").addEventListener("click", function () { MEM.side = !MEM.side; save(); setSide(MEM.side); });
+
+/* ---------- theme: Auto follows Claude's own theme (whatever the viewer set on this page), Light/Dark override it ---------- */
+var HOST_THEME = document.documentElement.getAttribute("data-theme");
+var THEME_ICON = { auto: '<circle cx="12" cy="12" r="8"/><path class="fill" d="M12 4a8 8 0 010 16z"/>',
+  light: '<circle cx="12" cy="12" r="3.6"/><path d="M12 3v1.6M12 19.4V21M3 12h1.6M19.4 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1"/>',
+  dark: '<path d="M19.5 14.5A7.5 7.5 0 019.5 4.5a7.5 7.5 0 1010 10z"/>' };
+var THEME_NEXT = { auto: "light", light: "dark", dark: "auto" };
+function applyTheme() {
+  var m = THEME_NEXT[MEM.theme] ? MEM.theme : "auto", root = document.documentElement;
+  if (m === "auto") { if (HOST_THEME) root.setAttribute("data-theme", HOST_THEME); else root.removeAttribute("data-theme"); }
+  else root.setAttribute("data-theme", m);
+  var label = t("theme") + ": " + t("th_" + m) + ". " + t("th_next", { n: t("th_" + THEME_NEXT[m]) });
+  ["theme", "mtheme"].forEach(function (id) { var b = document.getElementById(id); if (!b) return;
+    b.replaceChildren(svg(THEME_ICON[m])); b.setAttribute("aria-label", label); b.title = label; });
+}
+["theme", "mtheme"].forEach(function (id) { document.getElementById(id).addEventListener("click", function () {
+  MEM.theme = THEME_NEXT[MEM.theme] || "light"; save(); applyTheme(); }); });
+new MutationObserver(function () {  // Claude's theme changed: remember it for Auto, keep an explicit choice on top
+  var cur = document.documentElement.getAttribute("data-theme"), m = MEM.theme || "auto";
+  if (m === "auto") { HOST_THEME = cur; return; }
+  if (cur !== m) { HOST_THEME = cur; document.documentElement.setAttribute("data-theme", m); }
+}).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+applyTheme();
 document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible" && booted && mcp) load(false); });
 window.addEventListener("hashchange", function () { go(location.hash.slice(1)); });
 go((location.hash || "#today").slice(1));

@@ -281,3 +281,16 @@ body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--sans);-we
 [hidden]{display:none!important}
 .tgrid.nofocus{grid-template-areas:"needs cal" "else cal"}
 @container app (max-width:960px){.tgrid.nofocus{grid-template-areas:"needs" "cal" "else"}}
+
+/* theme switch: one quiet icon, Auto -> Light -> Dark */
+.frow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.themeb{width:26px;height:26px;border:0;background:transparent;border-radius:6px;cursor:pointer;color:var(--faint);display:grid;place-items:center;flex:none;padding:0}
+.themeb:hover{background:var(--hover);color:var(--fg)}
+.themeb svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.themeb svg .fill{fill:currentColor;stroke:none}
+.app.collapsed .side .foot{display:flex;align-items:center;padding:8px 0}
+.app.collapsed .side .foot #updated,.app.collapsed .side .foot #refresh{display:none}
+.mtheme{display:none;position:absolute;top:12px;right:calc(12px + env(safe-area-inset-right,0px));z-index:5}
+@container app (max-width:720px){.mtheme{display:grid}}
+.tgrid.nofocus{margin-top:22px}
+.tgrid.nofocus>.a-needs{margin-top:0}
