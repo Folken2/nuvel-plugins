@@ -1,0 +1,53 @@
+{
+ "query": "in:inbox after:2026-11-17 16:57",
+ "sent": [],
+ "threads": [
+  {
+   "id": "lin-notif-1",
+   "link": "https://mail.example.com/thread/lin-notif-1",
+   "labels": [
+    "INBOX",
+    "CATEGORY_UPDATES"
+   ],
+   "from": "Linear <notifications@linear.app>",
+   "to": [
+    "marc@ferrer.example"
+   ],
+   "date": "2026-11-18T08:41:00+01:00",
+   "subject": "[Linear] Laia Mas assigned you ENG-140",
+   "snippet": "ENG-140 Checkout times out under load was assigned to you by Laia Mas.",
+   "body": "(notification)"
+  },
+  {
+   "id": "lin-notif-2",
+   "link": "https://mail.example.com/thread/lin-notif-2",
+   "labels": [
+    "INBOX",
+    "CATEGORY_UPDATES"
+   ],
+   "from": "Linear <notifications@linear.app>",
+   "to": [
+    "marc@ferrer.example"
+   ],
+   "date": "2026-11-18T08:55:00+01:00",
+   "subject": "[Linear] New comment on ENG-140",
+   "snippet": "Laia Mas: should we roll back the payment SDK before Friday?",
+   "body": "(notification)"
+  },
+  {
+   "id": "costs",
+   "link": "https://mail.example.com/thread/costs",
+   "labels": [
+    "INBOX"
+   ],
+   "from": "Ana Ferrer <ana@ferrer.example>",
+   "to": [
+    "marc@ferrer.example"
+   ],
+   "date": "2026-11-18T08:20:00+01:00",
+   "subject": "Re: Q4 infrastructure costs",
+   "snippet": "Thanks, tomorrow is fine. Can you split hosting and licences?",
+   "body": "Thanks, tomorrow is fine. Can you split hosting and licences?\nAna"
+  }
+ ]
+}

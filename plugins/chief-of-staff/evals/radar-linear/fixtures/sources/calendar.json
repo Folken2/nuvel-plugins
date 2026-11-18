@@ -1,0 +1,4 @@
+{"timeZone": "Europe/Madrid", "events": [
+ {"id": "ev1", "summary": "Routing v2 standup", "start": "2026-11-18T09:30:00+01:00", "end": "2026-11-18T09:45:00+01:00"},
+ {"id": "ev2", "summary": "Black Friday readiness review", "start": "2026-11-19T15:00:00+01:00", "end": "2026-11-19T16:00:00+01:00"}
+]}

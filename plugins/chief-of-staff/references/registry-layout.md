@@ -145,6 +145,8 @@ the order a search returns.
 - calendar: …
 
 ## Routines
+- routines.model: claude-haiku-5-5
+- routines.connectors: <plain names, e.g. Gmail, Google Calendar, Google Drive, Nuvel>
 - radar: <mechanism> — <schedule> — <id or "manual">
 
 ## How I work

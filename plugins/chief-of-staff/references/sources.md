@@ -9,7 +9,7 @@ has no tool, it is simply off — say so in the radar journal rather than guessi
 | `email` | New messages since the cursor in inbox + sent; flagged/starred; threads the user is waiting on | Microsoft 365 connector (Outlook mail), then Gmail connector |
 | `calendar` | Today + next 2 working days; changes since the cursor (new, moved, cancelled, RSVP changes) | Microsoft 365 connector (Outlook calendar), then Google Calendar connector |
 | `chat` | DMs and mentions since the cursor; threads the user posted in | Microsoft 365 connector (Teams chats and channels), then Slack connector |
-| `tasks` | Items assigned to the user that changed or fall due | Linear, Jira, Asana, Notion, Todoist, GitHub issues/PRs |
+| `tasks` | Items assigned to the user that changed or fall due | Linear (see *Linear*, for technical users), Jira, Asana, Notion, Todoist, GitHub issues/PRs |
 | `meetings` | Notes/transcripts of meetings that ended since the cursor | Granola, Fireflies, Otter, Teams/Meet recordings, Notion meeting notes |
 | `docs` | Files shared with the user or comments that mention them | Microsoft 365 connector (OneDrive / SharePoint files), then Google Drive connector |
 
@@ -52,6 +52,59 @@ file search"); never hard-code a tool name.
   registry (`safety.md` §1).
 
 For builders: the tool-selection logic is host-neutral, so any tool provider the host exposes can fill a kind; the user-facing flow never mentions one.
+
+## Linear (technical users)
+
+**Not yet tested on a real Linear workspace.** The official Linear connector
+reads with `list_issues`, `get_issue`, `list_comments` and `list_cycles`; it also
+has write tools (`create_issue`, `update_issue`, `create_comment`, …) that are
+never called (`safety.md` §1). Check the names the session actually lists and
+use them by function.
+
+**Only for technical users.** Setup brings Linear up only when it sees one of
+these, and never asks anyone else about it:
+
+- a Linear connector is already connected in this session;
+- the answer to question 1 is a technical role (engineering, product, CTO,
+  developer, a software company);
+- the last 7 days of mail have Linear or GitHub notification emails
+  (`notifications@linear.app`, `notifications@github.com`).
+
+Connected → prove it with one tiny read (one issue assigned to the user) and
+record `- tasks: connector Linear — assigned to me, mentions, issues I created`.
+Not connected but a signal → say one line, once, and carry on either way:
+
+> Veo avisos de Linear en tu correo. Si conectas Linear en Ajustes → Conectores, el repaso verá directamente tus incidencias.
+
+**What radar reads**, since the `tasks` cursor (the newest `updatedAt` it
+processed):
+
+1. Issues assigned to the user that changed.
+2. Comments on those issues, and comments elsewhere that mention the user.
+3. Issues the user created that are assigned to someone else and became
+   blocked or passed their due date.
+
+Never the whole backlog, and never other people's issues beyond (3).
+
+**Where it goes:**
+
+| What | Section |
+|---|---|
+| Assigned, priority Urgent or High, or due today or tomorrow | *Needs you now*, `due` from the issue's due date |
+| Assigned with a due date in the next 7 days, or started in the current cycle | *I owe*, `who` = team or the person who assigned it |
+| A comment that asks the user something | *I owe* (*Needs you now* if urgent) |
+| Created by the user, assigned to someone else, blocked or past due | *Waiting on* |
+| An issue behind a carried task moved to Done or Canceled | that task to *Closed* (`resolved`): the state change is the evidence |
+| Cycle or project progress | *Moving*, one line per project |
+
+- **One issue, one task.** The issue identifier (`ENG-123`) starts the title
+  (`T-42 — ENG-123 Fix the login timeout — …`) and the issue URL is the link,
+  so the next run matches it to the same task ID.
+- **Cap:** at most 10 Linear items in *I owe*; the rest are one line in
+  *Moving* ("[eng] 14 more assigned issues in the current cycle").
+- **`seen`:** the issue or comment IDs, never titles or names.
+- **No duplicates:** with Linear as a source, Linear's notification emails are
+  noise. Count them, don't open them.
 
 ## How much to read
 

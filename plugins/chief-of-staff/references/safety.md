@@ -17,7 +17,9 @@ published, so this list is by function) never call: send mail, reply or
 forward, create or update drafts, flag, categorize, mark read, move or archive
 mail, create/update/delete/respond to calendar
 events, post or reply in Teams chats and channels, and create, update, rename,
-move, delete or share files and folders anywhere outside the registry. Inside
+move, delete or share files and folders anywhere outside the registry. On
+Linear (or any issue tracker) never create, update, comment on, assign,
+label, move, archive or delete an issue, project or cycle. Inside
 the registry the only allowed Microsoft write is **create file**, or create
 folder at setup (and once by `learn`, to add `lessons/` and `recipes/` to an
 older registry). In cloud routines those tools may run **without any approval
