@@ -24,6 +24,19 @@ Setup owns the routines' settings, so nobody fixes them by hand.
   get the plugin's scripts (the radar check) and to use the nuvel connector
   for telemetry.
 
+### Added
+
+- **Linear for technical users:** setup brings Linear up only when it sees
+  you're technical (Linear already connected, a technical role, or Linear or
+  GitHub notification emails), and never as a question. The radar reads
+  issues assigned to you that changed, comments that ask you something, and
+  issues you created that someone else is blocked on; never the whole backlog.
+  Urgent or due issues go to *Needs you now*, near-term ones to *I owe*, and
+  an issue moved to Done closes its task. One issue is one task (its
+  identifier, e.g. `ENG-123`, starts the title), Linear's notification emails
+  stop being separate items, and the radar never changes anything in Linear.
+  New eval case `radar-linear`.
+
 Design: `docs/specs/2026-11-17-routine-settings.md`.
 
 ## chief-of-staff 0.5.1 - 2026-11-17

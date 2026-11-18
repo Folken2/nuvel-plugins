@@ -134,7 +134,8 @@ Plain language works too: "set up my chief of staff", "what did I miss?",
 ## Requirements
 
 - An **email** and a **calendar** connector (Microsoft 365 or Google). Chat
-  (Teams, Slack), tasks and meeting notes are optional.
+  (Teams, Slack), tasks and meeting notes are optional. Technical teams can add
+  **Linear**: the radar then also tracks the issues assigned to you.
 - A **storage** connector (OneDrive / SharePoint, Google Drive) or a synced or
   local folder if everything runs on one computer.
 - A scheduler: Cowork scheduled tasks, cloud routines (claude.ai/code/routines),

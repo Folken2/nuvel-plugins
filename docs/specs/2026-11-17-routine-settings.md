@@ -45,3 +45,31 @@ surface for a malicious email.
 Changing connectors of an existing cloud routine: the scheduling tool
 available to skills can set name, schedule, model, prompt and on/off, but
 not connectors. Setup tells the user where to change them.
+
+## Addendum: Linear for technical users (same release)
+
+Decided in chat ("add Linear for issue tracking when user is technical").
+
+- **Gate:** Linear is mentioned only for technical users. The signals are a
+  connected Linear connector, a technical role in question 1, or Linear or
+  GitHub notification emails in the last 7 days. It is never a question;
+  without a connector it is one line pointing to Settings → Connectors.
+- **What radar reads:** issues assigned to the user that changed since the
+  tasks cursor, comments on them or mentioning the user, and issues the user
+  created that someone else owns and that became blocked or overdue. Never
+  the whole backlog.
+- **Mapping:**
+  - Urgent, High, or due today or tomorrow → *Needs you now*;
+  - due within 7 days or started in the current cycle → *I owe* (at most 10;
+    the rest become one count line in *Moving*);
+  - a comment asking the user something → *I owe*;
+  - the user's issues others are blocked on → *Waiting on*;
+  - Done or Canceled → closes the matching task (the evidence);
+  - cycle and project progress → *Moving*.
+- **Identity:** the issue identifier starts the title and the issue URL is
+  the link, so the radar's task matching keeps one task per issue. With
+  Linear as a source, its notification emails are noise.
+- **Safety:** no Linear write tool, ever. Routines get the Linear connector
+  through `routines.connectors` like any other source.
+- **Not yet tested on a real workspace:** the tool names come from the claude.ai directory listing,
+  not from a real workspace run.

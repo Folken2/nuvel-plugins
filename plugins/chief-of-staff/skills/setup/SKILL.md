@@ -67,7 +67,9 @@ plain table:
 
 > Correo ✅ · Calendario ✅ · Teams ✅ · Carpeta ✅
 
-Email and calendar are the minimum; chat and documents are a bonus.
+Email and calendar are the minimum; chat and documents are a bonus. For a
+technical user, issue tracking is one too: follow `../../references/sources.md`
+*Linear* to tell whether to bring it up at all, and how (never as a question).
 
 If a connector is missing, name the official one in the host's own words and
 stop guessing:

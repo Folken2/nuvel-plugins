@@ -1,0 +1,77 @@
+{
+ "source": "Linear connector (list_issues / list_comments) for Marc Soler, updated since 2026-11-17T18:40:00+01:00",
+ "assigned_to_me": [
+  {
+   "id": "lin-140",
+   "identifier": "ENG-140",
+   "title": "Checkout times out under load",
+   "url": "https://linear.app/ferrer/issue/ENG-140",
+   "priority": "Urgent",
+   "state": "In Progress",
+   "dueDate": "2026-11-19",
+   "team": "Checkout",
+   "assignedBy": "Laia Mas",
+   "cycle": "42",
+   "updatedAt": "2026-11-18T08:55:00+01:00"
+  },
+  {
+   "id": "lin-101",
+   "identifier": "ENG-101",
+   "title": "Migrate the rate-limit config to the new gateway",
+   "url": "https://linear.app/ferrer/issue/ENG-101",
+   "priority": "Medium",
+   "state": "Done",
+   "dueDate": "2026-11-20",
+   "team": "Platform",
+   "completedAt": "2026-11-18T07:30:00+01:00",
+   "updatedAt": "2026-11-18T07:30:00+01:00"
+  },
+  {
+   "id": "lin-155",
+   "identifier": "ENG-155",
+   "title": "Add retries to the routing worker",
+   "url": "https://linear.app/ferrer/issue/ENG-155",
+   "priority": "High",
+   "state": "Todo",
+   "dueDate": "2026-11-24",
+   "team": "Routing",
+   "cycle": "42",
+   "updatedAt": "2026-11-18T08:10:00+01:00"
+  },
+  {
+   "id": "lin-150",
+   "identifier": "ENG-150",
+   "title": "Rename legacy feature flags",
+   "url": "https://linear.app/ferrer/issue/ENG-150",
+   "priority": "Low",
+   "state": "Backlog",
+   "dueDate": null,
+   "team": "Platform",
+   "updatedAt": "2026-11-18T06:00:00+01:00"
+  }
+ ],
+ "created_by_me_assigned_to_others": [
+  {
+   "id": "lin-133",
+   "identifier": "ENG-133",
+   "title": "Route optimiser returns empty plans for Girona",
+   "url": "https://linear.app/ferrer/issue/ENG-133",
+   "priority": "High",
+   "state": "Blocked",
+   "assignee": "Pau Ferrer",
+   "dueDate": "2026-11-21",
+   "team": "Routing",
+   "updatedAt": "2026-11-18T08:30:00+01:00",
+   "lastComment": "Pau Ferrer: blocked until we get the new map tiles from the vendor."
+  }
+ ],
+ "comments_mentioning_me": [
+  {
+   "id": "cmt-9",
+   "issue": "ENG-140",
+   "author": "Laia Mas",
+   "createdAt": "2026-11-18T08:55:00+01:00",
+   "body": "@marc should we roll back the payment SDK before Friday? I need a yes or no today."
+  }
+ ]
+}

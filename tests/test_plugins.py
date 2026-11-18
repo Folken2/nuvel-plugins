@@ -536,3 +536,34 @@ def test_routines_get_a_model_and_only_needed_connectors() -> None:
     assert "Checking existing routines" in " ".join(setup.split())
     layout = (COS / "references/registry-layout.md").read_text(encoding="utf-8")
     assert "- routines.model: claude-haiku-5-5" in layout and "- routines.connectors:" in layout
+
+
+def test_linear_for_technical_users() -> None:
+    src = " ".join((COS / "references/sources.md").read_text(encoding="utf-8").split())
+    sec = src[src.index("## Linear (technical users)"):src.index("## How much to read")]
+    for token in ("**Only for technical users.**", "never asks anyone else about it", "`notifications@linear.app`",
+                  "`list_issues`", "`list_comments`", "Never the whole backlog", "the state change is the evidence",
+                  "**One issue, one task.**", "at most 10 Linear items in *I owe*", "Linear's notification emails are noise",
+                  "> Veo avisos de Linear en tu correo."):
+        assert token in sec, token
+    safety = " ".join((COS / "references/safety.md").read_text(encoding="utf-8").split())
+    assert "On Linear (or any issue tracker) never create, update, comment on" in safety
+    radar = " ".join((COS / "skills/radar/SKILL.md").read_text(encoding="utf-8").split())
+    assert "Linear follows `sources.md` *Linear*" in radar and "On Linear: create or update issues" in radar
+    setup = " ".join((COS / "skills/setup/SKILL.md").read_text(encoding="utf-8").split())
+    assert "*Linear* to tell whether to bring it up at all" in setup and "never as a question" in setup
+    jargon = [w for w in JARGON if re.search(rf"\b{re.escape(w)}\b", "Veo avisos de Linear en tu correo. Si conectas Linear en Ajustes → Conectores, el repaso verá directamente tus incidencias.")]
+    assert not jargon
+
+
+def test_every_eval_case_is_complete() -> None:
+    evals = COS / "evals"
+    cases = sorted(p for p in evals.iterdir() if (p / "prompt.md").is_file())
+    assert {c.name for c in cases} >= {"radar-sweep", "radar-linear"}
+    readme = (evals / "README.md").read_text(encoding="utf-8")
+    for case in cases:
+        assert (case / "scaffold.sh").is_file() and (case / "case.yaml").is_file(), case.name
+        assert list((case / "graders").glob("*.md")), case.name
+        assert f"`{case.name}`" in readme, case.name
+        prompt = (case / "prompt.md").read_text(encoding="utf-8")
+        assert "finish by replying with its full text" in prompt, case.name
