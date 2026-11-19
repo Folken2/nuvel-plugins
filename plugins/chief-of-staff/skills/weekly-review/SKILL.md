@@ -37,8 +37,9 @@ Afterwards, if the user corrected the result or a recipe was used, run the
 ## Steps
 
 1. Find the registry and read the newest `config` (stop if `paused: true`).
-2. Read this ISO week's runs in `runs/` (radars, briefs, preps, learn runs), the
-   newest radar, open handoffs, and next week's calendar (Outlook or Google).
+2. Read this ISO week's runs in `runs/` (radars, briefs, preps, learn runs,
+   `prepared` documents), this week's handoffs, the newest radar, and next
+   week's calendar (Outlook or Google).
    List this week's documents in `lessons/` and `recipes/`.
 3. **Merge duplicate lessons.** If the newest `lessons` list has two lines
    that say the same thing, or one that a newer line contradicts, write a new
@@ -94,8 +95,16 @@ Afterwards, if the user corrected the result or a recipe was used, run the
 - Calendar: <heavy days, conflicts, prep needed>
 - Suggested blocks: <focus time to protect>
 
+## How it went
+- Closed by you: <n> (<m> on the dashboard, <k> in chat) · expired: <n>
+- Looks done: <a> confirmed, <b> kept open
+- Replies prepared: <p> · used: <u> (<e> edited)
+- Days to done: <median> (from first seen to your close)
+- Snoozed: <s>
+
 ## What I learned this week
 - Lessons: <added, dropped or merged this week, one line each>
+- Suggested rules, waiting for you: <P-n — rule, one line each> ("keep P-3" or "drop P-3")
 - Recipes: <created, changed, merged, expired or retired — title, uses, successes, corrections>
 
 ## Registry health
@@ -104,8 +113,13 @@ Afterwards, if the user corrected the result or a recipe was used, run the
   (suggest "update my dashboard") — ask the user, don't change `config` yourself>
 ```
 
-   Items taken from the radar keep their task ID (`T-42 — …`). Drop *What I
-   learned this week* when nothing changed. The journal lists
+   Items taken from the radar keep their task ID (`T-42 — …`). *How it went*
+   counts this week's handoffs and radars: closes by `from:` (dashboard or main
+   agent), `looks done` marks confirmed by a `close — done` vs answered with
+   `keep open`, `prepared` documents vs `learn — draft used|edited` notes, and
+   for each task you closed, the days from its first `since` to the close.
+   Drop a line that would be all zeros. Drop *What I learned this week* when
+   nothing changed. The journal lists
    the recipe batch: drafts expired, recipes merged, whether an `index` was
    written, and the `signal:` and `share:` lines from `recipe-sharing.md`
    (never a recipe's text).
@@ -128,8 +142,11 @@ and which reply counts where: `recipe-sharing.md` *Trace counts*) and
   `index_written` (0 or 1) on `weekly-review.recipes`; `signals_sent`,
   `signals_failed`, `shares_sent`, `shares_blocked`, `shares_failed` and
   `shares_with_text` on `weekly-review.share`; `loops_closed`, `loops_open`, `overdue`,
-  `decide_pending`, `priorities_at_risk`, `lessons_learned` and
-  `recipes_changed` on `weekly-review.write`.
+  `decide_pending`, `priorities_at_risk`, `lessons_learned`,
+  `recipes_changed`, `closed_by_user`, `closed_from_dashboard`,
+  `looks_done_confirmed`, `looks_done_kept_open`, `drafts_prepared`,
+  `drafts_used`, `drafts_edited`, `median_days_to_done`, `snoozed` and
+  `lessons_proposed_open` on `weekly-review.write`.
 - **Outcome:** `partial` if the calendar could not be read; `blocked` if the
   registry could not be found.
 - Counts and identifiers only — never a priority, name or link.

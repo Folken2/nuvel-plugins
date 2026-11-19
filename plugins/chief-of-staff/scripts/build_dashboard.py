@@ -99,6 +99,7 @@ def settings_from(text: str) -> tuple[dict, list[str]]:
             "root": keys.get("storage.root", ""),
             "runs": folders.get("runs", ""),
             "handoff": folders.get("handoff", ""),
+            "lessons": folders.get("lessons", "") if FOLDER_ID_RE.match(folders.get("lessons", "")) else "",
         },
         "email": "gmail" if "gmail" in email else ("other" if email else "none"),
         "calendar": "google" if "google" in calendar else ("other" if calendar else "none"),

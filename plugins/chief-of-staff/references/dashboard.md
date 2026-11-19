@@ -68,6 +68,8 @@ window 3 days, then 14, then everything):
 | Focus | `**Focus today:**` of today's brief, when there is one |
 | *Draft ready* | the newest `prepared T-<n>` document in `runs/` for an open task |
 | *Looks done?* | a task whose line ends with `— looks done: …`: the evidence, its link, and the user's two choices |
+| *Snoozed* (To-do tab) | tasks marked `— snoozed until <date>` (or snoozed on this page and not yet applied), with their date |
+| *Suggestions* (Today) | the `## Proposed` lines of the newest `lessons` document (needs the `lessons` folder in `config`) |
 
 Item fields follow the radar contract (`T-<n> — <what> — … — due … — <link> —
 since …`); `since` / `closed` dates are read whatever word precedes them
@@ -84,7 +86,9 @@ Only on the viewer's click, with the viewer's own connectors:
 | **Not mine** | the same, with `close — not mine` |
 | **Yes, it's done** (on a task marked `looks done`) | the same `close — done` handoff: the user confirms what the radar suggested |
 | **Not yet** (on a task marked `looks done`) | a `keep open` handoff; the radar drops the mark and suggests it again only on new evidence |
-| **Review the draft** (a task with a `prepared` document) | nothing by itself: it opens the prepared reply in the editor; saving it is the same Gmail draft as *Reply* |
+| **Review the draft** (a task with a `prepared` document) | nothing by itself: it opens the prepared reply in the editor; saving it is the same Gmail draft as *Reply*, plus a `learn — draft edited` note (both texts) or `learn — draft used` in the registry |
+| **Remind me** (Tomorrow / Monday / Next week) | after the undo window, a `snooze until <date>` handoff; the task moves to the *Snoozed* tab until then |
+| **Keep / Dismiss** on a suggestion | a `lesson — keep P-<n>` or `lesson — drop P-<n>` handoff; only a kept suggestion ever changes anything |
 | **Reply / Follow up / Accept / Decline / Ask for more time** | one Gmail **draft** (`create_draft`), in the thread when the link is a Gmail thread; the user edits and sends it from Gmail. Never sent. |
 | **Block time** | one busy event on the user's own calendar (`create_event`, no attendees, no notifications) |
 | In progress, *Got it*, sidebar | nothing: kept in the viewer's browser only |

@@ -77,6 +77,9 @@ not in the `index`, so they are never followed.
   lesson.
 - **Removal.** "Bórrala", "esa no", "forget that rule" → retire that recipe
   or drop that lesson.
+- **Decisions.** A radar applied notes for `learn` (`learn — draft edited`,
+  `learn — draft used`, `lesson — keep|drop P-<n>`) or `close — not mine` /
+  `keep open` handoffs. Work through *From decisions* (§2b).
 
 Skip one-off facts about a single item, anything the user did not actually
 correct, and anything `safety.md` §3 forbids (secrets, codes, bank or ID
@@ -118,6 +121,40 @@ lessons` document holding the previous list with the change applied
 lets a skill write memory, so never claim it was saved: offer the user the one
 sentence to send, in the afterwards line («Si quieres que lo recuerde en
 cualquier conversación, dime: "Recuerda que…"»).
+
+## 2b. From decisions
+
+The user's decisions on the dashboard teach as much as their corrections,
+but they weren't said out loud, so a pattern in them becomes a **proposed**
+lesson that changes nothing until the user keeps it
+(`registry-layout.md`, *Proposed lessons*). Never put an inferred rule in the
+main list yourself.
+
+1. **Answers first.** For each `lesson — keep P-<n>`: move it to the main list
+   as `- <rule> — scope: <scope> — since <today>`. For each `lesson — drop
+   P-<n>`: move it to `## Dismissed` with `dismissed <today>`. Drop `##
+   Dismissed` lines older than 30 days and proposals older than 30 days.
+2. **Look for patterns** in the last 30 days of handoffs. A pattern needs **at
+   least 2 decisions of the same kind**, and nothing in `## Proposed` or `##
+   Dismissed` that already covers it:
+   - **Draft edits** (`learn — draft edited`): compare `## Prepared` with `##
+     Saved`. The same change twice (greeting, sign-off, formal or informal
+     address, length, a phrase always removed) → a rule for `prepare`
+     ("Firmar «Abrazo, Ana»", "Tratar a Marta de usted").
+   - **Not mine** (`close — not mine`): the same sender, domain or kind of item
+     twice → a rule for `radar` ("No listar los avisos de facturación de X").
+   - **Kept open** (`keep open`): the same kind of evidence rejected twice → a
+     rule for `radar` ("Un «hecho» de Laia no basta: espera a que lo
+     confirme Ana").
+3. **Propose** each new pattern under `## Proposed` as `- P-<n> — <rule> —
+   scope: <skill> — from: <what decisions, with dates> — proposed <today>`,
+   the rule in `owner.language`, worded so the user can judge it in one read.
+4. Write the new `lessons` document once (§2 rules on one document per run),
+   and say in one line what was kept, dropped or proposed ("Te propongo una
+   regla nueva: firmar «Abrazo, Ana». La verás en el panel.").
+
+Counts only reach the trace (`lessons_proposed`, `lessons_kept`,
+`lessons_dismissed`); a draft's text never leaves the registry.
 
 ## 3. Recipes
 
@@ -195,7 +232,8 @@ mirroring it. Report only these steps: `learn.load-state`, `learn.lesson`,
 `learn.recipe` and `learn.write` (`skipped` when not due). If nothing was
 worth learning, write nothing and send nothing.
 
-- **Counts:** `lessons_added`, `lessons_dropped` and `lessons_total` on
+- **Counts:** `lessons_added`, `lessons_dropped`, `lessons_total`,
+  `lessons_proposed`, `lessons_kept` and `lessons_dismissed` on
   `learn.lesson`; `drafts_created`, `recipes_promoted`, `recipes_created`
   (written `active` straight away), `recipes_updated`, `recipes_retired` and
   `index_written` on `learn.recipe`.

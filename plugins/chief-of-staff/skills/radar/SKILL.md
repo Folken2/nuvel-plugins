@@ -158,7 +158,13 @@ what you found:
   `done: expired`. A `close` handoff → its task moves to *Closed* with
   `closed <today> — done` or `— not mine`, and the handoff is `done`. A `keep
   open` handoff → drop the task's `looks done` field, write `— kept open
-  <today>`, and mark the handoff `done`. A handoff whose `task` is no longer
+  <today>`, and mark the handoff `done`. A `snooze until <date>` handoff → end
+  the task's line with `— snoozed until <date>`, take it out of *Needs you
+  now*, and mark the handoff `done`; on that date drop the mark and rank the
+  task again (journal: "T-42 back from snooze"). Notes for `learn` (`learn —
+  …`, `lesson — keep|drop …`) and any `close — not mine` or `keep open`
+  applied this run → run `learn` at the end (*From decisions*) and mark those
+  handoffs `done`. A handoff whose `task` is no longer
   in the snapshot → `done: task not found`.
 - **Cursors:** new cursor per source (newest item processed); failed sources keep
   the old one with `— error: …`; `seen` = opaque IDs (Gmail thread IDs, Outlook
@@ -224,7 +230,8 @@ or when nothing was sent).
   `check_errors` (error lines on the last check, of which `id_errors` are
   task-ID rules) and `check_fixes` (checks re-run after fixing) on
   `radar.check`;
-  `needs_you_now`, `decide`, `open_loops`, `handoffs_applied`, `tasks_new`
+  `needs_you_now`, `decide`, `open_loops`, `handoffs_applied`, `closed_done`,
+  `closed_not_mine`, `kept_open`, `looks_done_marked`, `snoozed`, `tasks_new`
   (IDs allocated this run) and `tasks_closed` (tasks moved to *Closed* this
   run) on `radar.write`. Never send a task ID.
 - **Routing:** how many relevant items fell in each bucket: `vip`, `priority`,
