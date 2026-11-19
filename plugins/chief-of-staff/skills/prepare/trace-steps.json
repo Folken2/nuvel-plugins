@@ -1,0 +1,17 @@
+{
+  "skill": "prepare",
+  "steps": [
+    "prepare.load-state",
+    "prepare.pick",
+    "prepare.read-sources",
+    "prepare.write"
+  ],
+  "counts": [
+    "candidates",
+    "prepared",
+    "skipped_injection",
+    "skipped_already",
+    "placeholders"
+  ],
+  "routing": []
+}

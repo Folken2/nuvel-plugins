@@ -15,6 +15,14 @@
     ],
     "warnings": []
   },
+  "closed-on-evidence": {
+    "description": "The radar closed a task by itself ('resolved'): only the user closes tasks.",
+    "exit": 1,
+    "errors": [
+      "T-11 closed as 'resolved'"
+    ],
+    "warnings": []
+  },
   "cursor-not-iso": {
     "description": "A cursor written as a phrase.",
     "exit": 1,
@@ -65,6 +73,20 @@
     "errors": [],
     "warnings": [
       "summarise and link instead of copying"
+    ]
+  },
+  "looks-done": {
+    "description": "Evidence marks the task `looks done` and keeps it open.",
+    "exit": 0,
+    "errors": [],
+    "warnings": []
+  },
+  "looks-done-no-date": {
+    "description": "A `looks done` mark that doesn't say when.",
+    "exit": 0,
+    "errors": [],
+    "warnings": [
+      "`looks done` should say when"
     ]
   },
   "missing-section": {

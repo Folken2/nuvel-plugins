@@ -174,7 +174,20 @@ var COS_STRINGS = {
 "th_auto": "Auto, like Claude",
 "th_light": "Light",
 "th_dark": "Dark",
-"th_next": "Switch to {n}"
+"th_next": "Switch to {n}",
+"looksDoneQ": "Looks done?",
+"looksDoneT": "Looks done",
+"looksDoneAsk": "Is it done? You decide; nothing closes on its own.",
+"seeIt": "See it",
+"yesDone": "Yes, it's done",
+"notYet": "Not yet",
+"markedKept": "Kept open. Your radar won't suggest it again until something new happens.",
+"draftReady": "Draft ready",
+"reviewDraft": "Review the draft",
+"hintPrepared": "Your chief of staff prepared this from the thread. Read it, change what you need, then save it as a draft. Nothing is sent.",
+"placeholdersLeft": "Some parts in [brackets] still need you. Fill them in, or press Save again to keep them as they are.",
+"preparedLoading": "Loading the prepared draft…",
+"preparedFail": "Couldn't load the prepared draft, so here's a starting point instead."
 },
 "ca": {
 "today": "Avui",
@@ -349,7 +362,20 @@ var COS_STRINGS = {
 "th_auto": "Automàtic, com Claude",
 "th_light": "Clar",
 "th_dark": "Fosc",
-"th_next": "Canvia a {n}"
+"th_next": "Canvia a {n}",
+"looksDoneQ": "Sembla fet?",
+"looksDoneT": "Sembla fet",
+"looksDoneAsk": "Està fet? Decideixes tu; res es tanca sol.",
+"seeIt": "Mira-ho",
+"yesDone": "Sí, està fet",
+"notYet": "Encara no",
+"markedKept": "Es queda obert. El radar no t'ho tornarà a proposar fins que passi alguna cosa nova.",
+"draftReady": "Esborrany a punt",
+"reviewDraft": "Revisa l'esborrany",
+"hintPrepared": "El teu cap de gabinet ho ha preparat a partir del fil. Llegeix-ho, canvia el que calgui i desa-ho com a esborrany. No s'envia res.",
+"placeholdersLeft": "Hi ha parts entre [claudàtors] que et necessiten. Omple-les, o torna a prémer Desa per deixar-les com estan.",
+"preparedLoading": "Carregant l'esborrany preparat…",
+"preparedFail": "No s'ha pogut carregar l'esborrany preparat; aquí tens un punt de partida."
 },
 "es": {
 "today": "Hoy",
@@ -524,7 +550,20 @@ var COS_STRINGS = {
 "th_auto": "Automático, como Claude",
 "th_light": "Claro",
 "th_dark": "Oscuro",
-"th_next": "Cambiar a {n}"
+"th_next": "Cambiar a {n}",
+"looksDoneQ": "¿Parece hecho?",
+"looksDoneT": "Parece hecho",
+"looksDoneAsk": "¿Está hecho? Decides tú; nada se cierra solo.",
+"seeIt": "Verlo",
+"yesDone": "Sí, está hecho",
+"notYet": "Todavía no",
+"markedKept": "Se queda abierto. El radar no te lo volverá a proponer hasta que pase algo nuevo.",
+"draftReady": "Borrador listo",
+"reviewDraft": "Revisar el borrador",
+"hintPrepared": "Tu jefe de gabinete lo ha preparado a partir del hilo. Léelo, cambia lo que haga falta y guárdalo como borrador. No se envía nada.",
+"placeholdersLeft": "Hay partes entre [corchetes] que te necesitan. Rellénalas, o vuelve a pulsar Guardar para dejarlas como están.",
+"preparedLoading": "Cargando el borrador preparado…",
+"preparedFail": "No se ha podido cargar el borrador preparado; aquí tienes un punto de partida."
 }
 },
 "DRAFT": {

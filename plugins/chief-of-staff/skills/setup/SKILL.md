@@ -225,7 +225,8 @@ session), say its one sentence and carry on: setup is complete without it.
 
 At most 6 lines, business language: the dashboard link, if there is one, and
 where the notes folder is (the newest radar is the same picture); when the routines run and that they only interrupt for
-what needs them now; that it never sends or changes anything; that from any
+what needs them now; that it never sends or changes anything, and that it
+prepares drafts and points out what looks done but they always decide; that from any
 conversation they can ask "¿qué vio mi chief of staff hoy?" or "dile al repaso
 que vigile X"; that it learns from their corrections and remembers how
 recurring tasks are done; and that setup can change anything later. Add the

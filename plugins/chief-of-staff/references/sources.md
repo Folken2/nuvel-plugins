@@ -94,7 +94,7 @@ Never the whole backlog, and never other people's issues beyond (3).
 | Assigned with a due date in the next 7 days, or started in the current cycle | *I owe*, `who` = team or the person who assigned it |
 | A comment that asks the user something | *I owe* (*Needs you now* if urgent) |
 | Created by the user, assigned to someone else, blocked or past due | *Waiting on* |
-| An issue behind a carried task moved to Done or Canceled | that task to *Closed* (`resolved`): the state change is the evidence |
+| An issue behind a carried task moved to Done or Canceled | that task stays, marked `— looks done: moved to Done (<date>) <issue link>`; the user confirms the close |
 | Cycle or project progress | *Moving*, one line per project |
 
 - **One issue, one task.** The issue identifier (`ENG-123`) starts the title

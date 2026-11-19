@@ -66,6 +66,8 @@ window 3 days, then 14, then everything):
 | Nice to know | *Watching* and *Moving*, grouped by `[project]` tag |
 | Calendar | today's events from Google Calendar (declined and all-day left out); free gaps ≥ 45 min in `owner.working_hours`, labelled with the brief's *Free blocks* |
 | Focus | `**Focus today:**` of today's brief, when there is one |
+| *Draft ready* | the newest `prepared T-<n>` document in `runs/` for an open task |
+| *Looks done?* | a task whose line ends with `— looks done: …`: the evidence, its link, and the user's two choices |
 
 Item fields follow the radar contract (`T-<n> — <what> — … — due … — <link> —
 since …`); `since` / `closed` dates are read whatever word precedes them
@@ -80,6 +82,9 @@ Only on the viewer's click, with the viewer's own connectors:
 |---|---|
 | **Done** (status ring, or *Done* in the sheet) | after a 6-second undo window, one `handoff/YYYY-MM-DD HHMM handoff` with `instruction: close — done` and `task: T-<n>` (contract in `registry-layout.md`); the next radar moves the task to *Closed* |
 | **Not mine** | the same, with `close — not mine` |
+| **Yes, it's done** (on a task marked `looks done`) | the same `close — done` handoff: the user confirms what the radar suggested |
+| **Not yet** (on a task marked `looks done`) | a `keep open` handoff; the radar drops the mark and suggests it again only on new evidence |
+| **Review the draft** (a task with a `prepared` document) | nothing by itself: it opens the prepared reply in the editor; saving it is the same Gmail draft as *Reply* |
 | **Reply / Follow up / Accept / Decline / Ask for more time** | one Gmail **draft** (`create_draft`), in the thread when the link is a Gmail thread; the user edits and sends it from Gmail. Never sent. |
 | **Block time** | one busy event on the user's own calendar (`create_event`, no attendees, no notifications) |
 | In progress, *Got it*, sidebar | nothing: kept in the viewer's browser only |
@@ -97,6 +102,11 @@ Rules the page keeps:
   until the next radar numbers them.
 - Every text from the registry is shown as text, never as HTML; only `https`
   links open.
+- Saving a draft that still has `[placeholders]` asks once ("Some parts in
+  [brackets] still need you") and saves on the second press.
+- The user decides: nothing on the page closes a task or sends anything
+  without a click, and the page says so where it matters ("Is it done? You
+  decide; nothing closes on its own.").
 
 ## States
 
