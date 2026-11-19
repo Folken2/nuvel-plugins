@@ -573,7 +573,7 @@ def test_human_in_the_loop() -> None:
     """The chief of staff prepares and suggests; only the user sends or closes."""
     layout = " ".join((COS / "references/registry-layout.md").read_text(encoding="utf-8").split())
     for token in ("**The user closes tasks, never the radar.**", "`— looks done:", "`expired` is the only reason the radar applies by itself",
-                  "**Kept open:**", "watch, rank, ignore, remind, close or keep open", "### `prepared T-<n>`", "Never sent anywhere",
+                  "**Kept open:**", "watch, rank, ignore, remind, close, keep open, snooze", "### `prepared T-<n>`", "Never sent anywhere",
                   "`prepared` (always followed by its task ID"):
         assert token in layout, token
     assert "resolved" not in layout.split("### Closed (last 14 days)")[1].split("\n")[0]
@@ -590,3 +590,20 @@ def test_human_in_the_loop() -> None:
     assert 'requestClose(x, "keep open")' in app and 'requestClose(x, "done")' in app and "placeholdersLeft" in app
     checker = (COS / "scripts/check_radar.py").read_text(encoding="utf-8")
     assert 'CLOSE_REASONS = ("done", "not mine", "expired")' in checker
+
+
+def test_learn_from_decisions_snooze_and_measure() -> None:
+    layout = " ".join((COS / "references/registry-layout.md").read_text(encoding="utf-8").split())
+    for token in ("**Proposed lessons**", "**no skill applies them**", "`lesson — keep P-3`", "## Dismissed", "### Snoozed tasks",
+                  "`learn — draft edited`", "`snooze until YYYY-MM-DD` needs a `task`"):
+        assert token in layout, token
+    learn = " ".join((COS / "skills/learn/SKILL.md").read_text(encoding="utf-8").split())
+    for token in ("## 2b. From decisions", "Never put an inferred rule in the main list yourself", "**at least 2 decisions of the same kind**"):
+        assert token in learn, token
+    radar = " ".join((COS / "skills/radar/SKILL.md").read_text(encoding="utf-8").split())
+    assert "A `snooze until <date>` handoff" in radar and "back from snooze" in radar
+    weekly = (COS / "skills/weekly-review/SKILL.md").read_text(encoding="utf-8")
+    assert "## How it went" in weekly and "Suggested rules, waiting for you" in weekly
+    assert {"closed_by_user", "looks_done_confirmed", "drafts_edited", "median_days_to_done"} <= set(_json(COS / "skills/weekly-review/trace-steps.json")["counts"])
+    app = (COS / "templates/dashboard/app.js").read_text(encoding="utf-8")
+    assert "answerProposal" in app and '"snooze until " + o[1]' in app and '"learn — draft edited"' in app and "usedNames" in app

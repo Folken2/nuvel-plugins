@@ -187,7 +187,21 @@ var COS_STRINGS = {
 "hintPrepared": "Your chief of staff prepared this from the thread. Read it, change what you need, then save it as a draft. Nothing is sent.",
 "placeholdersLeft": "Some parts in [brackets] still need you. Fill them in, or press Save again to keep them as they are.",
 "preparedLoading": "Loading the prepared draft…",
-"preparedFail": "Couldn't load the prepared draft, so here's a starting point instead."
+"preparedFail": "Couldn't load the prepared draft, so here's a starting point instead.",
+"snooze": "Remind me",
+"snoozeTomorrow": "Tomorrow",
+"snoozeMonday": "Monday",
+"snoozeNextWeek": "Next week",
+"markedSnoozed": "Snoozed until {d}. It comes back then.",
+"snoozedTab": "Snoozed",
+"snoozedUntil": "Until {d}",
+"sugT": "Suggestions",
+"sugP": "Patterns in what you decided. Nothing changes unless you keep one.",
+"keepRule": "Keep",
+"dismissRule": "Dismiss",
+"ruleKept": "Kept. It applies from the next run.",
+"ruleDismissed": "Dismissed. It won't be suggested again for 30 days.",
+"ruleFrom": "From {f}"
 },
 "ca": {
 "today": "Avui",
@@ -375,7 +389,21 @@ var COS_STRINGS = {
 "hintPrepared": "El teu cap de gabinet ho ha preparat a partir del fil. Llegeix-ho, canvia el que calgui i desa-ho com a esborrany. No s'envia res.",
 "placeholdersLeft": "Hi ha parts entre [claudàtors] que et necessiten. Omple-les, o torna a prémer Desa per deixar-les com estan.",
 "preparedLoading": "Carregant l'esborrany preparat…",
-"preparedFail": "No s'ha pogut carregar l'esborrany preparat; aquí tens un punt de partida."
+"preparedFail": "No s'ha pogut carregar l'esborrany preparat; aquí tens un punt de partida.",
+"snooze": "Recorda-m'ho",
+"snoozeTomorrow": "Demà",
+"snoozeMonday": "Dilluns",
+"snoozeNextWeek": "La setmana vinent",
+"markedSnoozed": "Ajornat fins {d}. Tornarà aleshores.",
+"snoozedTab": "Ajornades",
+"snoozedUntil": "Fins {d}",
+"sugT": "Suggeriments",
+"sugP": "Patrons en el que has decidit. No canvia res si no en guardes un.",
+"keepRule": "Guarda",
+"dismissRule": "Descarta",
+"ruleKept": "Guardat. S'aplica des de la propera passada.",
+"ruleDismissed": "Descartat. No es tornarà a suggerir en 30 dies.",
+"ruleFrom": "De {f}"
 },
 "es": {
 "today": "Hoy",
@@ -563,7 +591,21 @@ var COS_STRINGS = {
 "hintPrepared": "Tu jefe de gabinete lo ha preparado a partir del hilo. Léelo, cambia lo que haga falta y guárdalo como borrador. No se envía nada.",
 "placeholdersLeft": "Hay partes entre [corchetes] que te necesitan. Rellénalas, o vuelve a pulsar Guardar para dejarlas como están.",
 "preparedLoading": "Cargando el borrador preparado…",
-"preparedFail": "No se ha podido cargar el borrador preparado; aquí tienes un punto de partida."
+"preparedFail": "No se ha podido cargar el borrador preparado; aquí tienes un punto de partida.",
+"snooze": "Recuérdamelo",
+"snoozeTomorrow": "Mañana",
+"snoozeMonday": "Lunes",
+"snoozeNextWeek": "La semana que viene",
+"markedSnoozed": "Aplazado hasta {d}. Volverá entonces.",
+"snoozedTab": "Aplazadas",
+"snoozedUntil": "Hasta {d}",
+"sugT": "Sugerencias",
+"sugP": "Patrones en lo que has decidido. No cambia nada si no guardas uno.",
+"keepRule": "Guardar",
+"dismissRule": "Descartar",
+"ruleKept": "Guardado. Se aplica desde la próxima pasada.",
+"ruleDismissed": "Descartado. No se volverá a sugerir en 30 días.",
+"ruleFrom": "De {f}"
 }
 },
 "DRAFT": {

@@ -16,6 +16,8 @@ waiting for you, today's meetings with context, and promises still open.
 - **Morning brief** at 07:30: your focus, the day's meetings, loops due.
 - **Meeting prep** on request: who is attending, history, what to get out of it.
 - **Weekly review** on Friday: the week against your priorities and next week's plan.
+- **Snooze and suggestions:** snooze a task until Monday; when a pattern shows
+  in what you decide, it suggests a rule and waits for your OK.
 - **Learns from you:** correct it once ("a Marta, de usted") and it applies the
   rule from then on. Tasks you repeat become reusable recipes.
 - **Remembers on request:** tell it *"Recuerda que los viernes no tengo

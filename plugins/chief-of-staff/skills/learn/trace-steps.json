@@ -15,7 +15,10 @@
     "recipes_created",
     "recipes_updated",
     "recipes_retired",
-    "index_written"
+    "index_written",
+    "lessons_proposed",
+    "lessons_kept",
+    "lessons_dismissed"
   ],
   "routing": [
     "correction",

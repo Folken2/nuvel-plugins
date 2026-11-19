@@ -21,7 +21,12 @@
     "tasks_closed",
     "id_errors",
     "check_errors",
-    "check_fixes"
+    "check_fixes",
+    "closed_done",
+    "closed_not_mine",
+    "kept_open",
+    "looks_done_marked",
+    "snoozed"
   ],
   "routing": [
     "vip",

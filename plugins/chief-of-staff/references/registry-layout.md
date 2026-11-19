@@ -200,6 +200,7 @@ state forward, even when nothing changed.
 ### Waiting on
 - T-<n> — <what> — <who> — due <YYYY-MM-DD> — <link> — since <date>
 - T-<n> — <what> — <who> — <link> — since <date> — looks done: <what shows it> (<date>) <evidence link>
+- T-<n> — <what> — <who> — <link> — since <date> — snoozed until <YYYY-MM-DD>
 ### Closed (last 14 days)
 - T-<n> — <what> — <who> — closed <date> — <done | not mine | expired>
 
@@ -333,6 +334,12 @@ document with the previous list and the change; the newest wins.
 
 - Escribir a Marta de usted — scope: all — since 2026-10-28
 - No poner boletines en el resumen — scope: brief — since 2026-10-29
+
+## Proposed
+- P-3 — Firmar los correos «Abrazo, Ana» — scope: prepare — from: 2 drafts edited the same way (2026-11-18, 2026-11-19) — proposed 2026-11-19
+
+## Dismissed
+- P-1 — No listar avisos de GitHub — dismissed 2026-11-12
 ```
 
 Each line is `- <rule> — scope: <skill or "all"> — since <date>`, the rule in
@@ -341,6 +348,15 @@ applies the lines whose scope is itself or `all`; lessons rank above the
 skill's own defaults but never above `safety.md`. A lesson that asks for a
 forbidden action (send, reply, delete…) is ignored. Written only by `learn`
 (and by `weekly-review` when it merges duplicates).
+
+**Proposed lessons** come from the user's decisions, not from something they
+said (`learn` *From decisions*). They sit under `## Proposed` with an ID
+(`P-<n>`, numbered after the highest P in the document) and what they came
+from, and **no skill applies them**. The user keeps one (`lesson — keep P-3`,
+from the dashboard or chat) → `learn` moves it to the main list with `since
+<today>`; dismisses it (`lesson — drop P-3`) → it moves to `## Dismissed` for
+30 days, and the same pattern isn't proposed again in that time. Proposals
+nobody answers drop off after 30 days.
 
 ### `recipe <slug>` and `index` — recipes
 
@@ -388,6 +404,14 @@ Ana
 `kind` is `reply` for now. Placeholders are in square brackets. Headings stay
 in English; the draft is in the thread's language.
 
+### Snoozed tasks
+
+`snooze until <date>` (a handoff, from the dashboard or chat) hides a task
+until that day: the radar ends its line with `— snoozed until YYYY-MM-DD`
+(English keywords), takes it out of *Needs you now* and keeps it in its loop
+section. On that date it drops the mark, ranks the task again (it can go back
+to *Needs you now*) and says so in the journal ("T-42 back from snooze").
+
 ### `handoff` — instructions to future runs
 
 ```markdown
@@ -404,12 +428,23 @@ the user)` for a `close` the user clicked on the dashboard (`dashboard.md`).
 
 A handoff is open until a `radar` run lists it under `## Handoff` as `done`
 (or `until` has passed — then `done: expired`). Handoffs may only ask routines
-to **watch, rank, ignore, remind, close or keep open** — never to send, reply,
-accept or delete. `task` is optional: with it, the instruction applies to that task only.
+to **watch, rank, ignore, remind, close, keep open, snooze**, or pass a note
+to `learn` — never to send, reply, accept or delete. `task` is optional: with it, the instruction applies to that task only.
 `close` needs a `task` and a reason — `- instruction: close — done` or
 `close — not mine` — and the next radar moves the task to *Closed* with that
 reason; it changes only the registry. `keep open` needs a `task`: the user
-says a task the radar thinks looks done isn't (*Kept open* above). A `task` that is no longer in the newest
+says a task the radar thinks looks done isn't (*Kept open* above). `snooze
+until YYYY-MM-DD` needs a `task` (*Snoozed tasks* above).
+
+Notes for `learn` (the radar marks them `done` once `learn` has run):
+
+- `lesson — keep P-<n>` / `lesson — drop P-<n>`: the user's answer to a
+  proposed lesson.
+- `learn — draft edited` (with `task`): written by the dashboard when the user
+  saves a prepared reply after changing it. Two sections follow the bullets,
+  `## Prepared` and `## Saved`, each the text (at most ~2,000 characters). It
+  stays in the user's own registry; it is never sent anywhere.
+- `learn — draft used` (with `task`): saved without changes. No text. A `task` that is no longer in the newest
 radar → the radar marks the handoff `done: task not found`.
 
 ## Searching history

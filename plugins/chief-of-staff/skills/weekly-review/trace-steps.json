@@ -27,7 +27,17 @@
     "shares_sent",
     "shares_blocked",
     "shares_failed",
-    "shares_with_text"
+    "shares_with_text",
+    "closed_by_user",
+    "closed_from_dashboard",
+    "looks_done_confirmed",
+    "looks_done_kept_open",
+    "drafts_prepared",
+    "drafts_used",
+    "drafts_edited",
+    "median_days_to_done",
+    "snoozed",
+    "lessons_proposed_open"
   ],
   "routing": []
 }

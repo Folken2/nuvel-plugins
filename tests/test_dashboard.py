@@ -50,7 +50,7 @@ def test_google_build(tmp_path: Path) -> None:
         "template": version,
         "owner": {"name": "Ana Ferrer", "language": "ca", "timezone": "Europe/Madrid", "working_hours": "09:00-19:00 Mon-Fri"},
         "storage": {"kind": "google-drive", "root": "1RootFolderExample000000000", "runs": "1RunsFolderExample000000",
-                    "handoff": "1HandoffFolderExample000"},
+                    "handoff": "1HandoffFolderExample000", "lessons": "1LessonsFolderExample000"},
         "email": "gmail", "calendar": "google",
     }
     assert "@@" not in html and html.startswith("<title>Chief of Staff</title>")

@@ -20,6 +20,8 @@
     "ignore",
     "remind",
     "close",
-    "keep_open"
+    "keep_open",
+    "snooze",
+    "lesson"
   ]
 }

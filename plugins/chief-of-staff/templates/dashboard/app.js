@@ -17,7 +17,7 @@ function t(k, v) { var s = STR.S[LANG][k] || STR.S.en[k] || k; if (v) for (var x
 
 /* ---------- per-viewer memory (never shared, never read by Claude) ---------- */
 var KEY = "cos.dash." + CFG.storage.root;
-var MEM = { doing: {}, closing: {}, read: {}, side: false, theme: "auto" };
+var MEM = { doing: {}, closing: {}, read: {}, side: false, theme: "auto", answered: {} };
 try { var m0 = JSON.parse(localStorage.getItem(KEY) || "{}"); for (var k0 in MEM) if (m0[k0] != null) MEM[k0] = m0[k0]; } catch (e) {}
 function save() { try { localStorage.setItem(KEY, JSON.stringify(MEM)); } catch (e) {} }
 
@@ -43,7 +43,7 @@ function hours() {
 
 /* ---------- state ---------- */
 var mcp = null, booted = false;
-var ST = { phase: "loading", model: null, radar: null, brief: null, meetings: [], free: [], prepared: {},
+var ST = { phase: "loading", model: null, radar: null, brief: null, meetings: [], free: [], prepared: {}, proposals: [],
   err: { drive: null, cal: null }, canDraft: false, canEvent: false, calOn: CFG.calendar === "google" };
 var timers = {};
 
@@ -92,6 +92,14 @@ function loadCalendar(fresh) {
   }).catch(function (e) { ST.err.cal = e; ST.meetings = []; });
 }
 
+function loadProposals(fresh) {  // suggested rules from the user's decisions, waiting for a yes or no
+  if (!CFG.storage.lessons) return Promise.resolve();
+  return call(SRV.drive, "search_files", { query: "parentId = " + q(CFG.storage.lessons) + " and title contains 'lessons'",
+    excludeContentSnippets: true, pageSize: 50 }, fresh).then(function (p) {
+    var f = R.newestLessons(p.files || []); if (!f) { ST.proposals = []; return; }
+    return readDoc(f.id, fresh).then(function (txt) { ST.proposals = R.parseLessons(txt).proposed; });
+  }).catch(function () { ST.proposals = []; });
+}
 function freeBlocks() {
   var wh = hours(), busy = ST.meetings.map(function (m) { return [mm(m.t), mm(m.e)]; }).sort(function (a, b) { return a[0] - b[0]; });
   var out = [], cur = wh[0];
@@ -127,7 +135,8 @@ function load(fresh) {
           else ST.brief = null;
           return Promise.all(jobs).then(function () { ST.phase = "ready"; });
         }).catch(function (e) { ST.err.drive = e; if (!ST.model) ST.phase = "disc"; }),
-        loadCalendar(fresh)
+        loadCalendar(fresh),
+        loadProposals(fresh)
       ]);
     }).then(function () { ST.free = freeBlocks(); reconcile(); render(); resumeCloses(); });
   });
@@ -145,11 +154,13 @@ function reconcile() {  // the radar closed it (or it left the lists): forget ou
   var marked = {}; ST.model.todo.concat(ST.model.dele).forEach(function (x) { if (x.id && x.looksDone) marked[x.id] = 1; });
   for (var id in MEM.closing) {
     var c = MEM.closing[id];
-    if (c.written && (!open[id] || (c.reason === "keep open" && !marked[id]))) delete MEM.closing[id];
+    var sn = /^snooze until (\S+)/.exec(c.reason || "");
+    if (c.written && (!open[id] || (c.reason === "keep open" && !marked[id]) || (sn && sn[1] <= today()))) delete MEM.closing[id];
   }
   for (var k in MEM.doing) if (!open[k]) delete MEM.doing[k];
   save();
 }
+var usedNames = {};  // names this page already wrote: Drive search can lag right after a write
 function stamp(d) {
   var p = parts(d); return { name: p.date + " " + p.hm.replace(":", "") + " handoff", human: p.date + " " + p.hm };
 }
@@ -164,6 +175,25 @@ function announceResumed(id) {  // a close from an earlier visit reached the reg
     } else toast(t("resumedMany", { n: ids.length, ids: ids.join(", ") }));
   }, 400);
 }
+function writeNote(kind, fields) {  // one handoff, written now (lesson answers, notes for learn)
+  var d = new Date(), tries = 0;
+  function attempt() {
+    var s = stamp(d);
+    return call(SRV.drive, "search_files", { query: "parentId = " + q(CFG.storage.handoff) + " and title = " + q(s.name),
+      excludeContentSnippets: true, pageSize: 5 }, true).then(function (p) {
+      if (((p.files || []).length || usedNames[s.name]) && tries++ < 10) { d = new Date(d.getTime() + 60000); return attempt(); }
+      usedNames[s.name] = 1;
+      return call(SRV.drive, "create_file", { title: s.name, parentId: CFG.storage.handoff, textContent: R.note(kind, fields, s.human),
+        contentMimeType: "text/markdown" });
+    });
+  }
+  return attempt();
+}
+function answerProposal(pr, keep) {
+  MEM.answered[pr.id] = keep ? "keep" : "drop"; save(); render();
+  writeNote("lesson — " + (keep ? "keep " : "drop ") + pr.id, {}).then(function () { toast(t(keep ? "ruleKept" : "ruleDismissed")); })
+    .catch(function (e) { delete MEM.answered[pr.id]; save(); render(); toast(t("closeFailed", { e: errText(e, SRV.drive) })); });
+}
 function writeClose(id, fromEarlier) {
   var c = MEM.closing[id]; if (!c || c.written || c.inflight || !mcp) return;
   c.inflight = true; save();
@@ -172,7 +202,8 @@ function writeClose(id, fromEarlier) {
     var s = stamp(d);
     return call(SRV.drive, "search_files", { query: "parentId = " + q(CFG.storage.handoff) + " and title = " + q(s.name),
       excludeContentSnippets: true, pageSize: 5 }, true).then(function (p) {
-      if ((p.files || []).length && tries++ < 5) { d = new Date(d.getTime() + 60000); return attempt(); }
+      if (((p.files || []).length || usedNames[s.name]) && tries++ < 10) { d = new Date(d.getTime() + 60000); return attempt(); }
+      usedNames[s.name] = 1;
       return call(SRV.drive, "create_file", { title: s.name, parentId: CFG.storage.handoff, textContent: R.handoff(id, c.reason, s.human),
         contentMimeType: "text/markdown" });
     });
@@ -203,14 +234,20 @@ function requestClose(x, reason) {
   delete MEM.doing[x.key]; save(); closeSheet(); render();
   clearTimeout(timers[x.id]);
   timers[x.id] = setTimeout(function () { writeClose(x.id); }, 6000);
-  toast(t(reason === "done" ? "markedDone" : reason === "keep open" ? "markedKept" : "markedNotMine"), { label: t("undo"), fn: function () {
+  var sm = /^snooze until (\S+)/.exec(reason);
+  toast(sm ? t("markedSnoozed", { d: dlong(sm[1]) }) : t(reason === "done" ? "markedDone" : reason === "keep open" ? "markedKept" : "markedNotMine"), { label: t("undo"), fn: function () {
     clearTimeout(timers[x.id]); var cc = MEM.closing[x.id];
     if (cc && (cc.written || cc.inflight)) { toast(t("alreadySent")); return; }
     delete MEM.closing[x.id]; save(); render(); toast(t("undone")); } });
 }
 
 /* ---------- model helpers ---------- */
-function closing(x) { var c = x.id && MEM.closing[x.id]; return c && c.reason !== "keep open" ? c : null; }
+function closing(x) { var c = x.id && MEM.closing[x.id]; return c && c.reason !== "keep open" && !/^snooze/.test(c.reason) ? c : null; }
+function snoozed(x) {  // until this date the task stays out of the lists
+  var c = x.id && MEM.closing[x.id], local = c && /^snooze until (\S+)/.exec(c.reason);
+  var until = local ? local[1] : x.snoozedUntil;
+  return until && until > today() && x.closedOn === undefined ? until : null;
+}
 function pending(x) { var c = closing(x); return !!(c && !c.written); }
 function looksDone(x) {  // the radar thinks it's finished; only the user closes it
   var c = x.id && MEM.closing[x.id];
@@ -223,13 +260,14 @@ function status(x) {
   return MEM.doing[x.key] ? "doing" : "todo";
 }
 function todoAll() { return ST.model ? ST.model.todo : []; }
-function openTodo() { return todoAll().filter(function (x) { return status(x) !== "done"; }); }
+function openTodo() { return todoAll().filter(function (x) { return status(x) !== "done" && !snoozed(x); }); }
+function snoozedAll() { return todoAll().concat(ST.model ? ST.model.dele : []).filter(function (x) { return status(x) !== "done" && snoozed(x); }); }
 function doneTodo() {
   var local = todoAll().filter(function (x) { return status(x) === "done"; });
   var closed = ST.model ? ST.model.closed.filter(function (c) { return !c.closedOn || dd(c.closedOn, today()) <= 7; }) : [];
   return local.concat(closed);
 }
-function openDele() { return ST.model ? ST.model.dele.filter(function (x) { return status(x) !== "done"; }) : []; }
+function openDele() { return ST.model ? ST.model.dele.filter(function (x) { return status(x) !== "done" && !snoozed(x); }) : []; }
 function waited(x) { return x.since ? dd(x.since, today()) : 0; }
 function overdueDele() { return openDele().filter(function (x) { return (x.due && dd(today(), x.due) < 0) || waited(x) >= 7; }); }
 function infoLeft() { return ST.model ? ST.model.info.filter(function (i) { return !MEM.read[i.key]; }) : []; }
@@ -421,10 +459,17 @@ function vToday() {
     listEmpty("todo") || (top.length ? h("div", { class: "list" }, top.map(function (x) { return todoRow(x, true); })) : allDone())));
   if (hasData()) {
     var od = overdueDele().length, fyi = infoLeft().length, doneN = doneTodo().length;
-    grid.append(h("div", { class: "blk a-else" }, h("div", { class: "blk-h" }, h("h2", { text: t("else") })), h("div", { class: "sum" },
+    var elseBlk = h("div", { class: "blk a-else" }); grid.append(elseBlk);
+    elseBlk.append(h("div", { class: "blk-h" }, h("h2", { text: t("else") })), h("div", { class: "sum" },
       h("button", { type: "button", onclick: function () { go("delegated"); } }, h("span", { class: "n" + (od ? " red" : ""), text: String(od) }), h("span", { class: "l", text: od === 1 ? t("sumDele1") : t("sumDele") }), h("span", { class: "chev", text: "›" })),
       h("button", { type: "button", onclick: function () { go("fyi"); } }, h("span", { class: "n", text: String(fyi) }), h("span", { class: "l", text: t("sumFyi") }), h("span", { class: "chev", text: "›" })),
-      h("button", { type: "button", onclick: function () { todoFilter = "done"; go("todo"); } }, h("span", { class: "n", text: String(doneN) }), h("span", { class: "l", text: t("sumDone") }), h("span", { class: "chev", text: "›" })))));
+      h("button", { type: "button", onclick: function () { todoFilter = "done"; go("todo"); } }, h("span", { class: "n", text: String(doneN) }), h("span", { class: "l", text: t("sumDone") }), h("span", { class: "chev", text: "›" }))));
+    var props = ST.proposals.filter(function (pr) { return !MEM.answered[pr.id]; });
+    if (props.length) elseBlk.append(h("div", { class: "sugg" }, h("div", { class: "blk-h" }, h("h2", { text: t("sugT") })),
+      h("p", { class: "v-sub", text: t("sugP") }), h("div", { class: "list" }, props.map(function (pr) {
+        return h("div", { class: "irow" }, h("div", {}, h("div", { class: "tt", text: pr.rule }), pr.from ? h("div", { class: "ss", text: t("ruleFrom", { f: pr.from }) }) : null),
+          h("div", { class: "rt" }, h("button", { class: "act pri", type: "button", onclick: function () { answerProposal(pr, true); }, text: t("keepRule") }),
+            h("button", { class: "ghost", type: "button", onclick: function () { answerProposal(pr, false); }, text: t("dismissRule") }))); }))));
   }
   return v;
 }
@@ -432,8 +477,18 @@ function vTodo() {
   var v = h("div", { class: "view" }, h("h1", { class: "v-h1", text: t("todo") }), h("p", { class: "v-sub", text: t("todoSub") }));
   var n = stateNotice(); if (n) v.append(n);
   var e = listEmpty("todo"); if (e) { v.append(e); return v; }
-  v.append(h("div", { class: "vtools" }, h("span", { class: "seg", role: "group" }, ["open", "done"].map(function (f) {
-    return h("button", { type: "button", "aria-pressed": String(todoFilter === f), onclick: function () { todoFilter = f; render(); }, text: f === "open" ? t("open") + " (" + openTodo().length + ")" : t("done") }); }))));
+  var sz = snoozedAll(), segs = sz.length ? ["open", "snoozed", "done"] : ["open", "done"];
+  if (todoFilter === "snoozed" && !sz.length) todoFilter = "open";
+  v.append(h("div", { class: "vtools" }, h("span", { class: "seg", role: "group" }, segs.map(function (f) {
+    return h("button", { type: "button", "aria-pressed": String(todoFilter === f), onclick: function () { todoFilter = f; render(); },
+      text: f === "open" ? t("open") + " (" + openTodo().length + ")" : f === "snoozed" ? t("snoozedTab") + " (" + sz.length + ")" : t("done") }); }))));
+  if (todoFilter === "snoozed") {
+    v.append(h("div", { class: "list" }, sz.sort(function (a, b) { return snoozed(a) < snoozed(b) ? -1 : 1; }).map(function (x) {
+      return h("div", { class: "row", role: "button", tabindex: "0", onclick: function () { openSheet(x, x.kind ? "todo" : "dele"); } },
+        h("span", { class: "stc todo" }, h("span", { class: "ring" })), h("div", {}, h("div", { class: "tt", text: x.title }), x.who ? h("div", { class: "ss", text: x.who }) : null),
+        h("div", { class: "rt" }, h("span", { class: "sig", text: t("snoozedUntil", { d: dlong(snoozed(x)) }) }))); })));
+    return v;
+  }
   var list = todoFilter === "open" ? rankTodo(openTodo()) : doneTodo();
   if (!list.length) { v.append(h("div", { class: "empty", text: todoFilter === "open" ? t("allClear") : t("noneDone") })); return v; }
   var days = {};
@@ -522,6 +577,10 @@ function openSheet(x, set, mode) {
   }
   acts.append(h("div", { class: "pair" }, ST.canEvent ? h("button", { class: "bigbtn", type: "button", onclick: function () { block(body, x, acts); }, text: t("block") }) : null,
     h("button", { class: "bigbtn", type: "button", onclick: function () { requestClose(x, "not mine"); }, text: t("notMine") })));
+  var d0 = today(), dow = new Date(d0 + "T12:00:00Z").getUTCDay(), toMon = ((8 - dow) % 7) || 7;
+  acts.append(h("div", { class: "qlabel", text: t("snooze") }), h("div", { class: "decide" },
+    [["snoozeTomorrow", addDays(d0, 1)], ["snoozeMonday", addDays(d0, toMon)], ["snoozeNextWeek", addDays(d0, 7)]].map(function (o) {
+      return h("button", { class: "bigbtn", type: "button", onclick: function () { requestClose(x, "snooze until " + o[1]); }, text: t(o[0]) }); })));
   acts.append(h("div", { class: "why-note", text: t("neverSent") }));
   s.classList.add("on"); s.setAttribute("aria-hidden", "false"); document.getElementById("scrim").classList.add("on");
   if (mode === "reply" && canMail) compose(body, x, prep ? "prepared" : "reply", acts);
@@ -546,6 +605,10 @@ function compose(body, x, m, acts) {
     mcp.callTool(SRV.mail, "create_draft", input).then(function (r) {
       var p = r.payload || {}; closeSheet();
       toast(t("draftSaved", { m: PROV.mail }), safeUrl(p.viewUrl) ? { label: t("openDraft"), fn: function () { openUrl(p.viewUrl); } } : null);
+      if (m === "prepared" && ref.original != null && x.id) {  // teach learn how the user writes; it only ever proposes rules
+        var same = ref.original.trim() === msg.value.trim();
+        writeNote(same ? "learn — draft used" : "learn — draft edited", same ? { task: x.id } : { task: x.id, prepared: ref.original, saved: msg.value }).catch(function () {});
+      }
       if (status(x) === "todo" && m !== "follow") { MEM.doing[x.key] = 1; save(); render(); }
     }).catch(function (e) { saveBtn.disabled = false; err.textContent = t("draftFail", { e: errText(e, SRV.mail) }); err.hidden = false; });
   } });
@@ -557,7 +620,7 @@ function compose(body, x, m, acts) {
     var doc = prepared(x); msg.value = t("preparedLoading"); msg.disabled = true;
     readDoc(doc.id).then(function (txt) {
       var pd = R.parsePrepared(txt); msg.disabled = false;
-      msg.value = pd.draft || text; if (pd.subject) subj.value = pd.subject;
+      msg.value = pd.draft || text; if (pd.subject) subj.value = pd.subject; ref.original = pd.draft || null;
       if (pd.notes.length) { notes.replaceChildren.apply(notes, pd.notes.map(function (n) { return h("li", { text: n }); })); notes.hidden = false; }
     }).catch(function () { msg.disabled = false; msg.value = text; err.textContent = t("preparedFail"); err.hidden = false; });
   }

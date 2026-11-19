@@ -2,6 +2,38 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.7.0 - 2026-11-19
+
+It learns from what you decide, you can see how it's going, and you can
+snooze. Still your call: suggested rules change nothing until you keep them.
+
+### Added
+
+- **Suggested rules from your decisions:** when you edit two prepared drafts
+  the same way, mark two items from the same sender "not mine", or twice
+  answer "not yet" to the same kind of evidence, `learn` proposes a rule
+  ("sign 'Un abrazo, Ana'", "don't list Hetzner notices"). Suggestions show on
+  the dashboard (*Keep* / *Dismiss*) and in the weekly review; only kept ones
+  apply, dismissed ones aren't suggested again for 30 days. One-off decisions
+  and facts you typed into a draft never become rules.
+- **How it went:** the weekly review counts what you closed (dashboard or
+  chat), "looks done" confirmed vs kept open, replies prepared and used or
+  edited, median days to done, snoozes and suggested rules waiting. The same
+  numbers, without content, go in the trace.
+- **Snooze:** *Remind me* (Tomorrow, Monday, Next week) on any task. It
+  leaves your lists and the *Needs you now* ranking until that day, then comes
+  back; the dashboard shows it under *Snoozed*. In chat: "remind me Monday
+  about T-42".
+- New eval case `learn-decisions`.
+
+### Fixed
+
+- Dashboard: handoffs written in the same minute no longer share a name (the
+  page remembers the names it used, since Drive search can lag); the
+  *Open the source* icon is sized.
+
+Design: `docs/specs/2026-11-19-learn-measure-snooze.md`.
+
 ## chief-of-staff 0.6.0 - 2026-11-19
 
 Tasks arrive prepared, and the chief of staff tells you what looks done.

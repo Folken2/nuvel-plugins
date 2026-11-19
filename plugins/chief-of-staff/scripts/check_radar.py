@@ -52,6 +52,7 @@ MAX_LINES = 150
 MAX_NEEDS = 5
 CLOSE_REASONS = ("done", "not mine", "expired")  # the user's close handoff, or the radar's own `expired`
 LOOKS_DONE_RE = re.compile(r"—\s*looks done:\s*(.+)$")
+SNOOZED_RE = re.compile(r"—\s*snoozed until\s*(\S+)\s*$")
 
 
 def luhn(digits: str) -> bool:
@@ -204,6 +205,14 @@ def check(previous: str | None, new: str) -> tuple[list[str], list[str], dict[st
                 warnings.append(f"T-{n}: `looks done` should say when, as (YYYY-MM-DD), and link the evidence")
             if m and sec == "Closed":
                 errors.append(f"T-{n} is in Closed and marked `looks done`: a closed task needs no mark")
+            s = SNOOZED_RE.search(MD_ESCAPE_RE.sub(r"\1", line))
+            if s:
+                try:
+                    dt.date.fromisoformat(s.group(1))
+                except ValueError:
+                    errors.append(f"T-{n}: `snoozed until` must be followed by a date YYYY-MM-DD, got {s.group(1)!r}")
+                if sec == "Needs you now":
+                    errors.append(f"T-{n} is snoozed: it stays out of Needs you now until its date")
 
     # Task IDs
     id_errors, id_warnings, counts = check_task_ids.check(previous, raw)

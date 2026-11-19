@@ -129,6 +129,28 @@
     ],
     "warnings": []
   },
+  "snoozed": {
+    "description": "A task snoozed until Monday, kept in I owe.",
+    "exit": 0,
+    "errors": [],
+    "warnings": []
+  },
+  "snoozed-in-needs": {
+    "description": "A snoozed task left in Needs you now.",
+    "exit": 1,
+    "errors": [
+      "T-14 is snoozed"
+    ],
+    "warnings": []
+  },
+  "snoozed-not-a-date": {
+    "description": "Snoozed until a word.",
+    "exit": 1,
+    "errors": [
+      "`snoozed until` must be followed by a date"
+    ],
+    "warnings": []
+  },
   "thread-link-not-a-card": {
     "description": "A Gmail thread-f number that passes the card check is a link, not a card.",
     "exit": 0,
