@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Prompt Engineering"
+  short_description: "Write system prompts with InstructionProvider and state"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-prompt-engineering to improve my agent's system prompt."

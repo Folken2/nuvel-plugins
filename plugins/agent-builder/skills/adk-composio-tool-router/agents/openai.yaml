@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Composio Router"
+  short_description: "Give an ADK agent ~1000 toolkits via Composio"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-composio-tool-router to connect my agent to Gmail and Slack."

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Build an Agent"
+  short_description: "Scaffold a production agent and fill in its tools"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $build-agent to build an agent that triages my support inbox."

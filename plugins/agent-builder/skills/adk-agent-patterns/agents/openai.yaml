@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Agent Patterns"
+  short_description: "Pick the agent's shape: LlmAgent, Workflow or multi-agent"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-agent-patterns to choose the architecture for my agent."

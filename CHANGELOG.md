@@ -2,6 +2,24 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## agent-builder 0.1.0 - 2026-11-19
+
+First release. Build production-ready AI agents from Claude Code or Codex.
+
+### Added
+
+- **`build-agent`:** the workflow from "build me an agent that…" to a tested
+  project: pick the framework, confirm the spec, scaffold with
+  `nuvel agent create` (run through `uvx --from nuvel-cli`, no global
+  install), write the tools, prompt and skills, verify with tests, an import
+  check and `nuvel doctor`.
+- **22 framework skills** copied from nuvel: 15 for Google ADK 2.x (agent
+  patterns, workflow graphs, task delegation, tools, prompts, callbacks and
+  approvals, skills, streaming, Composio, guardrails, long sessions, cron,
+  memory), 6 for the Claude Agent SDK and 1 for Hermes.
+- `scripts/sync_skills.py` copies the skills from a nuvel checkout and pins
+  the commit in `source.json`; CI fails if the copy drifts from that commit.
+
 ## chief-of-staff 0.7.0 - 2026-11-19
 
 It learns from what you decide, you can see how it's going, and you can

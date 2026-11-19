@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Self-Improving Memory"
+  short_description: "Experimental: consolidation, judge forks, skill curator"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-memory-self-improvement to make my agent learn across sessions."

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Claude SDK Tools"
+  short_description: "Custom tools with @tool and in-process MCP"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $claude-sdk-tool-creation to add a database lookup tool."

@@ -1,0 +1,49 @@
+{
+  "name": "agent-builder",
+  "version": "0.1.0",
+  "description": "Build production-ready AI agents from Claude or Codex. Scaffolds a runnable FastAPI project with nuvel (Google ADK by default, or Hermes) with auth, tracing, cost guard, guardrails, Docker and Railway config, then guides the tools, prompt and skills with 23 framework skills for Google ADK 2.x, the Claude Agent SDK and Hermes.",
+  "author": {
+    "name": "nuvel",
+    "url": "https://github.com/Folken2/nuvel"
+  },
+  "homepage": "https://github.com/Folken2/nuvel-plugins/tree/main/plugins/agent-builder",
+  "repository": "https://github.com/Folken2/nuvel-plugins",
+  "license": "MIT",
+  "keywords": [
+    "agents",
+    "ai-agents",
+    "agent-builder",
+    "google-adk",
+    "adk",
+    "claude-agent-sdk",
+    "hermes",
+    "scaffold",
+    "fastapi",
+    "mcp",
+    "skills",
+    "workflows",
+    "nuvel"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Agent Builder",
+    "shortDescription": "Scaffold and build production AI agents",
+    "longDescription": "Agent Builder turns \"build me an agent that…\" into a runnable project. It scaffolds a production skeleton with nuvel — FastAPI server with auth and health checks, a plugin chain for cost, tracing, caching, resilience and guardrails, tests, Dockerfile and Railway config — then writes the agent's tools, system prompt and domain skills using bundled knowledge for Google ADK 2.x (tools, workflows, callbacks and approvals, streaming, memory, long-running and scheduled agents), the Claude Agent SDK (tools, hooks, permissions, MCP, deployment) and Hermes. Optional Slack, Telegram and Teams gateways and Composio integrations.",
+    "developerName": "nuvel",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/Folken2/nuvel",
+    "defaultPrompt": [
+      "Build me an agent that triages my support inbox",
+      "Add an approval step before my agent sends anything",
+      "Turn my agent into a plan-then-execute workflow"
+    ],
+    "brandColor": "#1B1A17",
+    "composerIcon": "./assets/logo.png",
+    "logo": "./assets/logo.png"
+  }
+}

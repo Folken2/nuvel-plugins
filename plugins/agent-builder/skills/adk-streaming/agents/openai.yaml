@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Streaming"
+  short_description: "Voice and video agents with the Gemini Live API"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-streaming to build a voice agent."

@@ -9,6 +9,9 @@ skills tree with three manifests: `.claude-plugin/plugin.json`,
 - Skills cite shared files with paths relative to the skill folder
   (`../../references/x.md`); tests fail if a cited file is missing.
 - Every skill needs `agents/openai.yaml` (Codex UI metadata).
+- `agent-builder` skills other than `build-agent` are copies from Folken2/nuvel:
+  edit them there, then `python scripts/sync_skills.py agent-builder --from ../nuvel`.
+  CI fails if the copy differs from the commit pinned in its `source.json`.
 - Run `uvx --with pytest pytest tests -q` and `claude plugin validate --strict .`
   (CI also validates each `plugins/<name>/`) before committing.
 - Changes to the radar, references, scripts or evals: also run the radar evals

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Claude SDK Hooks"
+  short_description: "PreToolUse, PostToolUse and Stop hooks"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $claude-sdk-hooks to block risky shell commands in my agent."

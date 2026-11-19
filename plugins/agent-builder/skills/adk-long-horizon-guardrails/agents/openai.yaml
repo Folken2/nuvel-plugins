@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Guardrails"
+  short_description: "Halt guards, shell command safety and exfil guard"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-long-horizon-guardrails before my agent runs unattended."

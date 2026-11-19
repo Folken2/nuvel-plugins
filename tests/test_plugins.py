@@ -30,12 +30,16 @@ def _frontmatter(path: Path) -> dict[str, str]:
     text = path.read_text(encoding="utf-8")
     match = re.match(r"^---\n(.*?)\n---\n", text, flags=re.DOTALL)
     assert match, f"{path} has no frontmatter"
-    fields = {}
+    fields: dict[str, str] = {}
+    key = None
     for line in match.group(1).splitlines():
+        if key and line[:1] in (" ", "\t"):  # continuation of a folded (>) or literal (|) block
+            fields[key] = f"{fields[key]} {line.strip()}".strip()
+            continue
         key, _, value = line.partition(":")
-        if value:
-            fields[key.strip()] = value.strip()
-    return fields
+        key, value = key.strip(), value.strip()
+        fields[key] = "" if value in {">", ">-", "|", "|-"} else value
+    return {k: v for k, v in fields.items() if v}
 
 
 def _skills(plugin: Path) -> list[Path]:
@@ -43,6 +47,7 @@ def _skills(plugin: Path) -> list[Path]:
 
 
 SKILLS = [s for p in PLUGINS for s in _skills(p)]
+COS_SKILLS = _skills(COS)  # chief-of-staff contracts (trace catalog, lessons) apply only there
 
 
 @pytest.mark.parametrize("plugin", PLUGINS, ids=lambda p: p.name)
@@ -172,7 +177,7 @@ def test_project_instructions_template() -> None:
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9_.:-]{0,79}$")
 
 
-@pytest.mark.parametrize("skill", SKILLS, ids=lambda s: s.name)
+@pytest.mark.parametrize("skill", COS_SKILLS, ids=lambda s: s.name)
 def test_trace_catalog(skill: Path) -> None:
     cat = _json(skill / "trace-steps.json")
     assert cat["skill"] == skill.name
@@ -405,7 +410,7 @@ def test_registry_layout_has_learning_folders() -> None:
 
 
 def test_every_skill_reads_lessons() -> None:
-    for skill in SKILLS:
+    for skill in COS_SKILLS:
         if skill.name not in {"learn"}:
             assert "lessons" in (skill / "SKILL.md").read_text(encoding="utf-8"), skill.name
 

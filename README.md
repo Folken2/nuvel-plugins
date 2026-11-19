@@ -27,6 +27,15 @@ a weekly review. You can correct it in plain language and it remembers.
 Open [plugins/chief-of-staff](plugins/chief-of-staff/) for the full guide. Once
 installed, just say: *"Set up my chief of staff."*
 
+## Agent Builder
+
+For developers in Claude Code and Codex. Say *"build me an agent that…"* and it
+scaffolds a production-ready project with [nuvel](https://github.com/Folken2/nuvel)
+(FastAPI server, auth, tracing, cost guard, guardrails, tests, Docker and
+Railway config), then writes the tools, prompt and skills, guided by 22
+framework skills for Google ADK 2.x, the Claude Agent SDK and Hermes. See
+[plugins/agent-builder](plugins/agent-builder/).
+
 ## For installers and builders
 
 This repo is a plugin marketplace for both Claude and Codex: one skills tree per
@@ -35,6 +44,7 @@ plugin, with a manifest for each host.
 | Plugin | What it does |
 |---|---|
 | [chief-of-staff](plugins/chief-of-staff/) | Radar, morning brief, meeting prep, weekly review, recall, setup and learn. Microsoft 365 and Google. |
+| [agent-builder](plugins/agent-builder/) | Scaffold and build production AI agents: Google ADK, Claude Agent SDK, Hermes. |
 
 ### Install
 

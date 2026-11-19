@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Skill Patterns"
+  short_description: "Five skill shapes: wrapper, generator, reviewer, inversion, pipeline"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-skill-design-patterns to pick a shape for my agent's skills."

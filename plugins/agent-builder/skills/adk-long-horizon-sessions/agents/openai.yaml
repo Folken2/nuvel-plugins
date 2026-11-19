@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Long Sessions"
+  short_description: "Resumability and event compaction for long runs"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-long-horizon-sessions so my agent survives restarts."

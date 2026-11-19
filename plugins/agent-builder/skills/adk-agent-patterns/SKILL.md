@@ -1,0 +1,245 @@
+---
+name: adk-agent-patterns
+description: >
+  Agent architecture patterns for Google ADK 2.x — when to reach for a single
+  LlmAgent, a Workflow graph (the default for multi-step orchestration), or the
+  deprecated SequentialAgent / LoopAgent / ParallelAgent classes. Load this
+  skill when deciding the agent's top-level shape.
+---
+
+# ADK Agent Architecture Patterns
+
+**Version 2.1** | Updated for `google-adk>=2.13.0`
+
+Select the right architecture for any task using Google ADK primitives. ADK 2.0
+introduced a graph-based **`Workflow`** model that subsumes Sequential / Loop /
+Parallel into a single primitive. The old classes are **deprecated** in favor
+of `Workflow` (they emit a `DeprecationWarning` and will be removed in a future
+release), so `Workflow` is the default for anything multi-step.
+
+For the full graph API (nodes, edges, routing, fan-out, dynamic nodes,
+human-in-the-loop), load the **`adk-workflow-graphs`** skill.
+
+## Decision Tree
+
+```
+Is the task a single, well-defined purpose with clear tools?
+  YES → LlmAgent (single agent)              [Pattern 1]
+  NO  ↓
+
+Is the task multi-step with branching, cycles, or fan-out?
+  YES → Workflow graph                       [Pattern 2 — preferred]
+  NO  ↓  (i.e., strictly linear, no branching)
+
+Strictly linear, looped, or parallel steps?
+  YES → Workflow graph too                   [Pattern 2]
+        (a coordinator LLM calls it as a tool: tools=[workflow])
+
+Specialized sub-agents picked dynamically by a router LLM?
+  YES → Multi-agent hierarchy                [Pattern 4]
+```
+
+**Rule of thumb in ADK 2.x:** multi-step means **`Workflow`** — it covers
+conditional branching, revision loops, fan-in joins, dynamic node scheduling,
+and plain Python steps mixed with LLM steps. Write new code against
+`Workflow` even when the shape is trivially linear; the deprecated classes are
+for existing code and for the one case `Workflow` can't cover yet (below).
+
+## Pattern 1: Single LlmAgent
+
+**When:** One clear purpose, well-defined tools, no multi-step pipeline. Covers
+~70% of real use cases.
+
+```python
+from google.adk.agents import LlmAgent
+
+agent = LlmAgent(
+    name="data_analyst",
+    model="gemini-2.5-flash",
+    instruction="You are a data analyst. Analyze datasets using the provided tools...",
+    tools=[query_tool, chart_tool, export_tool],
+    output_key="analysis_result",
+)
+```
+
+**Use single LlmAgent when:** one job, all tools serve the same purpose, no
+iterative refinement, single user → single agent conversation.
+
+## Pattern 2: Workflow graph (ADK 2.0, new default for multi-step)
+
+**When:** Anything multi-step that isn't trivially linear or trivially parallel.
+The graph is declared as a list of `edges`; ADK compiles it, validates it, and
+schedules execution.
+
+```python
+from google.adk.workflow import Workflow, node
+from google.adk.agents import LlmAgent
+
+classifier = LlmAgent(name="classifier", model="gemini-2.5-flash",
+                     instruction="Classify intent: return 'sql' or 'chart'.")
+sql_writer = LlmAgent(name="sql_writer", model="gemini-2.5-flash",
+                     instruction="Write the SQL query.", tools=[execute_sql])
+chart_maker = LlmAgent(name="chart_maker", model="gemini-2.5-flash",
+                      instruction="Make the chart.", tools=[chart_tool])
+
+@node
+def format_answer(node_input: str) -> str:
+    return f"Done: {node_input}"
+
+agent = Workflow(
+    name="analysis_router",
+    edges=[
+        ('START', classifier),
+        (classifier, {
+            "sql":   sql_writer,
+            "chart": chart_maker,
+        }),
+        ((sql_writer, chart_maker), format_answer),
+    ],
+)
+```
+
+**What you get for free:**
+- Conditional routing via dict syntax — `(node, {"a": A, "b": B})`
+- Fan-out via tuple in target — `(start, (A, B, C))`
+- Fan-in via tuple in source — `((A, B, C), join)`
+- Cycles for revision loops — `(reviewer, {"revise": drafter, "approve": send})`
+- Plain Python steps as nodes via `@node`
+- `LlmAgent` auto-wraps to output `str` (or parsed dict if `output_schema` set)
+
+**Use Workflow when:** branching, cycles, fan-out/in, mixing LLM and pure-Python
+steps, anything where you'd otherwise nest Sequential inside Loop inside
+something. For the full reference, load `adk-workflow-graphs`.
+
+## Pattern 3: Deprecated shortcut classes
+
+`SequentialAgent`, `LoopAgent`, and `ParallelAgent` still run, but they are
+deprecated in favor of `Workflow` and will be removed in a future release.
+Write the equivalent `Workflow` shown under each class instead, and migrate
+existing ones with the `workflow-migration.md` reference in `adk-task-delegation`.
+
+**`Workflow` cannot be an `LlmAgent` sub-agent** — `sub_agents=[workflow]`
+fails validation. To put a pipeline under a coordinator LLM, pass it as a
+tool: `LlmAgent(tools=[workflow])` wraps it in a `NodeTool` the model calls
+by the workflow's `name`, with the `description` as the tool description. Only
+when the coordinator must *transfer* control to the pipeline (rather than call
+it and get a result back) do you still need one of the deprecated classes.
+
+### 3a. SequentialAgent — strictly linear pipeline
+
+```python
+from google.adk.agents import SequentialAgent, LlmAgent
+
+pipeline = SequentialAgent(
+    name="analysis_pipeline",
+    sub_agents=[planner, executor, summarizer],
+)
+```
+
+Equivalent `Workflow`: `edges=[('START', planner), (planner, executor), (executor, summarizer)]`.
+
+### 3b. LoopAgent — iterate until exit
+
+```python
+from google.adk.agents import LoopAgent
+
+research_loop = LoopAgent(
+    name="research_loop",
+    sub_agents=[researcher, reviewer],
+    max_iterations=10,
+)
+```
+
+Exits via `tool_context.actions.escalate = True` or `max_iterations`. Always set
+`max_iterations`. For loop exit patterns, see `references/loop-patterns.md`.
+
+`max_iterations` is the intended termination condition, but it's not the only
+backstop: if a loop's exit logic itself fails to trigger — a reviewer that
+never escalates, a step that returns the same output forever — the shipped
+`NoProgressGuard` / `RepeatedFailureGuard` halt guards catch the runaway
+response loop or the identically-failing tool call and latch a halt rather
+than letting the loop spin unbounded. Load `adk-long-horizon-guardrails` for
+how those guards work and how they're wired into every generated agent.
+
+### 3c. ParallelAgent — fan-out only
+
+```python
+from google.adk.agents import ParallelAgent
+
+parallel_research = ParallelAgent(
+    name="parallel_research",
+    sub_agents=[market_analyst, tech_analyst],
+)
+```
+
+Equivalent `Workflow`: `edges=[('START', (market_analyst, tech_analyst))]`. If
+you also need fan-in (an aggregator that consumes both outputs), switch to
+`Workflow` — `ParallelAgent` alone has no join step.
+
+## Pattern 4: Multi-agent hierarchy (LLM-routed sub_agents)
+
+**When:** A coordinator LLM picks which specialist handles each request. The
+choice is made by the model, not by static edges.
+
+```python
+from google.adk.agents import LlmAgent
+
+coordinator = LlmAgent(
+    name="coordinator",
+    model="gemini-2.5-pro",
+    instruction="Route user requests to the appropriate specialist.",
+    sub_agents=[sql_expert, viz_expert],
+)
+```
+
+**Hierarchy vs. Workflow routing:**
+- **Hierarchy (`sub_agents=`)** — the LLM decides routing at runtime based on
+  the user's message. Flexible but opaque.
+- **Workflow dict-routing** — a node emits an explicit route string, edges map
+  it to a target. Auditable and testable.
+
+Use hierarchy when routing is genuinely conversational. Use Workflow when the
+routing is more like a state machine you can write down. They compose: a
+Workflow node can itself be an `LlmAgent` with `sub_agents`.
+
+For `AgentTool` and advanced hierarchies, see `references/multi-agent-patterns.md`.
+
+## Combining patterns
+
+```
+coordinator (LlmAgent)
+  ├── sub_agents:
+  │     └── simple_agent (LlmAgent)          ← transfer target
+  └── tools:
+        ├── analysis_pipeline (Workflow)     ← called as a NodeTool
+        │     ├── classifier (ClassifierNode or LlmAgent node)
+        │     ├── sql_writer / chart_maker (routed branches)
+        │     └── format_answer (FunctionNode)
+        └── research_loop (Workflow with a routed cycle)
+```
+
+A `Workflow` goes in `tools`, never `sub_agents` — see Pattern 3.
+
+**Rules:**
+1. Start simple. Single `LlmAgent` first; reach for `Workflow` when you actually
+   need branching, cycles, or fan-in.
+2. Prefer `Workflow` over nesting `SequentialAgent`/`LoopAgent`/`ParallelAgent`
+   — the graph is flatter and the routing is explicit.
+3. Every sub-agent has one clear job.
+4. Pass state between nodes via node output (auto-wired) or `output_key` /
+   session state for cross-cutting values.
+5. Bound every cycle — a route that eventually leaves the cycle in a
+   `Workflow` (or `max_iterations` on a legacy `LoopAgent`).
+
+## Common Mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| Reaching for SequentialAgent for any multi-step task | It is deprecated — write a `Workflow` with linear edges |
+| `LlmAgent(sub_agents=[some_workflow])` | Fails validation — pass it as `tools=[some_workflow]` (wrapped as a `NodeTool`) |
+| Using ParallelAgent then needing to aggregate | `ParallelAgent` has no join — use `Workflow` with fan-out + fan-in |
+| Nesting `LoopAgent` inside `SequentialAgent` inside `ParallelAgent` | Collapse to a single `Workflow` with routed cycles and tuple fan-out |
+| LoopAgent or workflow cycle without an exit | Always set `max_iterations` or ensure at least one route leaves the cycle |
+| Two parallel agents writing to the same `output_key` | Each parallel branch needs a unique key, or fan into a join node |
+| Over-engineering with multi-agent when one LlmAgent works | Profile first — extra agents add latency and cost |
+| Forgetting `rerun_on_resume=True` on a node that calls `ctx.run_node()` | Required for dynamic-node parents — see `adk-workflow-graphs` |

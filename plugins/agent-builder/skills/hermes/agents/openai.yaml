@@ -1,0 +1,5 @@
+interface:
+  display_name: "Hermes Agents"
+  short_description: "SOUL.md profiles, config and the Telegram gateway"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $hermes to build a Telegram bot with Hermes."

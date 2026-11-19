@@ -1,0 +1,5 @@
+interface:
+  display_name: "Claude SDK MCP"
+  short_description: "Wire external MCP servers into a Claude agent"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $claude-sdk-mcp-integration to connect my agent to an MCP server."

@@ -1,0 +1,28 @@
+{
+  "repo": "https://github.com/Folken2/nuvel",
+  "commit": "5dc3cfcaca8d41fe0b4246f76905db212e19675d",
+  "skills": {
+    "adk-agent-patterns": "nuvel/backends/adk/skills/adk-agent-patterns",
+    "adk-callbacks-hitl": "nuvel/backends/adk/skills/adk-callbacks-hitl",
+    "adk-composio-tool-router": "nuvel/backends/adk/skills/adk-composio-tool-router",
+    "adk-cron-isolation": "nuvel/backends/adk/skills/adk-cron-isolation",
+    "adk-long-horizon-guardrails": "nuvel/backends/adk/skills/adk-long-horizon-guardrails",
+    "adk-long-horizon-sessions": "nuvel/backends/adk/skills/adk-long-horizon-sessions",
+    "adk-memory-self-improvement": "nuvel/backends/adk/skills/adk-memory-self-improvement",
+    "adk-org-memory-retrieval": "nuvel/backends/adk/skills/adk-org-memory-retrieval",
+    "adk-prompt-engineering": "nuvel/backends/adk/skills/adk-prompt-engineering",
+    "adk-skill-creation": "nuvel/backends/adk/skills/adk-skill-creation",
+    "adk-skill-design-patterns": "nuvel/backends/adk/skills/adk-skill-design-patterns",
+    "adk-streaming": "nuvel/backends/adk/skills/adk-streaming",
+    "adk-task-delegation": "nuvel/backends/adk/skills/adk-task-delegation",
+    "adk-tool-creation": "nuvel/backends/adk/skills/adk-tool-creation",
+    "adk-workflow-graphs": "nuvel/backends/adk/skills/adk-workflow-graphs",
+    "claude-sdk-deployment": "nuvel/backends/claude_agent_sdk/skills/claude-sdk-deployment",
+    "claude-sdk-hooks": "nuvel/backends/claude_agent_sdk/skills/claude-sdk-hooks",
+    "claude-sdk-mcp-integration": "nuvel/backends/claude_agent_sdk/skills/claude-sdk-mcp-integration",
+    "claude-sdk-permissions": "nuvel/backends/claude_agent_sdk/skills/claude-sdk-permissions",
+    "claude-sdk-system-prompt": "nuvel/backends/claude_agent_sdk/skills/claude-sdk-system-prompt",
+    "claude-sdk-tool-creation": "nuvel/backends/claude_agent_sdk/skills/claude-sdk-tool-creation",
+    "hermes": "nuvel/backends/hermes/skills/hermes"
+  }
+}

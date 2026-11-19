@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "nuvel",
-  "description": "Official nuvel plugins for Claude and Cowork (also Codex): agents that run your day-to-day.",
+  "description": "Official nuvel plugins for Claude and Cowork (also Codex): agents that run your day-to-day, and the toolkit to build your own.",
   "owner": {
     "name": "nuvel",
     "url": "https://github.com/Folken2/nuvel"
@@ -16,6 +16,16 @@
       "source": "./plugins/chief-of-staff",
       "category": "productivity",
       "homepage": "https://github.com/Folken2/nuvel-plugins/tree/main/plugins/chief-of-staff"
+    },
+    {
+      "name": "agent-builder",
+      "description": "Build production-ready AI agents: scaffolds a runnable FastAPI project with nuvel (Google ADK or Hermes) and guides its tools, prompt and skills with 23 framework skills for Google ADK, the Claude Agent SDK and Hermes.",
+      "author": {
+        "name": "nuvel"
+      },
+      "source": "./plugins/agent-builder",
+      "category": "development",
+      "homepage": "https://github.com/Folken2/nuvel-plugins/tree/main/plugins/agent-builder"
     }
   ]
 }

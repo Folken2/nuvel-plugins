@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Tool Creation"
+  short_description: "Function tools: ToolContext, signatures, errors"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-tool-creation to write a tool that looks up orders."

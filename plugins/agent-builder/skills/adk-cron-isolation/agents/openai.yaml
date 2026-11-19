@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Cron Isolation"
+  short_description: "Safe scheduled runs: scoped secrets, headless policy"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-cron-isolation to run my agent every morning safely."

@@ -32,3 +32,17 @@ jobs:
           for plugin in plugins/*/; do
             claude plugin validate --strict "$plugin"
           done
+  skills-sync:
+    # agent-builder republishes skills from Folken2/nuvel; fail if the copy
+    # differs from the commit pinned in plugins/agent-builder/source.json.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: pin
+        run: echo "commit=$(python3 -c 'import json; print(json.load(open("plugins/agent-builder/source.json"))["commit"])')" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: Folken2/nuvel
+          ref: ${{ steps.pin.outputs.commit }}
+          path: _nuvel
+      - run: python3 scripts/sync_skills.py agent-builder --from _nuvel --check

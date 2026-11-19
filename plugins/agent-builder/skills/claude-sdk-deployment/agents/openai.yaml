@@ -1,0 +1,5 @@
+interface:
+  display_name: "Claude SDK Deployment"
+  short_description: "Ship a Claude Agent SDK agent behind FastAPI"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $claude-sdk-deployment to deploy my Claude agent to Railway."

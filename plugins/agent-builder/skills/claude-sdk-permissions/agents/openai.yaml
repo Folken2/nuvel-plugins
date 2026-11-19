@@ -1,0 +1,5 @@
+interface:
+  display_name: "Claude SDK Permissions"
+  short_description: "allowed_tools, permission modes and can_use_tool"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $claude-sdk-permissions to lock down what my agent can do."

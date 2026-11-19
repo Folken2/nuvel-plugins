@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Callbacks & HITL"
+  short_description: "Callbacks, approval gates and state in ADK"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-callbacks-hitl to add an approval step before my agent sends email."

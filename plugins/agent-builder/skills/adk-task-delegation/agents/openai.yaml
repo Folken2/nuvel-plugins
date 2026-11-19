@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Task Delegation"
+  short_description: "Sub-agents with mode='task' and typed contracts"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-task-delegation to split my agent into a planner and a worker."

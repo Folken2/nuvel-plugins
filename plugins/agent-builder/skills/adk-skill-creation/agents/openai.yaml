@@ -1,0 +1,5 @@
+interface:
+  display_name: "ADK Skill Creation"
+  short_description: "Write SKILL.md files and wire them into SkillToolset"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $adk-skill-creation to add a skill with our refund policy."
