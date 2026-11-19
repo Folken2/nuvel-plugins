@@ -2,6 +2,39 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.6.0 - 2026-11-19
+
+Tasks arrive prepared, and the chief of staff tells you what looks done.
+You always decide: nothing is sent or closed without you.
+
+### Added
+
+- **Prepared replies:** after each scheduled radar, the new `prepare` skill
+  drafts a reply for up to 3 tasks where someone asked you something by
+  email. Each draft is a `prepared T-<n>` document in your registry: short, in
+  your voice, with `[placeholders]` for anything only you can decide. It is
+  never put in your mailbox. It skips prompt-injection emails, anything about
+  payment or bank details, decisions you haven't made, and tasks that already
+  have a draft.
+- **Dashboard:** those tasks show *Draft ready*, and *Review the draft* opens
+  it to edit and save as a Gmail draft. Saving with `[placeholders]` left asks
+  once. The morning brief lists them under *Ready for you*.
+
+### Changed
+
+- **Looks done, never closed:** when a source shows a task is finished (a
+  reply saying it's done, a Linear issue moved to Done), the radar no longer
+  closes it. It marks it `looks done` with the evidence and its link. You
+  confirm on the dashboard (*Yes, it's done*) or in chat, or say *Not yet*,
+  which writes a new `keep open` handoff, and the radar won't suggest it again
+  until there's new evidence. Only your own close (done, not mine) or `expired`
+  closes a task; `check_radar.py` now fails a radar that closes one any other
+  way. The closed reason `resolved` is gone.
+- Eval cases `radar-sweep` and `radar-linear` now expect `looks done` instead
+  of a close; new case `prepare-replies`.
+
+Design: `docs/specs/2026-11-19-prepared-and-looks-done.md`.
+
 ## chief-of-staff 0.5.2 - 2026-11-17
 
 Setup owns the routines' settings, so nobody fixes them by hand.

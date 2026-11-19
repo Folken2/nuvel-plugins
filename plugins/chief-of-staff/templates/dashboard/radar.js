@@ -18,6 +18,7 @@
   var REASONS = /^(done|not mine|resolved|expired)$/i;  // Closed reasons, English in every language
   var RADAR_TITLE_RE = /^(\d{4}-\d{2}-\d{2}) (\d{2})(\d{2}) radar$/;
   var BRIEF_TITLE_RE = /^(\d{4}-\d{2}-\d{2}) (\d{2})(\d{2}) brief$/;
+  var PREPARED_TITLE_RE = /^(\d{4}-\d{2}-\d{2}) (\d{2})(\d{2}) prepared (T-[1-9]\d*)$/;
 
   function unescapeMd(s) { return s.replace(/\\([\[\]()*_`#>\\-])/g, "$1"); }
   function stripMd(s) { return unescapeMd(s).replace(/\*\*?([^*]+)\*\*?/g, "$1").trim(); }
@@ -47,10 +48,19 @@
   function item(body) {
     var id = null, rest = body, m = TASK_RE.exec(body);
     if (m) { id = "T-" + m[1]; rest = m[2]; }
-    var link = null, due = null, dates = [], fields = [];
+    var link = null, due = null, dates = [], fields = [], looksDone = null, keptOpen = null;
     rest.split(/\s+—\s+/).forEach(function (part) {
       var p = part.trim();
       if (!p) return;
+      var ld = /^looks done:\s*(.*)$/i.exec(unescapeMd(p));
+      if (ld) {  // evidence that the task is finished: the user confirms, the radar never closes it
+        var lk = LINK_RE.exec(ld[1]), dm0 = /\((\d{4}-\d{2}-\d{2})\)/.exec(ld[1]);
+        looksDone = { text: stripMd(ld[1].replace(LINK_RE, "").replace(/\(\d{4}-\d{2}-\d{2}\)/, "").trim()),
+          date: dm0 ? dm0[1] : null, link: lk ? lk[1] : null };
+        return;
+      }
+      var ko = /^kept open (\d{4}-\d{2}-\d{2})$/i.exec(p);
+      if (ko) { keptOpen = ko[1]; return; }
       var lm = LINK_RE.exec(p);
       if (lm && p.replace(LINK_RE, "").trim() === "") { link = link || lm[1]; return; }
       var dm = DUE_RE.exec(p);
@@ -61,7 +71,8 @@
       if (lm) link = link || lm[1];
       fields.push(stripMd(p.replace(LINK_RE, "").trim()));
     });
-    return { id: id, title: fields[0] || "", fields: fields.slice(1), link: link, due: due, dates: dates };
+    return { id: id, title: fields[0] || "", fields: fields.slice(1), link: link, due: due, dates: dates,
+      looksDone: looksDone, keptOpen: keptOpen };
   }
 
   function isNote(body) { return body.indexOf("—") < 0 && !TASK_RE.test(body); }  // "none", "Cap.", "Res nou…"
@@ -97,6 +108,7 @@
         seen.due = seen.due || it.due; seen.link = seen.link || it.link;
         seen.since = seen.since || it.dates[it.dates.length - 1] || null;
         seen.threadId = seen.threadId || gmailThreadId(it.link);
+        seen.looksDone = seen.looksDone || it.looksDone;
         return;
       }
       var who = "", why = "";
@@ -104,7 +116,8 @@
       else if (kind === "decide") { who = it.fields[0] || ""; why = it.fields.slice(1).join(" — "); }
       else { who = it.fields[0] || ""; why = it.fields.slice(1).join(" — "); }
       var x = { key: key, id: it.id, kind: kind, title: it.title, who: who, why: why, link: it.link,
-        due: it.due, since: it.dates[it.dates.length - 1] || null, threadId: gmailThreadId(it.link) };
+        due: it.due, since: it.dates[it.dates.length - 1] || null, threadId: gmailThreadId(it.link),
+        looksDone: it.looksDone };
       byId[key] = x;
       todo.push(x);
     }
@@ -115,7 +128,7 @@
       var it = item(b);
       dele.push({ key: it.id || hash("w" + b), id: it.id, title: it.title, who: it.fields[0] || "",
         why: it.fields.slice(1).join(" — "), link: it.link, due: it.due,
-        since: it.dates[it.dates.length - 1] || null, threadId: gmailThreadId(it.link) });
+        since: it.dates[it.dates.length - 1] || null, threadId: gmailThreadId(it.link), looksDone: it.looksDone });
     });
     list("Closed").forEach(function (b) {
       var it = item(b), f = it.fields.slice(), reason = "";
@@ -154,17 +167,47 @@
       .sort(function (a, b) { return a.title < b.title ? 1 : a.title > b.title ? -1 : 0; })[0] || null;
   }
 
+  /** Newest `prepared T-<n>` document per task: {"T-42": file}. */
+  function preparedByTask(files) {
+    var out = {};
+    (files || []).forEach(function (f) {
+      var m = PREPARED_TITLE_RE.exec((f && f.title) || "");
+      if (m && (!out[m[4]] || out[m[4]].title < f.title)) out[m[4]] = f;
+    });
+    return out;
+  }
+
+  /** A `prepared` document -> {task, kind, subject, draft, notes[]}. */
+  function parsePrepared(text) {
+    var t = String(text || ""), out = { task: null, kind: "reply", subject: "", draft: "", notes: [] }, cur = null, draft = [];
+    t.split(/\r?\n/).forEach(function (raw) {
+      var h = /^\s*#{2,3}\s*(.+?)\s*$/.exec(raw);
+      if (h && !/^\s*[-*•]\s/.test(raw)) { cur = h[1].toLowerCase(); return; }
+      if (cur === null) {
+        var kv = /^\s*[-*•]\s+(task|kind):\s*(.+)$/.exec(unescapeMd(raw));
+        if (kv) out[kv[1]] = kv[2].trim();
+        return;
+      }
+      if (cur === "subject" && raw.trim() && !out.subject) out.subject = unescapeMd(raw.trim());
+      else if (cur === "draft") draft.push(unescapeMd(raw.replace(/^ {2}/, "")));
+      else if (cur === "notes") { var b = /^\s*[-*•]\s+(.*)$/.exec(raw); if (b) out.notes.push(stripMd(b[1])); }
+    });
+    out.draft = draft.join("\n").replace(/^\n+|\n+$/g, "");
+    return out;
+  }
+
   function titleTime(title) {
     var m = RADAR_TITLE_RE.exec(title || "") || BRIEF_TITLE_RE.exec(title || "");
     return m ? m[1] + "T" + m[2] + ":" + m[3] : null;
   }
 
   /** The handoff document the board writes for "Done" / "Not mine". */
-  function handoff(taskId, reason, stamp) {
-    return "# Handoff · " + stamp + "\n\n- instruction: close — " + reason + "\n- task: " + taskId +
+  function handoff(taskId, reason, stamp) {  // reason: "done" | "not mine" | "keep open"
+    var instruction = reason === "keep open" ? "keep open" : "close — " + reason;
+    return "# Handoff · " + stamp + "\n\n- instruction: " + instruction + "\n- task: " + taskId +
       "\n- from: dashboard (on behalf of the user)\n";
   }
 
   return { sections: sections, item: item, parseRadar: parseRadar, parseBrief: parseBrief, newest: newest,
-    titleTime: titleTime, handoff: handoff, gmailThreadId: gmailThreadId, hash: hash };
+    titleTime: titleTime, handoff: handoff, preparedByTask: preparedByTask, parsePrepared: parsePrepared, gmailThreadId: gmailThreadId, hash: hash };
 });

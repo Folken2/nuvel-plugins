@@ -43,7 +43,7 @@ function hours() {
 
 /* ---------- state ---------- */
 var mcp = null, booted = false;
-var ST = { phase: "loading", model: null, radar: null, brief: null, meetings: [], free: [],
+var ST = { phase: "loading", model: null, radar: null, brief: null, meetings: [], free: [], prepared: {},
   err: { drive: null, cal: null }, canDraft: false, canEvent: false, calOn: CFG.calendar === "google" };
 var timers = {};
 
@@ -62,7 +62,7 @@ function q(s) { return "'" + String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'
 function isoAgo(days) { return new Date(Date.now() - days * 864e5).toISOString().replace(/\.\d+Z$/, "Z"); }
 
 function findDocs(fresh) {
-  var base = "parentId = " + q(CFG.storage.runs) + " and (title contains 'radar' or title contains 'brief')";
+  var base = "parentId = " + q(CFG.storage.runs) + " and (title contains 'radar' or title contains 'brief' or title contains 'prepared')";
   function search(days) {
     var query = days ? base + " and createdTime > " + q(isoAgo(days)) : base;
     return call(SRV.drive, "search_files", { query: query, excludeContentSnippets: true, pageSize: 100 }, fresh)
@@ -119,6 +119,7 @@ function load(fresh) {
         findDocs(fresh).then(function (files) {
           ST.err.drive = null;
           var radar = R.newest(files, "radar"), brief = R.newest(files, "brief");
+          ST.prepared = R.preparedByTask(files);
           if (!radar) { ST.phase = "first"; ST.model = null; return; }
           var jobs = [readDoc(radar.id, fresh).then(function (txt) { ST.model = R.parseRadar(txt); ST.radar = radar; })];
           var bt = brief && R.titleTime(brief.title);
@@ -141,7 +142,11 @@ function openIds() {
 function reconcile() {  // the radar closed it (or it left the lists): forget our local note
   if (!ST.model) return;
   var open = openIds();
-  for (var id in MEM.closing) if (MEM.closing[id].written && !open[id]) delete MEM.closing[id];
+  var marked = {}; ST.model.todo.concat(ST.model.dele).forEach(function (x) { if (x.id && x.looksDone) marked[x.id] = 1; });
+  for (var id in MEM.closing) {
+    var c = MEM.closing[id];
+    if (c.written && (!open[id] || (c.reason === "keep open" && !marked[id]))) delete MEM.closing[id];
+  }
   for (var k in MEM.doing) if (!open[k]) delete MEM.doing[k];
   save();
 }
@@ -198,17 +203,23 @@ function requestClose(x, reason) {
   delete MEM.doing[x.key]; save(); closeSheet(); render();
   clearTimeout(timers[x.id]);
   timers[x.id] = setTimeout(function () { writeClose(x.id); }, 6000);
-  toast(t(reason === "done" ? "markedDone" : "markedNotMine"), { label: t("undo"), fn: function () {
+  toast(t(reason === "done" ? "markedDone" : reason === "keep open" ? "markedKept" : "markedNotMine"), { label: t("undo"), fn: function () {
     clearTimeout(timers[x.id]); var cc = MEM.closing[x.id];
     if (cc && (cc.written || cc.inflight)) { toast(t("alreadySent")); return; }
     delete MEM.closing[x.id]; save(); render(); toast(t("undone")); } });
 }
 
 /* ---------- model helpers ---------- */
-function pending(x) { var c = x.id && MEM.closing[x.id]; return !!(c && !c.written); }
+function closing(x) { var c = x.id && MEM.closing[x.id]; return c && c.reason !== "keep open" ? c : null; }
+function pending(x) { var c = closing(x); return !!(c && !c.written); }
+function looksDone(x) {  // the radar thinks it's finished; only the user closes it
+  var c = x.id && MEM.closing[x.id];
+  return x.looksDone && x.closedOn === undefined && !(c && c.reason === "keep open") && !closing(x) ? x.looksDone : null;
+}
+function prepared(x) { return x.id && ST.prepared[x.id] && x.closedOn === undefined && !closing(x) ? ST.prepared[x.id] : null; }
 function status(x) {
   if (x.closedOn !== undefined) return "done";
-  if (x.id && MEM.closing[x.id]) return "done";
+  if (closing(x)) return "done";
   return MEM.doing[x.key] ? "doing" : "todo";
 }
 function todoAll() { return ST.model ? ST.model.todo : []; }
@@ -250,6 +261,7 @@ function safeUrl(u) { return /^https:\/\//i.test(u || "") ? u : null; }
 function openUrl(u) { var s = safeUrl(u); if (s) window.open(s, "_blank", "noopener"); }
 function initials(n) { return String(n || "").split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0]; }).join("").toUpperCase() || "·"; }
 function signal(x, dele) {
+  if (looksDone(x)) return h("span", { class: "sig amber", text: t("looksDoneQ") });
   if (status(x) === "done") return pending(x) ? h("span", { class: "sig amber", text: t("closing") + "…" }) : h("span", { class: "sig", text: t("st_done") });
   if (x.due) { var n = dd(today(), x.due); if (n < 0) return h("span", { class: "sig red", text: t("overdue", { n: -n }) });
     if (n === 0) return h("span", { class: "sig amber", text: t("dueToday") }); return h("span", { class: "sig", text: t("due", { d: n < 7 ? wk(x.due) : dlong(x.due) }) }); }
@@ -342,7 +354,7 @@ function todoRow(x, withAct) {
     onkeydown: function (e) { if (e.key === "Enter" && !closedRow) openSheet(x, "todo"); } },
     closedRow ? h("span", { class: "stc done", "aria-label": t("st_done") }, h("span", { class: "ring" })) : stc(x, "todo"),
     h("div", {}, h("div", { class: "tt", text: x.title }), sub ? h("div", { class: "ss", text: sub }) : null),
-    h("div", { class: "rt" }, signal(x, false), withAct && a && !done ? h("button", { class: "act pri", type: "button", onclick: function (e) {
+    h("div", { class: "rt" }, prepared(x) ? h("span", { class: "chip ready", text: t("draftReady") }) : null, signal(x, false), withAct && a && !done ? h("button", { class: "act pri", type: "button", onclick: function (e) {
       e.stopPropagation(); if (a === "open") openUrl(x.link); else openSheet(x, "todo", a === "reply" ? "reply" : null); }, text: label }) : null));
 }
 function deleRow(x) {
@@ -483,15 +495,25 @@ function openSheet(x, set, mode) {
   if (x.since) fact(set === "dele" ? t("f_since") : t("f_first"), set === "dele" ? dlong(x.since) + " · " + t("days", { n: waited(x) }) : rel(x.since));
   var u = safeUrl(x.link); if (u) fact(t("f_src"), h("a", { href: u, target: "_blank", rel: "noopener", text: t("openSrc") }));
   body.append(f);
+  var ld = looksDone(x);
+  if (ld) {  // evidence, then the user's call
+    var lu = safeUrl(ld.link);
+    body.append(h("div", { class: "evidence" }, h("div", { class: "k", text: t("looksDoneT") }),
+      h("p", {}, ld.text + (ld.date ? " (" + rel(ld.date) + ")" : ""), lu ? h("a", { href: lu, target: "_blank", rel: "noopener", text: " " + t("seeIt") }) : null),
+      h("div", { class: "qlabel", text: t("looksDoneAsk") }),
+      h("div", { class: "pair" }, h("button", { class: "bigbtn pri", type: "button", onclick: function () { requestClose(x, "done"); }, text: t("yesDone") }),
+        h("button", { class: "bigbtn", type: "button", onclick: function () { requestClose(x, "keep open"); }, text: t("notYet") }))));
+  }
   var acts = h("div", { class: "acts" }); body.append(acts);
   var canMail = ST.canDraft && (x.threadId || set === "dele" || x.kind === "decide");
+  var prep = prepared(x);
   if (set === "todo" && x.kind === "decide" && canMail) {
     acts.append(h("div", { class: "qlabel", text: t("decideQ") }), h("div", { class: "decide" },
       h("button", { class: "bigbtn", type: "button", onclick: function () { compose(body, x, "accept", acts); }, text: t("accept") }),
       h("button", { class: "bigbtn", type: "button", onclick: function () { compose(body, x, "decline", acts); }, text: t("decline") }),
       h("button", { class: "bigbtn", type: "button", onclick: function () { compose(body, x, "time", acts); }, text: t("moreTime") })));
   } else if (canMail) {
-    var main = set === "dele" ? ["follow", t("follow")] : ["reply", t("reply")];
+    var main = set === "dele" ? ["follow", t("follow")] : prep ? ["prepared", t("reviewDraft")] : ["reply", t("reply")];
     acts.append(h("button", { class: "bigbtn pri", type: "button", onclick: function () { compose(body, x, main[0], acts); }, text: main[1] }));
   } else if (u) {
     acts.append(h("button", { class: "bigbtn pri", type: "button", onclick: function () { openUrl(u); } },
@@ -502,19 +524,23 @@ function openSheet(x, set, mode) {
     h("button", { class: "bigbtn", type: "button", onclick: function () { requestClose(x, "not mine"); }, text: t("notMine") })));
   acts.append(h("div", { class: "why-note", text: t("neverSent") }));
   s.classList.add("on"); s.setAttribute("aria-hidden", "false"); document.getElementById("scrim").classList.add("on");
-  if (mode === "reply" && canMail) compose(body, x, "reply", acts);
+  if (mode === "reply" && canMail) compose(body, x, prep ? "prepared" : "reply", acts);
   setTimeout(function () { var b = s.querySelector(".x"); if (b) b.focus(); }, 60);
 }
 function emailOf(s) { var m = /<([^>]+@[^>]+)>/.exec(s || "") || /([^\s<>"]+@[^\s<>"]+)/.exec(s || ""); return m ? m[1] : ""; }
 function compose(body, x, m, acts) {
   acts.hidden = true;
   var first = String(x.who || "").split(/[\s(]/)[0], me = String(CFG.owner.name || "").split(" ")[0];
-  var text = (STR.DRAFT[LANG] || STR.DRAFT.en)[m].split("{f}").join(first || "").split("{me}").join(me).replace(/^(Hi|Hola) ,/, "$1,").replace(/^(Hola) :/, "$1:");
+  var tpl = m === "prepared" ? "reply" : m;
+  var text = (STR.DRAFT[LANG] || STR.DRAFT.en)[tpl].split("{f}").join(first || "").split("{me}").join(me).replace(/^(Hi|Hola) ,/, "$1,").replace(/^(Hola) :/, "$1:");
   var ref = { msgId: null };
   var to = h("input", { type: "email", autocomplete: "off" }), subj = h("input", { type: "text", value: x.title }), msg = h("textarea", {}, text);
-  var err = h("div", { class: "sh-err", hidden: true });
+  var err = h("div", { class: "sh-err", hidden: true }), notes = h("ul", { class: "notes", hidden: true }), warned = false;
   var saveBtn = h("button", { class: "bigbtn pri", type: "button", text: t("saveDraft", { m: PROV.mail }), onclick: function () {
     var addr = to.value.trim(); if (!/^[^\s@]+@[^\s@]+$/.test(addr)) { err.textContent = t("toMissing"); err.hidden = false; to.focus(); return; }
+    if (/\[[^\]\n]+\]/.test(msg.value) && !warned) {  // parts only the user can fill: say so once, save on the second press
+      warned = true; err.textContent = t("placeholdersLeft"); err.hidden = false; msg.focus(); return;
+    }
     saveBtn.disabled = true; err.hidden = true;
     var input = { to: [addr], subject: subj.value, body: msg.value }; if (ref.msgId) input.replyToMessageId = ref.msgId;
     mcp.callTool(SRV.mail, "create_draft", input).then(function (r) {
@@ -523,17 +549,25 @@ function compose(body, x, m, acts) {
       if (status(x) === "todo" && m !== "follow") { MEM.doing[x.key] = 1; save(); render(); }
     }).catch(function (e) { saveBtn.disabled = false; err.textContent = t("draftFail", { e: errText(e, SRV.mail) }); err.hidden = false; });
   } });
-  var box = h("div", { class: "compose" }, h("div", { class: "hint", text: m === "follow" ? t("hintFollow") : t("hintReply") }),
-    h("label", {}, t("to"), to), h("label", {}, t("subject"), subj), h("label", {}, t("message"), msg), err,
+  var box = h("div", { class: "compose" }, h("div", { class: "hint", text: m === "follow" ? t("hintFollow") : m === "prepared" ? t("hintPrepared") : t("hintReply") }),
+    h("label", {}, t("to"), to), h("label", {}, t("subject"), subj), h("label", {}, t("message"), msg), notes, err,
     h("div", { style: "display:grid;grid-template-columns:1fr 1fr;gap:8px" }, h("button", { class: "bigbtn", type: "button", onclick: function () { box.remove(); acts.hidden = false; }, text: t("cancel") }), saveBtn));
   body.append(box); msg.focus();
+  if (m === "prepared") {  // the draft the prepare skill wrote for this task; the user edits and saves it
+    var doc = prepared(x); msg.value = t("preparedLoading"); msg.disabled = true;
+    readDoc(doc.id).then(function (txt) {
+      var pd = R.parsePrepared(txt); msg.disabled = false;
+      msg.value = pd.draft || text; if (pd.subject) subj.value = pd.subject;
+      if (pd.notes.length) { notes.replaceChildren.apply(notes, pd.notes.map(function (n) { return h("li", { text: n }); })); notes.hidden = false; }
+    }).catch(function () { msg.disabled = false; msg.value = text; err.textContent = t("preparedFail"); err.hidden = false; });
+  }
   if (x.threadId) {  // reply in the thread: last message from someone else
     mcp.callTool(SRV.mail, "get_thread", { threadId: x.threadId, messageFormat: "MINIMAL" }).then(function (r) {
       var msgs = ((r.payload || {}).messages || []).slice().reverse();
       var other = msgs.filter(function (z) { return (z.labelIds || []).indexOf("SENT") < 0; })[0] || msgs[0];
       if (!other) return;
       ref.msgId = other.id; if (!to.value) to.value = emailOf(other.sender);
-      if (other.subject) subj.value = /^re:/i.test(other.subject) ? other.subject : "Re: " + other.subject;
+      if (other.subject && (m !== "prepared" || !subj.value || subj.value === x.title)) subj.value = /^re:/i.test(other.subject) ? other.subject : "Re: " + other.subject;
     }).catch(function () { err.textContent = t("threadFail"); err.hidden = false; });
   }
 }

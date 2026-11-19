@@ -10,6 +10,9 @@ waiting for you, today's meetings with context, and promises still open.
 - **Dashboard:** one private page with your to-dos, your day and what others
   owe you. Mark things done, draft a reply or block time without opening a chat.
 - **Radar** every two hours in working hours: what changed, what needs you.
+- **Ready for you:** replies drafted for the tasks you owe, and a note when a
+  task looks done. You review, edit and send, and you confirm what's done:
+  nothing is sent or closed without you.
 - **Morning brief** at 07:30: your focus, the day's meetings, loops due.
 - **Meeting prep** on request: who is attending, history, what to get out of it.
 - **Weekly review** on Friday: the week against your priorities and next week's plan.
@@ -125,6 +128,7 @@ codex plugin add chief-of-staff@nuvel
 | weekly-review | The week vs. priorities, loops, decisions pending, next week's plan. |
 | recall | From any conversation: answer from the registry, or leave instructions for the routines. |
 | dashboard | Builds your to-do dashboard from the plugin's template (always the same page) and publishes it; setup runs it. Google for now. |
+| prepare | Drafts replies for up to 3 open tasks after each radar, as registry documents for you to review. Never sends. |
 | learn | Lessons from your corrections and private recipes for repeated tasks; anonymous signals and recipe sharing (structure only by default) run in the weekly review. |
 
 In Claude they appear as `/chief-of-staff:<skill>`; in Codex as `$<skill>`.

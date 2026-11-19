@@ -50,6 +50,8 @@ CARD_RE = re.compile(r"\b(?:\d[ -]?){13,19}\b")
 LONG_BULLET = 400   # characters: summarise and link instead
 MAX_LINES = 150
 MAX_NEEDS = 5
+CLOSE_REASONS = ("done", "not mine", "expired")  # the user's close handoff, or the radar's own `expired`
+LOOKS_DONE_RE = re.compile(r"—\s*looks done:\s*(.+)$")
 
 
 def luhn(digits: str) -> bool:
@@ -184,6 +186,24 @@ def check(previous: str | None, new: str) -> tuple[list[str], list[str], dict[st
     trace = body.get("Trace", [])
     if not any(t.startswith(("outcome:", "not sent")) for t in trace):
         errors.append("## Trace must say 'outcome: …' or 'not sent: <reason>'")
+
+    # Human in the loop: the radar never closes a task on evidence, only the user does
+    prev_tasks = check_task_ids.parse(previous, "previous").tasks if previous is not None else {}
+    cur_tasks = check_task_ids.parse(raw, "new").tasks
+    for n, where in sorted(cur_tasks.items()):
+        closed_lines = [line for sec, line in where if sec == "Closed"]
+        was_closed = any(sec == "Closed" for sec, _ in prev_tasks.get(n, []))
+        if closed_lines and not was_closed:
+            reason = MD_ESCAPE_RE.sub(r"\1", closed_lines[0]).rsplit("—", 1)[-1].strip().lower()
+            if reason not in CLOSE_REASONS:
+                errors.append(f"T-{n} closed as {reason!r}: only the user's close handoff (done / not mine) or "
+                              "`expired` closes a task; on evidence, mark it `looks done` instead")
+        for sec, line in where:
+            m = LOOKS_DONE_RE.search(MD_ESCAPE_RE.sub(r"\1", line))
+            if m and not re.search(r"\(\d{4}-\d{2}-\d{2}\)", m.group(1)):
+                warnings.append(f"T-{n}: `looks done` should say when, as (YYYY-MM-DD), and link the evidence")
+            if m and sec == "Closed":
+                errors.append(f"T-{n} is in Closed and marked `looks done`: a closed task needs no mark")
 
     # Task IDs
     id_errors, id_warnings, counts = check_task_ids.check(previous, raw)

@@ -294,3 +294,11 @@ body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--sans);-we
 @container app (max-width:720px){.mtheme{display:grid}}
 .tgrid.nofocus{margin-top:22px}
 .tgrid.nofocus>.a-needs{margin-top:0}
+
+/* prepared drafts and "looks done" */
+.chip.ready{background:var(--green-soft);color:var(--green)}
+.evidence{border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:var(--amber-soft)}
+.evidence .k{font-size:12px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.06em}
+.evidence p{margin:0;line-height:1.5}
+.compose .notes{margin:0;padding-left:18px;font-size:13px;color:var(--muted)}
+.evidence .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}

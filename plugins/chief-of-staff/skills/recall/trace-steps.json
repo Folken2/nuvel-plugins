@@ -19,6 +19,7 @@
     "rank",
     "ignore",
     "remind",
-    "close"
+    "close",
+    "keep_open"
   ]
 }

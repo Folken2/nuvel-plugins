@@ -138,7 +138,7 @@ def check(previous: str | None, new: str) -> tuple[list[str], list[str], dict[st
         errors.append(f"next_task is T-{cur.next_task}, expected T-{floor + len(fresh)}")
 
     for n in sorted(prev.open_ids - set(cur.tasks)):
-        errors.append(f"T-{n} was open and is gone: close it (Closed — done | not mine | resolved | expired) instead of dropping it")
+        errors.append(f"T-{n} was open and is gone: close it (Closed — done | not mine | expired) instead of dropping it")
     for n in sorted(prev.closed_ids & cur.open_ids):
         warnings.append(f"T-{n} was closed and is open again")
 

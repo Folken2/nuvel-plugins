@@ -56,8 +56,8 @@ skill finds them; document **content** is in `owner.language`.
 `YYYY-MM-DD HHMM <kind>[ <slug>]`, in the owner's timezone, 24 h. Names sort
 chronologically, so the newest is the greatest name. `<kind>` is one of
 `config`, `radar`, `brief`, `prep`, `weekly-review`, `recall`, `setup`,
-`learn`, `handoff`, `lessons`, `recipe` (always followed by its slug),
-`index`.
+`learn`, `prepared` (always followed by its task ID: `prepared T-42`),
+`handoff`, `lessons`, `recipe` (always followed by its slug), `index`.
 
 The registry never overwrites. If a document with the intended name already
 exists (two writes in the same minute), use the next minute instead; never
@@ -199,8 +199,9 @@ state forward, even when nothing changed.
 - T-<n> — <what> — <who> — due <date> — <link> — since <date>
 ### Waiting on
 - T-<n> — <what> — <who> — due <YYYY-MM-DD> — <link> — since <date>
+- T-<n> — <what> — <who> — <link> — since <date> — looks done: <what shows it> (<date>) <evidence link>
 ### Closed (last 14 days)
-- T-<n> — <what> — <who> — closed <date> — <done | not mine | resolved | expired>
+- T-<n> — <what> — <who> — closed <date> — <done | not mine | expired>
 
 ## Moving
 - [project] <what changed recently>
@@ -251,6 +252,18 @@ Rules:
   An open task never just disappears: it moves to `Closed` first, with one of
   the reasons above (`expired` for a *Decide* item left 14 days without action
   or a *Watching* notice whose date has passed).
+- **The user closes tasks, never the radar.** A task moves to *Closed* as
+  `done` or `not mine` only because of the user's own `close` handoff (chat,
+  dashboard). Evidence that a task is finished (a reply saying it's done, a
+  Linear issue moved to Done, the user's own sent reply) never closes it:
+  the radar keeps the task where it is and adds a last field `— looks done:
+  <what shows it> (<date>) <evidence link>` (the words `looks done` in English
+  whatever `owner.language` is, the rest in it). The user confirms (`close —
+  done`) or says it isn't (`keep open`). `expired` is the only reason the
+  radar applies by itself.
+- **Kept open:** after a `keep open` handoff the radar drops the `looks done`
+  field and writes `— kept open <date>` instead, and suggests closing that task
+  again only on evidence newer than that date.
 - `I owe` is only for real commitments: something the user promised, or a
   direct ask from someone they work with. Inbound the user never asked for
   (cold proposals, partnership offers, invitations) goes to `Decide`; items
@@ -339,6 +352,42 @@ outcome run when the user approves or corrects. `version` goes up only when
 *When to use*, *Steps* or *Pitfalls* change, or the status changes. Formats,
 stats (`draft|active|retired`) and index rules: `recipes.md`.
 
+### `prepared T-<n>` — work prepared for a task, for the user to review
+
+Written by the `prepare` skill in `runs/`, one per task; the newest per task
+wins. Never sent anywhere: the user reads it (in the registry or on the
+dashboard), edits it and sends it themselves.
+
+```markdown
+# Prepared · T-42 · 2026-11-18 09:15
+
+- task: T-42
+- kind: reply
+- for: Joan Serra (Lumen Logistics)
+- source: <link to the thread>
+- based on: radar 2026-11-18 0907
+
+## Subject
+Re: Renewal — signed copy
+
+## Draft
+Hi Joan,
+
+Thanks, glad legal is happy. I'll send you the signed renewal [confirm: by Friday?].
+
+Best,
+Ana
+
+## Notes
+- Placeholder: the date you commit to.
+
+## Trace
+- not sent: telemetry off
+```
+
+`kind` is `reply` for now. Placeholders are in square brackets. Headings stay
+in English; the draft is in the thread's language.
+
 ### `handoff` — instructions to future runs
 
 ```markdown
@@ -355,11 +404,12 @@ the user)` for a `close` the user clicked on the dashboard (`dashboard.md`).
 
 A handoff is open until a `radar` run lists it under `## Handoff` as `done`
 (or `until` has passed — then `done: expired`). Handoffs may only ask routines
-to **watch, rank, ignore, remind or close** — never to send, reply, accept or
-delete. `task` is optional: with it, the instruction applies to that task only.
+to **watch, rank, ignore, remind, close or keep open** — never to send, reply,
+accept or delete. `task` is optional: with it, the instruction applies to that task only.
 `close` needs a `task` and a reason — `- instruction: close — done` or
 `close — not mine` — and the next radar moves the task to *Closed* with that
-reason; it changes only the registry. A `task` that is no longer in the newest
+reason; it changes only the registry. `keep open` needs a `task`: the user
+says a task the radar thinks looks done isn't (*Kept open* above). A `task` that is no longer in the newest
 radar → the radar marks the handoff `done: task not found`.
 
 ## Searching history

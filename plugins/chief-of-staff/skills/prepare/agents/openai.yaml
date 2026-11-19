@@ -1,0 +1,5 @@
+interface:
+  display_name: "Prepare replies"
+  short_description: "Draft replies for tasks, for you to review"
+  brand_color: "#4F46E5"
+  default_prompt: "Use $prepare to draft replies for my open tasks."
