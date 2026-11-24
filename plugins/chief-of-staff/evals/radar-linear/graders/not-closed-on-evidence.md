@@ -1,6 +1,6 @@
 ---
 type: regex
-target: {source: file, path: "registry/runs/2026-11-18 0907 radar.md"}
+target: {source: file, path: "registry/runs/2026-11/2026-11-18 0907 radar.md"}
 pattern: 'T-1 —[^\n]*looks done:'
 match: contains
 weight: 2

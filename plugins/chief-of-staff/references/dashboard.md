@@ -55,8 +55,9 @@ Local or synced folders can't be read from a web page: no dashboard (exit 1).
 
 ## Data (what the page shows)
 
-From the newest `radar` in `runs/` (picked by name, never by search order;
-window 3 days, then 14, then everything):
+From the newest `radar` in `runs/` and its month folders (searched with
+`'<runs id>' in ancestors`, picked by name, never by search order; window 3
+days, then 14, then everything):
 
 | view | radar sections |
 |---|---|

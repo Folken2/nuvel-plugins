@@ -10,7 +10,7 @@ Run the chief-of-staff radar skill as a scheduled (unattended) run.
 
 This is a test harness: the connectors are replaced by files in the working directory.
 - Now is 2026-11-18 09:07 (Europe/Madrid, a Wednesday). Use this time for the document name, the header and the cursors.
-- Registry: the local folder `./registry` (storage.kind local, documents are `.md` files). Write the new radar there, as the registry contract says: `./registry/runs/2026-11-18 0907 radar.md`.
+- Registry: the local folder `./registry` (storage.kind local, documents are `.md` files). Write the new radar there, as the registry contract says: `./registry/runs/2026-11/2026-11-18 0907 radar.md`.
 - Email: `./sources/email.json` is what the mail search returns for this run's window (inbox threads with snippets; bodies included, open them only for real candidates; `sent` is the user's sent mail).
 - Calendar: `./sources/calendar.json` holds today and the next two working days.
 - No telemetry connector is available.

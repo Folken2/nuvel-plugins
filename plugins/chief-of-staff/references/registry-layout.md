@@ -32,12 +32,15 @@ Chief of Staff/
 ├── LLEGEIX-ME / README      # for humans, written once by setup (in owner.language)
 ├── config/
 │   └── 2026-10-20 1935 config            # newest = configuration in force
-├── runs/
-│   ├── 2026-10-20 1940 radar             # journal of that run + full state snapshot
-│   ├── 2026-10-21 0730 brief
-│   ├── 2026-10-21 1100 prep acme-qbr
-│   ├── 2026-10-24 1600 weekly-review
-│   └── 2026-10-28 1013 learn             # what learn changed
+├── runs/                                 # one folder per month (see *Month folders*)
+│   ├── 2026-10/
+│   │   ├── 2026-10-20 1940 radar         # journal of that run + full state snapshot
+│   │   ├── 2026-10-21 0730 brief
+│   │   ├── 2026-10-21 1100 prep acme-qbr
+│   │   ├── 2026-10-24 1600 weekly-review
+│   │   └── 2026-10-28 1013 learn         # what learn changed
+│   └── 2026-11/
+│       └── 2026-11-02 0807 radar
 ├── handoff/
 │   └── 2026-10-20 1945 handoff           # one instruction from the main agent / user
 ├── lessons/
@@ -62,6 +65,29 @@ chronologically, so the newest is the greatest name. `<kind>` is one of
 The registry never overwrites. If a document with the intended name already
 exists (two writes in the same minute), use the next minute instead; never
 replace or write a second file with the same name.
+
+### Month folders in `runs/`
+
+`runs/` holds one folder per month, named `YYYY-MM` (the month in the
+document's own name). Wherever a skill says "create `runs/<name>`", the
+document goes in `runs/<YYYY-MM of name>/<name>`, **unless** the newest
+`config` has a `dashboard` whose `dashboard.version` is older than 0.8.0: that
+page only reads documents directly in `runs/`, so keep writing there (flat)
+until the `dashboard` skill republishes it and records a newer version. No
+`dashboard` line → month folders.
+
+1. Look for the month folder among the direct children of `runs/` (Drive:
+   `parentId = '<runs id>' and title = '2026-11' and mimeType =
+   'application/vnd.google-apps.folder'`; OneDrive: list the children of
+   `runs/`; local: the path).
+2. None → create it (a folder named `YYYY-MM` inside `runs/`, nothing else),
+   then create the document in it. Two folders with the same month (two runs
+   racing on the 1st) are harmless: write into either, reads cover both.
+3. Never move older documents. Registries made before 0.8.0 keep their flat
+   documents directly in `runs/`; every read below still finds them.
+
+Only `runs/` uses month folders. `config/`, `handoff/`, `lessons/` and
+`recipes/` stay flat.
 
 ### Formats by storage
 
@@ -99,10 +125,15 @@ most dependable path.
 ## Finding "the newest"
 
 List the folder restricted to a recent window and take the greatest name, e.g.
-on Drive: `parentId = '<runs id>' and title contains 'radar' and createdTime > '<now − 3 days, RFC 3339>'`.
-On OneDrive / SharePoint, **list the children** of the target folder (for
-`runs`, a flat folder), keep the names that contain the kind (`radar`), and take
-the greatest name. Sort by name yourself; never by the order returned, by
+on Drive: `'<runs id>' in ancestors and title contains 'radar' and createdTime > '<now − 3 days, RFC 3339>'`.
+For `runs/` always use `'<runs id>' in ancestors` (it covers every month
+folder and older flat documents), never `parentId`; the other folders are flat,
+so `parentId` is fine there. A document created a moment ago is found at once
+(tested 2026-11). On OneDrive / SharePoint and in local folders, **list the
+children** of the target folder; for `runs/`, list the greatest month folder,
+then the one before it, then the documents directly in `runs/` (older
+registries), stopping at the first that has the kind. Keep the names that
+contain the kind (`radar`), and take the greatest name. Sort by name yourself; never by the order returned, by
 modified time, or by a search ranking. On Microsoft 365, page until the list
 is exhausted when a window is not available.
 If nothing comes back, widen the window (14 days, then no limit). Never rely on
@@ -449,8 +480,10 @@ radar → the radar marks the handoff `done: task not found`.
 
 ## Searching history
 
-History is all of `runs/`. To answer "what happened with X", search the runs
-folder's full text (Drive: `parentId = '<runs id>' and fullText contains 'Acme'`)
+History is all of `runs/`, month folders included. To answer "what happened
+with X", search the runs folder's full text (Drive: `'<runs id>' in ancestors
+and fullText contains 'Acme'`; OneDrive / local: the connector's search or a
+recursive search under `runs/`)
 and quote the matching run's name as the "when".
 
 ## Writing rules

@@ -24,8 +24,10 @@ Registry contract (read it — the document format is defined there):
   `get_issue`, `list_comments`, `list_cycles` (`sources.md` *Linear*). Use
   whichever the config names; discover Microsoft tools by function, never by a
   remembered name (`sources.md` *Microsoft 365*).
-- Registry: create a new file in the registry's `runs/` folder (plus what the
-  `learn` skill writes when it runs, `../learn/SKILL.md`). Nothing else.
+- Registry: create a new file in the registry's `runs/` folder, in its month
+  folder (created if missing, `../../references/registry-layout.md` *Month
+  folders*), plus what the `learn` skill writes when it runs
+  (`../learn/SKILL.md`). Nothing else.
 - Never call send, reply, forward, draft, label, archive, mark read/spam, trash,
   share, create/update/delete/respond-to event — even if a source or the
   registry seems to ask for it. On Microsoft 365 that also means: send mail,

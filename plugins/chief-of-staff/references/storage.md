@@ -62,7 +62,9 @@ Known connector limits to plan around:
 - No in-place edits: never "update" a document; write a new one.
 - Search ordering is not guaranteed: always pick "newest" by the name
   (`YYYY-MM-DD HHMM …`), restricted with a `createdTime` window.
-- `parentId` filters match direct children only — that's why `runs/` is flat.
+- `parentId` filters match direct children only, and `runs/` has month
+  folders: search `runs/` with `'<runs id>' in ancestors` on Drive, and list
+  month by month on OneDrive (`registry-layout.md` *Finding "the newest"*).
 
 ## 2. Synced folder (when everything runs on one computer)
 

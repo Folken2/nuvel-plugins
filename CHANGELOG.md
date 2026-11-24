@@ -2,6 +2,27 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.8.0 - 2026-11-24
+
+One folder per month in `runs/`, so the registry stays easy to browse after
+months of radars (about 7 a weekday).
+
+### Changed
+
+- **Month folders:** every run document goes in `runs/YYYY-MM/`, and the
+  folder is created on the first write of the month. Older documents stay
+  where they are: nothing is moved, and every read finds both layouts (on
+  Drive, `runs/` is searched with `'<runs id>' in ancestors`. On OneDrive and
+  local folders, the newest month is listed first, then the one before, then
+  `runs/` itself).
+- **Safe rollover:** while `config` records a dashboard older than 0.8.0,
+  writers keep `runs/` flat, because that page only reads it directly. Run
+  the `dashboard` skill to republish it, and month folders start with the
+  next run.
+- The dashboard searches `runs/` with `ancestors`.
+- Evals write to month folders; `radar-sweep` reads its previous radar from
+  a month folder, and `radar-linear` reads it from a flat `runs/`.
+
 ## chief-of-staff 0.7.0 - 2026-11-19
 
 It learns from what you decide, you can see how it's going, and you can

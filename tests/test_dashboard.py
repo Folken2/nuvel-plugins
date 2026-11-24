@@ -227,3 +227,18 @@ def test_theme_switch_is_per_viewer_and_follows_claude_on_auto() -> None:
     for lang in ("en", "ca", "es"):
         for key in ("theme", "th_auto", "th_light", "th_dark", "th_next"):
             assert data["S"][lang].get(key), (lang, key)
+
+
+def test_dashboard_finds_runs_in_month_folders() -> None:
+    """runs/ has one folder per month: the page searches it by ancestors, never by direct parent."""
+    app = (TEMPLATE / "app.js").read_text(encoding="utf-8")
+    assert 'q(CFG.storage.runs) + " in ancestors' in app
+    assert "parentId = \" + q(CFG.storage.runs)" not in app
+
+
+def test_registry_writes_flat_until_the_dashboard_reads_month_folders() -> None:
+    """An older dashboard only reads runs/ directly, so writers keep it flat until it is republished."""
+    layout = (COS / "references/registry-layout.md").read_text(encoding="utf-8")
+    assert "### Month folders in `runs/`" in layout
+    assert "older than 0.8.0" in layout
+    assert "'<runs id>' in ancestors" in layout
