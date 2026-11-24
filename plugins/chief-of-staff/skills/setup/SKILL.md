@@ -233,7 +233,7 @@ recurring tasks are done; and that setup can change anything later. Add the
 two one-line notices from *Trace* below (anonymous counts, recipe
 sharing); they do not count toward the 6 lines.
 
-Write one `runs/YYYY-MM-DD HHMM setup` document with the technical journal of
+Write one `runs/YYYY-MM/YYYY-MM-DD HHMM setup` document (always in the month folder, `../../references/registry-layout.md` *Month folders*) with the technical journal of
 what was configured.
 
 ## Read-only storage

@@ -74,7 +74,10 @@ document goes in `runs/<YYYY-MM of name>/<name>`, **unless** the newest
 `config` has a `dashboard` whose `dashboard.version` is older than 0.8.0: that
 page only reads documents directly in `runs/`, so keep writing there (flat)
 until the `dashboard` skill republishes it and records a newer version. No
-`dashboard` line → month folders.
+`dashboard` line → month folders. The page reads only `radar`, `brief` and
+`prepared` documents, so this exception covers only those three kinds; every
+other kind (`learn`, `prep`, `weekly-review`, `setup`, `recall`) always goes in
+the month folder.
 
 1. Look for the month folder among the direct children of `runs/` (Drive:
    `parentId = '<runs id>' and title = '2026-11' and mimeType =

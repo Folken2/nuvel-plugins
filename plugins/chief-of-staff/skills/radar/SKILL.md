@@ -107,7 +107,7 @@ asks the user something or has a date → reply in a waited-on thread → noise.
 
 ## 3. Write the new radar document
 
-Create `runs/YYYY-MM-DD HHMM radar` (owner's timezone; Google Doc on Drive,
+Create `runs/YYYY-MM-DD HHMM radar` in its month folder (`../../references/registry-layout.md` *Month folders*) (owner's timezone; Google Doc on Drive,
 `.md`/`.docx` on OneDrive — see *Formats by storage*) following the **radar run** contract in
 `registry-layout.md`, in `owner.language`. Build it from the previous radar plus
 what you found:

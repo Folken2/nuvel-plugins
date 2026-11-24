@@ -48,7 +48,7 @@ Afterwards, if the user corrected the result or a recipe was used, run the
       or chats with them, if the chat source is Teams.
    5. Notes or transcripts from the previous meeting in the series, if a meetings
       source is connected (Teams recordings, OneDrive or Drive notes included).
-4. Create `runs/YYYY-MM-DD HHMM prep <meeting-slug>` (in the registry language)
+4. Create `runs/YYYY-MM/YYYY-MM-DD HHMM prep <meeting-slug>` (always in the month folder, `../../references/registry-layout.md` *Month folders*) (in the registry language)
    with the *Other runs* journal header, then:
 
 ```markdown

@@ -16,9 +16,10 @@ months of radars (about 7 a weekday).
   local folders, the newest month is listed first, then the one before, then
   `runs/` itself).
 - **Safe rollover:** while `config` records a dashboard older than 0.8.0,
-  writers keep `runs/` flat, because that page only reads it directly. Run
-  the `dashboard` skill to republish it, and month folders start with the
-  next run.
+  radar, brief and prepared documents stay flat in `runs/`, because that
+  page only reads them there (other kinds go in month folders right away).
+  Run the `dashboard` skill to republish it, and month folders start with
+  the next run.
 - The dashboard searches `runs/` with `ancestors`.
 - Evals write to month folders; `radar-sweep` reads its previous radar from
   a month folder, and `radar-linear` reads it from a flat `runs/`.

@@ -206,7 +206,7 @@ it.
 
 ## 4. Journal and tell the user
 
-Write one `runs/YYYY-MM-DD HHMM learn` document (*Other runs* contract in
+Write one `runs/YYYY-MM/YYYY-MM-DD HHMM learn` document (always in the month folder, `../../references/registry-layout.md` *Month folders*) (*Other runs* contract in
 `registry-layout.md`, in `owner.language`; `learn.write`): `## Journal` with
 the lessons added or dropped, the recipes drafted, promoted, updated or
 retired (slug, status and version) and whether the `index` was written; then
