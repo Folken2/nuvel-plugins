@@ -7,7 +7,9 @@
     "radar.sweep.chat",
     "radar.check",
     "radar.write",
-    "radar.notify"
+    "radar.notify",
+    "radar.prepare",
+    "radar.learn"
   ],
   "counts": [
     "read",

@@ -46,9 +46,10 @@ line's *When to use* matches this sweep, open only that recipe's newest version
 and follow its *Steps* and *Pitfalls*. No `lessons/` or `recipes/` folder yet →
 carry on without them (`registry-layout.md`).
 
-In a scheduled run, after the radar is saved, run the `prepare` skill
+In a scheduled run, after the radar is saved, always run the `prepare` skill
 (`../prepare/SKILL.md`): it drafts replies for up to 3 open tasks, as new
-registry documents for the user to review.
+registry documents for the user to review. Run it even when *I owe* looks
+empty: `prepare` decides, and reports `skipped` when there is nothing to do.
 
 In a scheduled run, if an open handoff or a `config` change shows a lasting
 preference ("from now on, ignore X"), run the `learn` skill at the end so it
@@ -227,8 +228,10 @@ document with a `## Trace` section mirroring it. Report only these steps:
 `radar.load-state`, `radar.sweep.email`, `radar.sweep.calendar`,
 `radar.sweep.chat` (for the chat, task and document sources; `skipped` if none
 is configured), `radar.check` (`skipped` without code execution, `error`
-if it still failed when saved), `radar.write` and `radar.notify` (`skipped` on interactive runs
-or when nothing was sent).
+if it still failed when saved), `radar.write`, `radar.notify` (`skipped` on interactive runs
+or when nothing was sent), `radar.prepare` (`ok` when this run goes on to run
+`prepare`, `skipped` on interactive runs) and `radar.learn` (`ok` when this run
+goes on to run `learn`, `skipped` otherwise).
 
 - **Counts:** `read`, `relevant`, `skipped_noise` per sweep step;
   `check_errors` (error lines on the last check, of which `id_errors` are
