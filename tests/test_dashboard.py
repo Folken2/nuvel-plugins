@@ -181,6 +181,23 @@ def test_parser_picks_newest_by_name() -> None:
 
 
 @pytest.mark.skipif(not NODE, reason="node not installed")
+def test_newest_radar_skips_a_stub() -> None:
+    # Seen live: "2026-11-18 1407 radar" held only PLACEHOLDER, "2026-11-20 1808 radar" only {{NEW_RADAR}}.
+    out = json.loads(node(
+        'const R=require("./plugins/chief-of-staff/templates/dashboard/radar.js");'
+        'const real=require("fs").readFileSync("tests/fixtures/dashboard/radar.md","utf8");'
+        'const docs={a:"PLACEHOLDER",b:"{{NEW_RADAR}}",c:real,d:real};'
+        'const f=[{id:"c",title:"2026-11-18 1406 radar"},{id:"a",title:"2026-11-20 1809 radar"},'
+        '{id:"b",title:"2026-11-20 1808 radar"},{id:"d",title:"2026-11-17 1100 radar"}];'
+        'const read=id=>Promise.resolve(docs[id]);'
+        'Promise.all([R.newestRadar(f,read),R.newestRadar([f[1],f[2]],read)]).then(([r,none])=>'
+        'console.log(JSON.stringify({title:r.file.title,owner:R.parseRadar(r.text).owner,none})));'))
+    assert out == {"title": "2026-11-18 1406 radar", "owner": "Ana Ferrer", "none": None}
+    app = (COS / "templates/dashboard/app.js").read_text()
+    assert "R.newestRadar(files" in app and "readDoc(radar.id" not in app
+
+
+@pytest.mark.skipif(not NODE, reason="node not installed")
 def test_parser_agrees_with_checker_on_task_ids() -> None:
     """The board and check_task_ids.py read the same IDs from every task-ID fixture."""
     sys.path.insert(0, str(COS / "scripts"))

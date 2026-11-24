@@ -26,7 +26,7 @@ Registry contract (read it — the document format is defined there):
   remembered name (`sources.md` *Microsoft 365*).
 - Registry: create a new file in the registry's `runs/` folder, in its month
   folder (created if missing, `../../references/registry-layout.md` *Month
-  folders*), plus what the `learn` skill writes when it runs
+  folders*), once, with its full final text, plus what the `learn` skill writes when it runs
   (`../learn/SKILL.md`). Nothing else.
 - Never call send, reply, forward, draft, label, archive, mark read/spam, trash,
   share, create/update/delete/respond-to event — even if a source or the
@@ -61,7 +61,8 @@ becomes a lesson. Interactive run corrected by the user, or a recipe was used
    report — never create one.
 2. Read the newest `config` document. If `paused: true`, write nothing and reply
    "Chief of staff is paused." Done.
-3. Read the **previous radar** (newest `radar` in `runs/`). No previous radar →
+3. Read the **previous radar** (newest `radar` in `runs/`, skipping a stub without
+   the `# Radar ·` header: *Finding "the newest"*). No previous radar →
    this is the first run: window = last 7 days.
 4. Read open handoffs: documents in `handoff/` newer than ~30 days that the
    previous radar does not list as `done`. Apply them during the sweep; they
@@ -195,7 +196,8 @@ it). Then write `Radar check: ok` in the journal and use its `tasks_new` and
 `tasks_closed` for the trace. Can't run code → skip the check and write
 `Radar check: not checked (no code execution)` in the journal.
 
-Write it once. If the write fails, retry once; if it still fails, report the
+Write it once, with the full checked text: never a placeholder, stub or test
+document first (*The one rule* in `../../references/registry-layout.md`). If the write fails, retry once; if it still fails, report the
 error — the next run will cover the same window because no new cursor was saved.
 
 ## 4. Report

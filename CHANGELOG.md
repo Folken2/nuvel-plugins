@@ -2,6 +2,25 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.8.1 - 2026-11-24
+
+A stub document can no longer pass for the newest radar.
+
+### Fixed
+
+- **No stub writes:** the radar sometimes created a placeholder document
+  (seen live: `2026-11-18 1407 radar` holding only `PLACEHOLDER`,
+  `2026-11-20 1808 radar` holding only `{{NEW_RADAR}}`) a minute before the
+  real one. *The one rule* in `registry-layout.md` now says every document is
+  written once, with its full final content, after its check; the radar skill
+  points there.
+- **Readers skip stubs:** *Finding "the newest"* takes the greatest `radar`
+  name whose text starts with the `# Radar ·` header, and falls back to the
+  next one otherwise. The dashboard does the same (`newestRadar` in
+  `radar.js`); run the `dashboard` skill to republish the page with it.
+- `check_radar.py` already rejects such a body (no header line); a
+  regression fixture now covers it.
+
 ## chief-of-staff 0.8.0 - 2026-11-24
 
 One folder per month in `runs/`, so the registry stays easy to browse after

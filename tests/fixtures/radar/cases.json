@@ -172,5 +172,13 @@
       "## Trace must be the last section"
     ],
     "warnings": []
+  },
+  "placeholder-stub": {
+    "description": "A stub written to reserve the name (seen live: only `PLACEHOLDER`).",
+    "exit": 1,
+    "errors": [
+      "first line is not"
+    ],
+    "warnings": []
   }
 }

@@ -164,11 +164,26 @@
     return { focus: f ? stripMd(f[1]) : "", free: free };
   }
 
-  /** Pick the newest document of a kind from search results by name, never by returned order. */
-  function newest(files, kind) {
+  /** Documents of a kind from search results, newest name first, never by returned order. */
+  function byName(files, kind) {
     var re = kind === "brief" ? BRIEF_TITLE_RE : RADAR_TITLE_RE;
     return (files || []).filter(function (f) { return f && re.test(f.title || ""); })
-      .sort(function (a, b) { return a.title < b.title ? 1 : a.title > b.title ? -1 : 0; })[0] || null;
+      .sort(function (a, b) { return a.title < b.title ? 1 : a.title > b.title ? -1 : 0; });
+  }
+  function newest(files, kind) { return byName(files, kind)[0] || null; }
+
+  /** A real radar starts with its `# Radar ·` header; a stub (e.g. only "PLACEHOLDER") does not. */
+  function isRadar(text) { return /^\s*#?\s*Radar · \d{4}-\d{2}-\d{2} \d{2}:\d{2}/.test(String(text || "")); }
+
+  /** The newest real radar: read by name, newest first, skipping stubs (registry-layout *Finding "the newest"*).
+   *  read(id) -> Promise<text>. Resolves {file, text}, or null when the newest few are all stubs. */
+  function newestRadar(files, read) {
+    var list = byName(files, "radar").slice(0, 5);
+    function at(i) {
+      if (i >= list.length) return Promise.resolve(null);
+      return Promise.resolve(read(list[i].id)).then(function (txt) { return isRadar(txt) ? { file: list[i], text: txt } : at(i + 1); });
+    }
+    return at(0);
   }
 
   /** Newest `prepared T-<n>` document per task: {"T-42": file}. */
@@ -249,7 +264,7 @@
     return out;
   }
 
-  return { sections: sections, item: item, parseRadar: parseRadar, parseBrief: parseBrief, newest: newest,
+  return { sections: sections, item: item, parseRadar: parseRadar, parseBrief: parseBrief, newest: newest, byName: byName, isRadar: isRadar, newestRadar: newestRadar,
     titleTime: titleTime, handoff: handoff, preparedByTask: preparedByTask, parsePrepared: parsePrepared,
     parseLessons: parseLessons, newestLessons: newestLessons, note: note, gmailThreadId: gmailThreadId, hash: hash };
 });

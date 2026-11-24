@@ -27,6 +27,12 @@ place. Each skill run creates exactly one new document; "the current X" is
 always the newest document of that kind. This also means concurrent runs never
 conflict and the full history comes for free.
 
+**Write each document once, with its full final content.** Compose it
+completely (and run its check, if it has one) before creating the file. Never
+create a placeholder, stub, test or "reserve the name" document first: it can't
+be edited or replaced afterwards, and if it is the newest of its kind every
+reader takes it as the current state.
+
 ```
 Chief of Staff/
 ├── LLEGEIX-ME / README      # for humans, written once by setup (in owner.language)
@@ -141,6 +147,11 @@ modified time, or by a search ranking. On Microsoft 365, page until the list
 is exhausted when a window is not available.
 If nothing comes back, widen the window (14 days, then no limit). Never rely on
 the order a search returns.
+
+**Skip a radar that isn't one.** Read the greatest `radar` name; if its text
+doesn't start with the `# Radar ·` header (the *radar run* contract), it is a
+stub, not a radar (e.g. a document holding only `PLACEHOLDER`): take the next
+greatest name, and so on. Never use a stub's text as the current picture.
 
 ## Document contracts
 
