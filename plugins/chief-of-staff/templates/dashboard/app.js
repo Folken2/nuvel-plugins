@@ -44,7 +44,7 @@ function hours() {
 /* ---------- state ---------- */
 var mcp = null, booted = false;
 var ST = { phase: "loading", model: null, radar: null, brief: null, meetings: [], free: [], prepared: {}, proposals: [],
-  err: { drive: null, cal: null }, canDraft: false, canEvent: false, calOn: CFG.calendar === "google" };
+  err: { drive: null, cal: null }, canDraft: false, canEvent: false, calOn: CFG.calendar === "google", paused: false };
 var timers = {};
 
 function errText(e, server) {
@@ -100,6 +100,35 @@ function loadProposals(fresh) {  // suggested rules from the user's decisions, w
     return readDoc(f.id, fresh).then(function (txt) { ST.proposals = R.parseLessons(txt).proposed; });
   }).catch(function () { ST.proposals = []; });
 }
+function loadPaused(fresh) {  // the newest config, read live: a pause from chat shows here without a republish
+  if (!CFG.storage.config) return Promise.resolve();
+  return call(SRV.drive, "search_files", { query: "parentId = " + q(CFG.storage.config) + " and title contains 'config'",
+    excludeContentSnippets: true, pageSize: 100 }, fresh).then(function (p) {
+    var f = (p.files || []).filter(function (x) { return /^\d{4}-\d{2}-\d{2} \d{4} config$/.test(x.title || ""); })
+      .sort(function (a, b) { return a.title < b.title ? 1 : -1; })[0];
+    if (!f) return;
+    return readDoc(f.id, fresh).then(function (txt) { ST.paused = R.isPaused(txt); });
+  }).catch(function () {});
+}
+function loadRemoteHandoffs(fresh) {  // closes and snoozes made on another device or in chat since the radar ran
+  if (!ST.radar || !ST.radar.createdTime) return Promise.resolve();
+  var since = new Date(Date.parse(ST.radar.createdTime) - 15 * 6e4).toISOString().replace(/\.\d+Z$/, "Z");
+  return call(SRV.drive, "search_files", { query: "parentId = " + q(CFG.storage.handoff) + " and title contains 'handoff' and createdTime > " + q(since),
+    excludeContentSnippets: true, pageSize: 20 }, fresh).then(function (p) {
+    var files = (p.files || []).filter(function (x) { return /^\d{4}-\d{2}-\d{2} \d{4} handoff$/.test(x.title || ""); })
+      .sort(function (a, b) { return a.title < b.title ? -1 : 1; }).slice(-20);
+    return Promise.all(files.map(function (f) { return readDoc(f.id, fresh).then(R.parseHandoff).catch(function () { return null; }); }))
+      .then(function (hs) {
+        hs.forEach(function (x) {  // oldest first, so the newest handoff for a task wins
+          if (!x) return;
+          var c = MEM.closing[x.task];
+          if (c && !c.remote) return;  // this browser's own close: it knows better
+          MEM.closing[x.task] = { reason: x.reason, at: Date.now(), written: true, remote: true };
+        });
+        save();
+      });
+  }).catch(function () {});
+}
 function freeBlocks() {
   var wh = hours(), busy = ST.meetings.map(function (m) { return [mm(m.t), mm(m.e)]; }).sort(function (a, b) { return a[0] - b[0]; });
   var out = [], cur = wh[0];
@@ -135,10 +164,11 @@ function load(fresh) {
           var bt = brief && R.titleTime(brief.title);
           if (bt && bt.slice(0, 10) === today()) jobs.push(readDoc(brief.id, fresh).then(function (txt) { ST.brief = R.parseBrief(txt); }).catch(function () {}));
           else ST.brief = null;
-          return Promise.all(jobs).then(function () { if (ST.model) ST.phase = "ready"; });
+          return Promise.all(jobs).then(function () { if (ST.model) ST.phase = "ready"; return loadRemoteHandoffs(fresh); });
         }).catch(function (e) { ST.err.drive = e; if (!ST.model) ST.phase = "disc"; }),
         loadCalendar(fresh),
-        loadProposals(fresh)
+        loadProposals(fresh),
+        loadPaused(fresh)
       ]);
     }).then(function () { ST.free = freeBlocks(); reconcile(); render(); resumeCloses(); });
   });
@@ -280,7 +310,14 @@ function rankTodo(list) {
 }
 function hasData() { return !!ST.model && (ST.phase === "ready" || ST.phase === "disc"); }
 function radarDate() { return ST.model && ST.model.at ? ST.model.at.slice(0, 10) : null; }
-function stale() { var d = radarDate(); return !!d && dd(d, today()) >= 1 && ST.radar && (Date.now() - Date.parse(ST.model.at + ":00")) > 18 * 36e5; }
+function stale() {  // a scheduled radar was due and didn't come; quiet nights and weekends are not stale
+  if (ST.paused || !ST.radar || !ST.model || !ST.model.at) return false;
+  var at = ST.model.at.replace("T", " "), now = parts(new Date()), nowS = now.date + " " + now.hm;
+  function shift(s, mins) { return new Date(Date.parse(s.replace(" ", "T") + ":00Z") + mins * 6e4).toISOString().slice(0, 16).replace("T", " "); }
+  var due = CFG.schedule && CFG.schedule.radar ? R.dueBetween(CFG.schedule.radar, shift(at, 30), shift(nowS, -45)) : null;
+  if (due !== null) return due;
+  var d = radarDate(); return dd(d, today()) >= 1 && (Date.now() - Date.parse(ST.model.at + ":00")) > 18 * 36e5;
+}
 
 /* ---------- DOM helpers ---------- */
 function h(tag, a) {
@@ -347,7 +384,7 @@ function renderNav() {
   });
   var up = document.getElementById("updated"); up.className = "";
   if (ST.phase === "loading") up.textContent = t("loading");
-  else if (ST.model && ST.model.at) { if (stale()) { up.className = "stale"; up.textContent = t("lastRadar", { w: dlong(radarDate()) }); }
+  else if (ST.model && ST.model.at) { if (ST.paused) { up.className = "stale"; up.textContent = t("pausedShort"); } else if (stale()) { up.className = "stale"; up.textContent = t("lastRadar", { w: dlong(radarDate()) }); }
     else up.textContent = t("updated", { t: ST.model.at.slice(11, 16) }); }
   else up.textContent = "";
   document.getElementById("refresh").textContent = t("refresh");
@@ -372,6 +409,7 @@ function stateNotice() {
     return notice("red", t("discT"), errText(ST.err.drive, SRV.drive), (c === "not_in_manifest" || c === "approval_required") ? allowBtn(SRV.drive) : null); }
   var ep = earlierPending();
   if (ep.length && mcp) return notice("calm", t("pendingT"), t("pendingP", { ids: ep.join(", ") }));
+  if (ST.paused) return notice("calm", t("pausedT"), t("pausedP"));
   if (stale()) return notice("amber", t("staleT", { w: dlong(radarDate()) }), t("staleP"), h("button", { class: "act nb", type: "button", onclick: function () { toast(t("staleFix")); }, text: t("fix") }));
   return null;
 }

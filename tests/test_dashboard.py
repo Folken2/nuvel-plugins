@@ -50,7 +50,9 @@ def test_google_build(tmp_path: Path) -> None:
         "template": version,
         "owner": {"name": "Ana Ferrer", "language": "ca", "timezone": "Europe/Madrid", "working_hours": "09:00-19:00 Mon-Fri"},
         "storage": {"kind": "google-drive", "root": "1RootFolderExample000000000", "runs": "1RunsFolderExample000000",
-                    "handoff": "1HandoffFolderExample000", "lessons": "1LessonsFolderExample000"},
+                    "handoff": "1HandoffFolderExample000", "lessons": "1LessonsFolderExample000",
+                    "config": "1ConfigFolderExample0000"},
+        "schedule": {"radar": ""},  # "every 2 h 08-20 Mon-Fri" has no cron: the page keeps its 18 h rule
         "email": "gmail", "calendar": "google",
     }
     assert "@@" not in html and html.startswith("<title>Chief of Staff</title>")
@@ -259,3 +261,45 @@ def test_registry_writes_flat_until_the_dashboard_reads_month_folders() -> None:
     assert "### Month folders in `runs/`" in layout
     assert "older than 0.8.0" in layout
     assert "'<runs id>' in ancestors" in layout
+
+
+def test_build_takes_the_radar_cron_from_routines(tmp_path: Path) -> None:
+    text = (FIX / "config-google-doc.md").read_text(encoding="utf-8").replace(
+        "radar: cowork — every 2 h 08-20 Mon-Fri — manual",
+        "radar: rutina al núvol (claude.ai) — cada 2 h, 08:07-20:07, dl-dv (CRON\\_TZ=Europe/Madrid 7 8-20/2 \\* \\* 1-5) — trig\\_01X")
+    assert "CRON" in text
+    cfg = tmp_path / "config.md"; cfg.write_text(text, encoding="utf-8")
+    code, out, page, _ = build(cfg, tmp_path)
+    assert code == 0, out
+    assert settings_of(page.read_text())["schedule"] == {"radar": "7 8-20/2 * * 1-5"}
+
+
+@pytest.mark.skipif(not NODE, reason="node not installed")
+def test_stale_follows_the_radar_schedule() -> None:
+    out = json.loads(node(
+        'const R=require("./plugins/chief-of-staff/templates/dashboard/radar.js");const c="7 8-20/2 * * 1-5";'
+        'console.log(JSON.stringify(['
+        'R.dueBetween(c,"2026-11-24 18:37","2026-11-24 19:30"),'   # next slot 20:07 not due yet
+        'R.dueBetween(c,"2026-11-24 18:37","2026-11-24 20:30"),'   # 20:07 missed
+        'R.dueBetween(c,"2026-11-27 20:37","2026-11-30 07:30"),'   # Friday night to Monday 07:30: a quiet weekend
+        'R.dueBetween(c,"2026-11-27 20:37","2026-11-30 08:30"),'   # Monday 08:07 missed
+        'R.dueBetween("0 9 1 * *","2026-11-01 00:00","2026-11-02 00:00")]));'))  # day-of-month: can't tell
+    assert out == [False, True, False, True, None]
+    app = (COS / "templates/dashboard/app.js").read_text()
+    assert "R.dueBetween(CFG.schedule.radar" in app
+
+
+@pytest.mark.skipif(not NODE, reason="node not installed")
+def test_handoffs_from_other_devices_and_chat_are_read_back() -> None:
+    out = json.loads(node(
+        'const R=require("./plugins/chief-of-staff/templates/dashboard/radar.js");'
+        'console.log(JSON.stringify([R.parseHandoff(R.handoff("T-42","not mine","2026-11-24 10:00")),'
+        'R.parseHandoff(R.handoff("T-7","snooze until 2026-11-30","2026-11-24 10:00")),'
+        'R.parseHandoff("# Handoff · 2026-11-24 10:00\\n\\n  - instruction: close — done\\n  - task: T\\\\-9\\n  - from: main agent"),'
+        'R.parseHandoff("- instruction: Watch for Acme\'s reply\\n- task: T-3"),'
+        'R.isPaused("  - paused: true"), R.isPaused("- paused: false")]));'))
+    assert out == [{"task": "T-42", "reason": "not mine"}, {"task": "T-7", "reason": "snooze until 2026-11-30"},
+                   {"task": "T-9", "reason": "done"}, None, True, False]
+    app = (COS / "templates/dashboard/app.js").read_text()
+    assert "return loadRemoteHandoffs(fresh)" in app and "loadPaused(fresh)" in app
+    assert "if (c && !c.remote) return;" in app  # this browser's own pending close is never overwritten

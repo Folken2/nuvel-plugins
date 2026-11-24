@@ -29,6 +29,8 @@ republish it (the `dashboard` skill, to the same link).
 | `owner.name`, `owner.language`, `owner.timezone`, `owner.working_hours` | same keys (`language` outside en/ca/es shows the English interface; radar text stays as written) |
 | `storage.kind`, `storage.root` | same keys |
 | `storage.runs`, `storage.handoff` | the `runs` and `handoff` ids in `storage.folders` |
+| `storage.lessons`, `storage.config` | the `lessons` and `config` ids, when they are folder ids (else empty: suggestions and the live *Paused* check are off) |
+| `schedule.radar` | the 5-field cron in the `## Routines` radar line, or empty |
 | `email` | `gmail` when the `## Sources` email line names Gmail, else `other` / `none` |
 | `calendar` | `google` when the calendar line names Google Calendar, else `other` / `none` |
 
@@ -74,8 +76,21 @@ days, then 14, then everything):
 
 Item fields follow the radar contract (`T-<n> — <what> — … — due … — <link> —
 since …`); `since` / `closed` dates are read whatever word precedes them
-(radars write them in `owner.language`). *Stale* = the newest radar is more than
-18 hours old and from an earlier day.
+(radars write them in `owner.language`). *Stale* = a scheduled radar was due
+(more than 30 min after the newest radar, and at least 45 min ago) and none
+came. The schedule is the cron in the `## Routines` radar line (`schedule.radar`;
+minute, hour and day-of-week fields), so nights and weekends without radars
+are not stale. Without a cron in that line: more than 18 hours old and from an
+earlier day.
+
+**Read live, not at build time:**
+
+- *Paused*: the newest `config` in `storage.config` says `paused: true` → a calm
+  *Paused* notice instead of a stale one.
+- *Closed elsewhere*: task handoffs created since the newest radar (15 min
+  margin), from another device or from chat (`close — done | not mine`,
+  `keep open`, `snooze until <date>`), apply as if this browser had made them,
+  until the radar does. A close still pending in this browser wins.
 
 ## Actions (what the page writes)
 
