@@ -83,5 +83,6 @@ section mirroring it. Report only these steps: `prepare.load-state`,
 - **Counts:** `candidates` and `skipped_injection` and `skipped_already` on
   `prepare.pick`; `prepared` and `placeholders` on `prepare.write`.
 - **Outcome:** `skipped` when nothing was prepared; `blocked` if the registry
-  could not be found.
+  could not be found. A run that prepares nothing still sends its one trace
+  (outcome `skipped`, right before it ends); there is no document to mirror it.
 - Counts and identifiers only — never a draft's text, a name or a link.

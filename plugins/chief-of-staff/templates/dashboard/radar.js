@@ -252,6 +252,59 @@
       "\n- from: dashboard (on behalf of the user)\n";
   }
 
+  /** Read back a task handoff (written here, on another device, or from chat): {task, reason} or null.
+   *  reason uses the same words as handoff(): "done" | "not mine" | "keep open" | "snooze until YYYY-MM-DD". */
+  function parseHandoff(text) {
+    var s = String(text || "").replace(/\\([_*\-])/g, "$1");
+    var task = /^\s*[-*]\s*task:\s*(T-\d+)\s*$/mi.exec(s), ins = /^\s*[-*]\s*instruction:\s*(.+?)\s*$/mi.exec(s);
+    if (!task || !ins) return null;
+    var i = ins[1].toLowerCase(), m;
+    if ((m = /^close\s*[—–-]\s*(done|not mine)\b/.exec(i))) return { task: task[1], reason: m[1] };
+    if (/^keep open\b/.test(i)) return { task: task[1], reason: "keep open" };
+    if ((m = /^snooze until (\d{4}-\d{2}-\d{2})\b/.exec(i))) return { task: task[1], reason: "snooze until " + m[1] };
+    return null;
+  }
+
+  /** `- paused: true` in a config document. */
+  function isPaused(text) { return /^\s*[-*]\s*paused:\s*true\s*$/mi.test(String(text || "")); }
+
+  /** One cron field ("*", "7", "8-20/2", "*\/30", "1-5", lists) against a number; null if unsupported. */
+  function cronField(f, n, lo, hi) {
+    var ok = false, bad = false;
+    String(f).split(",").forEach(function (part) {
+      var m = /^(\*|\d+)(?:-(\d+))?(?:\/(\d+))?$/.exec(part);
+      if (!m) { bad = true; return; }
+      var a = m[1] === "*" ? lo : +m[1], b = m[2] != null ? +m[2] : (m[1] === "*" || m[3] ? hi : a), st = m[3] ? +m[3] : 1;
+      if (n >= a && n <= b && (n - a) % st === 0) ok = true;
+    });
+    return bad ? null : ok;
+  }
+
+  /** Was a scheduled run due in (from, to]? Times are "YYYY-MM-DD HH:MM" in the owner's timezone.
+   *  Supports minute, hour and day-of-week fields (day-of-month and month must be "*"); null when it can't tell. */
+  function dueBetween(cron, from, to) {
+    var f = String(cron || "").trim().split(/\s+/);
+    if (f.length !== 5 || f[2] !== "*" || f[3] !== "*" || !(from < to)) return null;
+    var day = new Date(from.slice(0, 10) + "T00:00:00Z"), end = to.slice(0, 10);
+    for (var guard = 0; guard < 15; guard++) {
+      var d = day.toISOString().slice(0, 10);
+      if (d > end) return false;
+      var dow = cronField(f[4], day.getUTCDay(), 0, 7);
+      if (dow === null) return null;
+      if (!dow && day.getUTCDay() === 0) dow = cronField(f[4], 7, 0, 7);
+      if (dow) for (var hr = 0; hr < 24; hr++) {
+        var hOk = cronField(f[1], hr, 0, 23); if (hOk === null) return null; if (!hOk) continue;
+        for (var mi = 0; mi < 60; mi++) {
+          var mOk = cronField(f[0], mi, 0, 59); if (mOk === null) return null; if (!mOk) continue;
+          var at = d + " " + String(hr).padStart(2, "0") + ":" + String(mi).padStart(2, "0");
+          if (at > from && at <= to) return true;
+        }
+      }
+      day.setUTCDate(day.getUTCDate() + 1);
+    }
+    return true;  // more than two weeks without a radar
+  }
+
   /** Notes for `learn` and answers to proposed lessons (registry-layout.md, handoff). */
   function note(kind, fields, stamp) {
     // kind: "lesson — keep P-3" | "lesson — drop P-3" | "learn — draft used" | "learn — draft edited"
@@ -265,6 +318,6 @@
   }
 
   return { sections: sections, item: item, parseRadar: parseRadar, parseBrief: parseBrief, newest: newest, byName: byName, isRadar: isRadar, newestRadar: newestRadar,
-    titleTime: titleTime, handoff: handoff, preparedByTask: preparedByTask, parsePrepared: parsePrepared,
+    titleTime: titleTime, handoff: handoff, parseHandoff: parseHandoff, isPaused: isPaused, dueBetween: dueBetween, preparedByTask: preparedByTask, parsePrepared: parsePrepared,
     parseLessons: parseLessons, newestLessons: newestLessons, note: note, gmailThreadId: gmailThreadId, hash: hash };
 });

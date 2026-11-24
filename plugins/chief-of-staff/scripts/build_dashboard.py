@@ -35,21 +35,28 @@ GOOGLE = {
     "calendar": ("Google Calendar", ["list_events", "create_event"]),
 }
 MICROSOFT = None
+# Usage counts (event names and numbers only, references/telemetry.md), when telemetry is on.
+NUVEL = ("Nuvel", ["record_ui_event"])
 
 BULLET_RE = re.compile(r"^\s*[-*•]\s+([A-Za-z_.]+):\s*(.*?)\s*$")
 HEADING_RE = re.compile(r"^\s*#{1,6}\s*(.+?)\s*$")
 FOLDER_ID_RE = re.compile(r"^[A-Za-z0-9_-]{10,}$")
+UUID4_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
 MD_ESCAPE_RE = re.compile(r"\\([\\`*_{}\[\]()#+\-.!<>|])")  # Google Docs exports `working\_hours`, `1ow\_DSN…`
+# A 5-field cron in the `## Routines` radar line, e.g. "(CRON_TZ=Europe/Madrid 7 8-20/2 * * 1-5)".
+CRON_FIELD = r"[0-9*][0-9*,/-]*"
+CRON_RE = re.compile(rf"(?<![\w:/-])({CRON_FIELD}(?:\s+{CRON_FIELD}){{4}})(?![\w:/-])")
 
 
 def plugin_version() -> str:
     return json.loads((PLUGIN / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))["version"]
 
 
-def parse_config(text: str) -> tuple[dict[str, str], dict[str, str]]:
-    """Top-level `- key: value` bullets, plus the `## Sources` bullets."""
+def parse_config(text: str) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
+    """Top-level `- key: value` bullets, plus the `## Sources` and `## Routines` bullets."""
     keys: dict[str, str] = {}
     sources: dict[str, str] = {}
+    routines: dict[str, str] = {}
     section = ""
     for line in MD_ESCAPE_RE.sub(r"\1", text).splitlines():
         heading = HEADING_RE.match(line)
@@ -62,13 +69,21 @@ def parse_config(text: str) -> tuple[dict[str, str], dict[str, str]]:
         key, value = m.group(1), m.group(2)
         if section == "sources":
             sources[key.lower()] = value
+        elif section == "routines":
+            routines[key.lower()] = value
         elif section in ("", "chief of staff configuration"):
             keys.setdefault(key, value)
-    return keys, sources
+    return keys, sources, routines
+
+
+def radar_cron(line: str) -> str:
+    """The radar's cron, when the `## Routines` line records one; "" otherwise (the page then uses an 18 h rule)."""
+    m = CRON_RE.search(line or "")
+    return " ".join(m.group(1).split()) if m else ""
 
 
 def settings_from(text: str) -> tuple[dict, list[str]]:
-    keys, sources = parse_config(text)
+    keys, sources, routines = parse_config(text)
     errors: list[str] = []
     folders = dict(
         part.strip().split("=", 1) for part in keys.get("storage.folders", "").split(",") if "=" in part
@@ -86,6 +101,9 @@ def settings_from(text: str) -> tuple[dict, list[str]]:
     language = (keys.get("owner.language") or "en").split("-")[0].lower()
     email = sources.get("email", "").lower()
     calendar = sources.get("calendar", "").lower()
+    install_id = keys.get("telemetry.install_id", "").strip().lower()
+    if keys.get("telemetry", "on").strip().lower() == "off" or not UUID4_RE.match(install_id):
+        install_id = ""  # off means off; a v0.2 install without an id sends nothing
     settings = {
         "template": plugin_version(),
         "owner": {
@@ -100,9 +118,12 @@ def settings_from(text: str) -> tuple[dict, list[str]]:
             "runs": folders.get("runs", ""),
             "handoff": folders.get("handoff", ""),
             "lessons": folders.get("lessons", "") if FOLDER_ID_RE.match(folders.get("lessons", "")) else "",
+            "config": folders.get("config", "") if FOLDER_ID_RE.match(folders.get("config", "")) else "",
         },
+        "schedule": {"radar": radar_cron(routines.get("radar", ""))},
         "email": "gmail" if "gmail" in email else ("other" if email else "none"),
         "calendar": "google" if "google" in calendar else ("other" if calendar else "none"),
+        "telemetry": {"install_id": install_id},
     }
     return settings, errors
 
@@ -113,6 +134,8 @@ def capabilities(settings: dict) -> dict:
         servers.append(GOOGLE["mail"])
     if settings["calendar"] == "google":
         servers.append(GOOGLE["calendar"])
+    if settings["telemetry"]["install_id"]:
+        servers.append(NUVEL)
     return {"mcp": {"servers": [{"server": s, "tools": list(tools)} for s, tools in servers]}}
 
 

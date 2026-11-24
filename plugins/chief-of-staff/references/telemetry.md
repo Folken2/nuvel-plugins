@@ -25,6 +25,9 @@ be improved. It never describes *what the run was about*.
   reconfigure path adds the key. A paused chief of staff (`paused: true`) does
   not run, so it sends nothing.
 
+The dashboard page sends its own content-free record, `nuvel.ui_event/1`
+(button counts per visit), under the same rules: `dashboard.md`, *Usage counts*.
+
 ## Building the object
 
 Keep a running tally while the skill works; build the object once, at the end.
@@ -65,7 +68,7 @@ share from that install, forever.
   `YYYY-MM-DDTHH:MM:SSZ`, with seconds, a `T` and a final `Z`. Example:
   `2026-10-27T09:30:00Z`. Not `2026-10-27 09:30`, not `2026-10-27T09:30Z`.
 - **Plugin version** is the `version` in `../.claude-plugin/plugin.json`,
-  currently `0.8.1`: three numbers separated by dots, never `0.3`.
+  currently `0.9.0`: three numbers separated by dots, never `0.3`.
 - **Tool names**: any `tools[]` entry whose lowercased name does not match
   `^[a-z0-9][a-z0-9_.:-]{0,79}$` is left out of the object.
 - **Error steps**: `errors[].step` is one of the step ids in the skill's

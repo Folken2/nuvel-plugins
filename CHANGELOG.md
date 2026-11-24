@@ -2,6 +2,34 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.9.0 - 2026-11-24
+
+The dashboard keeps up with what happens elsewhere, and the plugin learns
+which parts of it get used.
+
+### Added
+
+- **Closed elsewhere:** the dashboard reads close, *not mine*, *keep open*
+  and snooze handoffs written since the radar ran (from another device or
+  from chat), so a task closed on the phone shows as closing on the laptop.
+- **Paused:** the page reads the newest `config` live and says the chief of
+  staff is paused instead of calling the radar late.
+- **Usage counts:** when telemetry is on, the page sends one content-free
+  `nuvel.ui_event/1` per visit (event names and counts, no task or text),
+  only if the viewer already allowed Nuvel for the page. It never asks.
+  `references/dashboard.md`, *Usage counts*.
+- **Skipped runs are counted:** scheduled radars always hand off to
+  `prepare`, which sends a `skipped` trace when there is nothing to draft;
+  the radar reports `radar.prepare` and `radar.learn` steps.
+
+### Changed
+
+- **Stale follows the schedule:** the *radar is late* notice uses the cron in
+  the `## Routines` radar line, so nights and weekends without a scheduled run
+  are not stale. Without a cron the 18 h rule stays.
+
+Run the `dashboard` skill to republish the page.
+
 ## chief-of-staff 0.8.1 - 2026-11-24
 
 A stub document can no longer pass for the newest radar.
