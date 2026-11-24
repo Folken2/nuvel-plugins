@@ -42,7 +42,7 @@ Afterwards, if the user corrected the result or a recipe was used, run the
 3. Read open handoffs (see `registry-layout.md`) and yesterday's runs.
 4. Read today's calendar in full (Outlook or Google). For each meeting, find context in the newest
    radar and by searching `runs/` for the attendees' names or the meeting topic.
-5. Create `runs/YYYY-MM-DD HHMM brief` (in `owner.language`), with the journal
+5. Create `runs/YYYY-MM-DD HHMM brief` in its month folder (`../../references/registry-layout.md` *Month folders*) (in `owner.language`), with the journal
    header from the *Other runs* contract, then:
 
 ```markdown

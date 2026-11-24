@@ -62,7 +62,7 @@ function q(s) { return "'" + String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'
 function isoAgo(days) { return new Date(Date.now() - days * 864e5).toISOString().replace(/\.\d+Z$/, "Z"); }
 
 function findDocs(fresh) {
-  var base = "parentId = " + q(CFG.storage.runs) + " and (title contains 'radar' or title contains 'brief' or title contains 'prepared')";
+  var base = q(CFG.storage.runs) + " in ancestors and (title contains 'radar' or title contains 'brief' or title contains 'prepared')";
   function search(days) {
     var query = days ? base + " and createdTime > " + q(isoAgo(days)) : base;
     return call(SRV.drive, "search_files", { query: query, excludeContentSnippets: true, pageSize: 100 }, fresh)

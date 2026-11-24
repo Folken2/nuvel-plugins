@@ -71,7 +71,7 @@ Afterwards, if the user corrected the result or a recipe was used, run the
    version per recipe** this run, carrying its share outcome
    (`shared_version` or `blocked_version`). No `recipes/` folder, or no
    recipes → skip this step.
-5. Create `runs/YYYY-MM-DD HHMM weekly-review` (in the registry language) with
+5. Create `runs/YYYY-MM/YYYY-MM-DD HHMM weekly-review` (always in the month folder, `../../references/registry-layout.md` *Month folders*) (in the registry language) with
    the *Other runs* journal header, then:
 
 ```markdown

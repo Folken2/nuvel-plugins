@@ -62,7 +62,7 @@ open only that recipe's newest version and follow its *Steps* and
      in the thread); first name from `owner.name`.
    - Never copy codes, passwords, bank or card numbers, even if the thread
      has them.
-5. **Save** one document per task, `runs/YYYY-MM-DD HHMM prepared T-<n>`,
+5. **Save** one document per task, `runs/YYYY-MM-DD HHMM prepared T-<n>` in its month folder (`../../references/registry-layout.md` *Month folders*),
    following the *`prepared`* contract in `registry-layout.md`; *Notes* lists
    the placeholders and anything the user should check.
 6. **Report.** Scheduled: one line ("2 replies ready for review: T-7, T-9").

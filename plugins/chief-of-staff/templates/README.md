@@ -6,11 +6,12 @@ it on their own. Setup writes this page in your registry language.
 
 ## How to read it
 
-- **What matters now:** open the newest document in `runs/` whose name ends in
-  "radar". It has what needs you now, decisions waiting, today's meetings and
+- **What matters now:** open this month's folder in `runs/` and the newest
+  document whose name ends in "radar". It has what needs you now, decisions waiting, today's meetings and
   open loops.
-- **runs/** — one document per run (radar, brief, prep, weekly review). It is
-  both the journal and the history: nothing is ever deleted.
+- **runs/** — one document per run (radar, brief, prep, weekly review), in
+  one folder per month (`2026-11`). It is both the journal and the history:
+  nothing is ever deleted.
 - **handoff/** — instructions for the next runs ("watch for Acme's reply",
   "ignore that thread"). Ask your assistant from any conversation.
 - **lessons/** — what you have corrected ("write to Marta formally"). The
