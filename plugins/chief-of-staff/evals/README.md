@@ -20,7 +20,8 @@ claude plugin eval plugins/chief-of-staff --trust-plugin --no-publish --scaffold
 
 CI runs the same command (`.github/workflows/evals.yml`) on pull requests that
 touch the radar, references, scripts or evals, with an `ANTHROPIC_API_KEY`
-repository secret.
+repository secret. Without the secret the `radar` job shows as **skipped**,
+never as passed: run the evals locally and say so in the PR.
 
 ## Adding a case
 
