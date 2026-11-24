@@ -9,7 +9,7 @@ var R = window.CosRadar, STR = window.COS_STRINGS;
 var LANG = STR.S[CFG.owner.language] ? CFG.owner.language : "en";
 var LOC = { en: "en-GB", ca: "ca", es: "es" }[LANG];
 var TZ = CFG.owner.timezone || undefined;
-var SRV = { drive: "Google Drive", mail: "Gmail", cal: "Google Calendar" };
+var SRV = { drive: "Google Drive", mail: "Gmail", cal: "Google Calendar", nuvel: "Nuvel" };
 var PROV = { mail: "Gmail", cal: "Google Calendar", conn: "Google Drive", name: "Google",
   calUrl: "https://calendar.google.com/calendar/r/day" };
 
@@ -58,6 +58,37 @@ function call(server, tool, input, fresh) {
   return mcp.callTool(server, tool, input, fresh ? { cache: { refresh: true, staleTime: 0, gcTime: 300000 } } : undefined)
     .then(function (r) { return r.payload || {}; });
 }
+/* ---------- usage counts: which buttons get used, as names and numbers only (references/telemetry.md) ---------- */
+// One visit = from load (or coming back to the tab) until the tab is hidden. Sent once, when hidden, and only when the
+// viewer already allowed Nuvel for this page: counting never asks for a permission and never shows an error.
+var USE = null;
+function uuid() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  var b = new Uint8Array(16); crypto.getRandomValues(b); b[6] = b[6] & 15 | 64; b[8] = b[8] & 63 | 128;
+  var x = Array.from(b, function (n) { return (n + 256).toString(16).slice(1); }).join("");
+  return x.slice(0, 8) + "-" + x.slice(8, 12) + "-" + x.slice(12, 16) + "-" + x.slice(16, 20) + "-" + x.slice(20);
+}
+function visit() { USE = { id: uuid(), t0: Date.now(), n: {}, first: null }; }
+function use(ev) {
+  if (!CFG.telemetry.install_id) return;
+  if (!USE) visit();
+  if (USE.n[ev] == null && Object.keys(USE.n).length >= 50) return;
+  USE.n[ev] = Math.min((USE.n[ev] || 0) + 1, 10000);
+  if (USE.first == null && !/^(view|error)\./.test(ev)) USE.first = Math.round((Date.now() - USE.t0) / 1000);
+}
+function sendUse() {
+  var u = USE; USE = null;
+  if (!u || !mcp || !Object.keys(u.n).length) return;
+  var ev = { schema: "nuvel.ui_event/1", run_id: u.id, install_id: CFG.telemetry.install_id,
+    plugin: { name: "chief-of-staff", version: CFG.template }, surface: "dashboard", host: "other",
+    started_at: new Date(u.t0).toISOString().replace(/\.\d+Z$/, "Z"),
+    duration_s: Math.min(86400, Math.round((Date.now() - u.t0) / 1000)), events: u.n };
+  if (u.first != null) ev.first_action_s = Math.min(86400, u.first);
+  claude.use("permissions").then(function (p) { return p ? p.state("mcp:" + SRV.nuvel) : "unavailable"; })
+    .then(function (st) { if (st === "granted") return mcp.callTool(SRV.nuvel, "record_ui_event", { event: ev }); })
+    .catch(function () {});
+}
+
 function q(s) { return "'" + String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'") + "'"; }
 function isoAgo(days) { return new Date(Date.now() - days * 864e5).toISOString().replace(/\.\d+Z$/, "Z"); }
 
@@ -89,7 +120,7 @@ function loadCalendar(fresh) {
       return { t: a.hm, e: b.date > d ? "23:59" : b.hm, title: e.summary || "", sub: e.conferenceUrl ? "Google Meet" : (e.location || ""),
         link: e.htmlLink || null };
     });
-  }).catch(function (e) { ST.err.cal = e; ST.meetings = []; });
+  }).catch(function (e) { ST.err.cal = e; ST.meetings = []; use("error.calendar"); });
 }
 
 function loadProposals(fresh) {  // suggested rules from the user's decisions, waiting for a yes or no
@@ -165,7 +196,7 @@ function load(fresh) {
           if (bt && bt.slice(0, 10) === today()) jobs.push(readDoc(brief.id, fresh).then(function (txt) { ST.brief = R.parseBrief(txt); }).catch(function () {}));
           else ST.brief = null;
           return Promise.all(jobs).then(function () { if (ST.model) ST.phase = "ready"; return loadRemoteHandoffs(fresh); });
-        }).catch(function (e) { ST.err.drive = e; if (!ST.model) ST.phase = "disc"; }),
+        }).catch(function (e) { ST.err.drive = e; if (!ST.model) ST.phase = "disc"; use("error.drive"); }),
         loadCalendar(fresh),
         loadProposals(fresh),
         loadPaused(fresh)
@@ -222,7 +253,7 @@ function writeNote(kind, fields) {  // one handoff, written now (lesson answers,
   return attempt();
 }
 function answerProposal(pr, keep) {
-  MEM.answered[pr.id] = keep ? "keep" : "drop"; save(); render();
+  MEM.answered[pr.id] = keep ? "keep" : "drop"; save(); render(); use(keep ? "rule.keep" : "rule.dismiss");
   writeNote("lesson — " + (keep ? "keep " : "drop ") + pr.id, {}).then(function () { toast(t(keep ? "ruleKept" : "ruleDismissed")); })
     .catch(function (e) { delete MEM.answered[pr.id]; save(); render(); toast(t("closeFailed", { e: errText(e, SRV.drive) })); });
 }
@@ -267,10 +298,11 @@ function requestClose(x, reason) {
   clearTimeout(timers[x.id]);
   timers[x.id] = setTimeout(function () { writeClose(x.id); }, 6000);
   var sm = /^snooze until (\S+)/.exec(reason);
+  use(sm ? "task.snooze" : reason === "done" ? "task.done" : reason === "keep open" ? "task.keep_open" : "task.not_mine");
   toast(sm ? t("markedSnoozed", { d: dlong(sm[1]) }) : t(reason === "done" ? "markedDone" : reason === "keep open" ? "markedKept" : "markedNotMine"), { label: t("undo"), fn: function () {
     clearTimeout(timers[x.id]); var cc = MEM.closing[x.id];
     if (cc && (cc.written || cc.inflight)) { toast(t("alreadySent")); return; }
-    delete MEM.closing[x.id]; save(); render(); toast(t("undone")); } });
+    delete MEM.closing[x.id]; save(); render(); use("task.undo"); toast(t("undone")); } });
 }
 
 /* ---------- model helpers ---------- */
@@ -369,7 +401,7 @@ function setStatus(x, s, set) {
 /* ---------- navigation ---------- */
 var VIEWS = ["today", "todo", "delegated", "fyi"], ICK = { today: "today", todo: "todo", delegated: "dele", fyi: "info" };
 var cur = "today", todoFilter = "open";
-function go(v) { if (VIEWS.indexOf(v) < 0) v = "today"; cur = v; try { if (location.hash !== "#" + v) history.replaceState(null, "", "#" + v); } catch (e) {} closeSheet(); render(); document.getElementById("main").scrollTop = 0; }
+function go(v) { if (VIEWS.indexOf(v) < 0) v = "today"; cur = v; use("view." + v); try { if (location.hash !== "#" + v) history.replaceState(null, "", "#" + v); } catch (e) {} closeSheet(); render(); document.getElementById("main").scrollTop = 0; }
 function renderNav() {
   var sn = document.getElementById("sidenav"), tb = document.getElementById("tabs"); sn.replaceChildren(); tb.replaceChildren();
   var c = { todo: openTodo().length, delegated: overdueDele().length, fyi: infoLeft().length,
@@ -576,7 +608,7 @@ function vFyi() {
 var sheetOpen = null;
 function closeSheet() { sheetOpen = null; var s = document.getElementById("sheet"); s.classList.remove("on"); s.setAttribute("aria-hidden", "true"); document.getElementById("scrim").classList.remove("on"); }
 function openSheet(x, set, mode) {
-  sheetOpen = { x: x, set: set };
+  sheetOpen = { x: x, set: set }; use("task.open");
   var s = document.getElementById("sheet"); s.replaceChildren(); s.setAttribute("aria-label", x.title);
   var body = h("div", { class: "sh-body" }), st = status(x);
   s.append(h("div", { class: "sh-top" }, h("span", { class: "chip", text: set === "dele" ? t("k_dele") : kindLabel(x.kind) }), x.id ? h("span", { class: "pend", text: x.id }) : null,
@@ -643,14 +675,14 @@ function compose(body, x, m, acts) {
     saveBtn.disabled = true; err.hidden = true;
     var input = { to: [addr], subject: subj.value, body: msg.value }; if (ref.msgId) input.replyToMessageId = ref.msgId;
     mcp.callTool(SRV.mail, "create_draft", input).then(function (r) {
-      var p = r.payload || {}; closeSheet();
+      var p = r.payload || {}; closeSheet(); use(m === "prepared" ? (ref.original != null && ref.original.trim() === msg.value.trim() ? "draft.prepared_used" : "draft.prepared_edited") : "draft." + m);
       toast(t("draftSaved", { m: PROV.mail }), safeUrl(p.viewUrl) ? { label: t("openDraft"), fn: function () { openUrl(p.viewUrl); } } : null);
       if (m === "prepared" && ref.original != null && x.id) {  // teach learn how the user writes; it only ever proposes rules
         var same = ref.original.trim() === msg.value.trim();
         writeNote(same ? "learn — draft used" : "learn — draft edited", same ? { task: x.id } : { task: x.id, prepared: ref.original, saved: msg.value }).catch(function () {});
       }
       if (status(x) === "todo" && m !== "follow") { MEM.doing[x.key] = 1; save(); render(); }
-    }).catch(function (e) { saveBtn.disabled = false; err.textContent = t("draftFail", { e: errText(e, SRV.mail) }); err.hidden = false; });
+    }).catch(function (e) { use("error.gmail"); saveBtn.disabled = false; err.textContent = t("draftFail", { e: errText(e, SRV.mail) }); err.hidden = false; });
   } });
   var box = h("div", { class: "compose" }, h("div", { class: "hint", text: m === "follow" ? t("hintFollow") : m === "prepared" ? t("hintPrepared") : t("hintReply") }),
     h("label", {}, t("to"), to), h("label", {}, t("subject"), subj), h("label", {}, t("message"), msg), notes, err,
@@ -686,8 +718,8 @@ function block(body, x, acts) {
     var d = addDays(today(), +day.value), a = mm(start.value || "14:00"), b = Math.min(a + +len.value, 1439);
     mcp.callTool(SRV.cal, "create_event", { summary: x.title, startTime: d + "T" + hhmm(a) + ":00", endTime: d + "T" + hhmm(b) + ":00", timeZone: TZ,
       availability: "AVAILABILITY_BUSY", notificationLevel: "NONE" }).then(function () {
-      closeSheet(); toast(t("added")); if (d === today()) loadCalendar(true).then(function () { ST.free = freeBlocks(); render(); });
-    }).catch(function (e) { add.disabled = false; err.textContent = t("eventFail", { e: errText(e, SRV.cal) }); err.hidden = false; });
+      closeSheet(); use("block.add"); toast(t("added")); if (d === today()) loadCalendar(true).then(function () { ST.free = freeBlocks(); render(); });
+    }).catch(function (e) { use("error.calendar"); add.disabled = false; err.textContent = t("eventFail", { e: errText(e, SRV.cal) }); err.hidden = false; });
   } });
   var box = h("div", { class: "compose" }, h("div", { class: "hint", text: t("hintBlock") }),
     h("div", { class: "row3" }, h("label", {}, t("day"), day), h("label", {}, t("start"), start), h("label", {}, t("length"), len)), err,
@@ -713,7 +745,7 @@ function render() {
 }
 var busyR = false;
 function refresh() {
-  if (busyR) return; busyR = true; var b = document.getElementById("refresh"); b.disabled = true; toast(t("refreshing"));
+  if (busyR) return; busyR = true; use("refresh"); var b = document.getElementById("refresh"); b.disabled = true; toast(t("refreshing"));
   var before = ST.radar && ST.radar.title;
   load(true).then(function () { busyR = false; b.disabled = false;
     if (ST.err.drive) toast(errText(ST.err.drive, SRV.drive));
@@ -749,7 +781,11 @@ new MutationObserver(function () {  // Claude's theme changed: remember it for A
   if (cur !== m) { HOST_THEME = cur; document.documentElement.setAttribute("data-theme", m); }
 }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 applyTheme();
-document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible" && booted && mcp) load(false); });
+document.addEventListener("visibilitychange", function () {
+  if (document.visibilityState === "hidden") { sendUse(); return; }
+  if (CFG.telemetry.install_id) visit();
+  if (booted && mcp) load(false);
+});
 window.addEventListener("hashchange", function () { go(location.hash.slice(1)); });
 go((location.hash || "#today").slice(1));
 load(false);

@@ -54,6 +54,7 @@ def test_google_build(tmp_path: Path) -> None:
                     "config": "1ConfigFolderExample0000"},
         "schedule": {"radar": ""},  # "every 2 h 08-20 Mon-Fri" has no cron: the page keeps its 18 h rule
         "email": "gmail", "calendar": "google",
+        "telemetry": {"install_id": ""},  # telemetry on but no install_id (a v0.2 install): no usage counts
     }
     assert "@@" not in html and html.startswith("<title>Chief of Staff</title>")
     assert f'<meta name="cos-dashboard" content="{version}">' in html
@@ -100,8 +101,8 @@ def test_sources_decide_the_connectors(tmp_path: Path) -> None:
 
 def test_page_calls_only_declared_tools() -> None:
     app = (TEMPLATE / "app.js").read_text()
-    servers = {"drive": "Google Drive", "mail": "Gmail", "cal": "Google Calendar"}
-    declared = {(s["server"], t) for s in EXPECTED_CAPS["mcp"]["servers"] for t in s["tools"]}
+    servers = {"drive": "Google Drive", "mail": "Gmail", "cal": "Google Calendar", "nuvel": "Nuvel"}
+    declared = {(s["server"], t) for s in EXPECTED_CAPS["mcp"]["servers"] for t in s["tools"]} | {("Nuvel", "record_ui_event")}
     called = {(servers[k], t) for k, t in re.findall(r'(?:call|callTool)\(SRV\.(\w+), "(\w+)"', app)}
     assert called == declared, called ^ declared
     # every connector call names its server and tool literally: nothing computed, nothing else reachable
@@ -303,3 +304,39 @@ def test_handoffs_from_other_devices_and_chat_are_read_back() -> None:
     app = (COS / "templates/dashboard/app.js").read_text()
     assert "return loadRemoteHandoffs(fresh)" in app and "loadPaused(fresh)" in app
     assert "if (c && !c.remote) return;" in app  # this browser's own pending close is never overwritten
+
+
+INSTALL_ID = "0b6f3c1e-8d2a-4f57-9c3e-5a1b2c3d4e5f"
+
+
+def test_usage_counts_follow_the_telemetry_config(tmp_path: Path) -> None:
+    base = (FIX / "config-google.md").read_text()
+    on = tmp_path / "on.md"
+    on.write_text(base.replace("- telemetry: on", f"- telemetry: on\n- telemetry.install_id: {INSTALL_ID}"))
+    code, out, page, caps = build(on, tmp_path, "on")
+    assert code == 0, out
+    assert settings_of(page.read_text())["telemetry"] == {"install_id": INSTALL_ID}
+    assert json.loads(caps.read_text())["mcp"]["servers"][-1] == {"server": "Nuvel", "tools": ["record_ui_event"]}
+    off = tmp_path / "off.md"
+    off.write_text(base.replace("- telemetry: on", f"- telemetry: off\n- telemetry.install_id: {INSTALL_ID}"))
+    code, out, page, caps = build(off, tmp_path, "off")
+    assert code == 0, out
+    assert settings_of(page.read_text())["telemetry"] == {"install_id": ""}
+    assert json.loads(caps.read_text()) == EXPECTED_CAPS
+
+
+def test_usage_event_names_are_fixed_and_documented() -> None:
+    app = (TEMPLATE / "app.js").read_text()
+    doc = (COS / "references/dashboard.md").read_text()
+    section = doc.split("## Usage counts", 1)[1].split("\n## ", 1)[0]
+    names = set()
+    for group in re.findall(r"`([a-z_]+\.[a-z_|]+)`", section):
+        head, tail = group.split(".", 1)
+        names |= {f"{head}.{x}" for x in tail.split("|")}
+    literal = set(re.findall(r'"((?:view|task|draft|block|rule|error)\.[a-z_]+)"', app)) | {"refresh"}
+    views = set(re.search(r"var VIEWS = (\[.*?\])", app).group(1).strip("[]").replace('"', "").replace(" ", "").split(","))
+    drafts = {"reply", "follow", "accept", "decline", "time"}
+    built = literal | {f"view.{v}" for v in views} | {f"draft.{m}" for m in drafts}
+    assert built <= names | {"refresh"}, built - names
+    assert all(re.fullmatch(r"[a-z0-9][a-z0-9_.:-]{0,79}", n) for n in built)
+    assert len(built) <= 50

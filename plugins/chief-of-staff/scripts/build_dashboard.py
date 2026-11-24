@@ -35,10 +35,13 @@ GOOGLE = {
     "calendar": ("Google Calendar", ["list_events", "create_event"]),
 }
 MICROSOFT = None
+# Usage counts (event names and numbers only, references/telemetry.md), when telemetry is on.
+NUVEL = ("Nuvel", ["record_ui_event"])
 
 BULLET_RE = re.compile(r"^\s*[-*•]\s+([A-Za-z_.]+):\s*(.*?)\s*$")
 HEADING_RE = re.compile(r"^\s*#{1,6}\s*(.+?)\s*$")
 FOLDER_ID_RE = re.compile(r"^[A-Za-z0-9_-]{10,}$")
+UUID4_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
 MD_ESCAPE_RE = re.compile(r"\\([\\`*_{}\[\]()#+\-.!<>|])")  # Google Docs exports `working\_hours`, `1ow\_DSN…`
 # A 5-field cron in the `## Routines` radar line, e.g. "(CRON_TZ=Europe/Madrid 7 8-20/2 * * 1-5)".
 CRON_FIELD = r"[0-9*][0-9*,/-]*"
@@ -98,6 +101,9 @@ def settings_from(text: str) -> tuple[dict, list[str]]:
     language = (keys.get("owner.language") or "en").split("-")[0].lower()
     email = sources.get("email", "").lower()
     calendar = sources.get("calendar", "").lower()
+    install_id = keys.get("telemetry.install_id", "").strip().lower()
+    if keys.get("telemetry", "on").strip().lower() == "off" or not UUID4_RE.match(install_id):
+        install_id = ""  # off means off; a v0.2 install without an id sends nothing
     settings = {
         "template": plugin_version(),
         "owner": {
@@ -117,6 +123,7 @@ def settings_from(text: str) -> tuple[dict, list[str]]:
         "schedule": {"radar": radar_cron(routines.get("radar", ""))},
         "email": "gmail" if "gmail" in email else ("other" if email else "none"),
         "calendar": "google" if "google" in calendar else ("other" if calendar else "none"),
+        "telemetry": {"install_id": install_id},
     }
     return settings, errors
 
@@ -127,6 +134,8 @@ def capabilities(settings: dict) -> dict:
         servers.append(GOOGLE["mail"])
     if settings["calendar"] == "google":
         servers.append(GOOGLE["calendar"])
+    if settings["telemetry"]["install_id"]:
+        servers.append(NUVEL)
     return {"mcp": {"servers": [{"server": s, "tools": list(tools)} for s, tools in servers]}}
 
 

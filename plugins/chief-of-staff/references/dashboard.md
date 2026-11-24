@@ -33,6 +33,7 @@ republish it (the `dashboard` skill, to the same link).
 | `schedule.radar` | the 5-field cron in the `## Routines` radar line, or empty |
 | `email` | `gmail` when the `## Sources` email line names Gmail, else `other` / `none` |
 | `calendar` | `google` when the calendar line names Google Calendar, else `other` / `none` |
+| `telemetry.install_id` | `telemetry.install_id` when it is a UUID and `telemetry` isn't `off`, else empty (no usage counts) |
 
 ### Capabilities
 
@@ -43,6 +44,7 @@ Only the `mcp` capability, with these connectors and **exact** tool names:
 | `Google Drive` | `search_files`, `read_file_content`, `create_file` | find and read the newest radar and brief; write close handoffs |
 | `Gmail` | `get_thread`, `create_draft` | reply in the right thread; save a draft (never send) |
 | `Google Calendar` | `list_events`, `create_event` | today's meetings; add a busy block |
+| `Nuvel` | `record_ui_event` | usage counts (below); only when `telemetry.install_id` is set |
 
 Gmail and Google Calendar are left out when the config's sources aren't
 Gmail / Google Calendar; their features then don't show.
@@ -128,6 +130,24 @@ Rules the page keeps:
   without a click, and the page says so where it matters ("Is it done? You
   decide; nothing closes on its own.").
 
+## Usage counts
+
+Content-free, like run traces (`telemetry.md`): one `nuvel.ui_event/1` object
+per visit (load, or coming back to the tab, until the tab is hidden), sent when
+the tab is hidden. It holds fixed event names and how many times each happened,
+the visit's length and the seconds to the first action. Never a task, title,
+name, address or text.
+
+Event names: `view.today|todo|delegated|fyi`, `task.open`, `task.done`,
+`task.not_mine`, `task.snooze`, `task.keep_open`, `task.undo`,
+`draft.reply|follow|accept|decline|time` (a draft saved), `draft.prepared_used`,
+`draft.prepared_edited`, `block.add`, `rule.keep`, `rule.dismiss`, `refresh`,
+`error.drive|gmail|calendar`.
+
+Sent only when the viewer has already allowed Nuvel for this page: counting
+never asks for a permission, never shows anything, and a failed send is dropped.
+`telemetry: off`, or no `telemetry.install_id`, leaves Nuvel out of the page.
+
 ## States
 
 Each section shows its own failure, by error code: Drive unreadable (reconnect,
@@ -140,7 +160,7 @@ access), Microsoft 365 storage.
 
 `config` records `- dashboard: <artifact link>` and `- dashboard.version:
 <plugin version>`. When the plugin is newer than `dashboard.version`, or the
-config's language, timezone, working hours, folders or sources changed, run the
+config's language, timezone, working hours, folders, sources or telemetry changed, run the
 `dashboard` skill again: it republishes to the same link.
 
 ## Safety
