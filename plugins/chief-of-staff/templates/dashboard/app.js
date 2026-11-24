@@ -129,11 +129,13 @@ function load(fresh) {
           var radar = R.newest(files, "radar"), brief = R.newest(files, "brief");
           ST.prepared = R.preparedByTask(files);
           if (!radar) { ST.phase = "first"; ST.model = null; return; }
-          var jobs = [readDoc(radar.id, fresh).then(function (txt) { ST.model = R.parseRadar(txt); ST.radar = radar; })];
+          var jobs = [R.newestRadar(files, function (id) { return readDoc(id, fresh); }).then(function (r) {
+            if (!r) { ST.phase = "first"; ST.model = null; return; }
+            ST.model = R.parseRadar(r.text); ST.radar = r.file; })];
           var bt = brief && R.titleTime(brief.title);
           if (bt && bt.slice(0, 10) === today()) jobs.push(readDoc(brief.id, fresh).then(function (txt) { ST.brief = R.parseBrief(txt); }).catch(function () {}));
           else ST.brief = null;
-          return Promise.all(jobs).then(function () { ST.phase = "ready"; });
+          return Promise.all(jobs).then(function () { if (ST.model) ST.phase = "ready"; });
         }).catch(function (e) { ST.err.drive = e; if (!ST.model) ST.phase = "disc"; }),
         loadCalendar(fresh),
         loadProposals(fresh)
