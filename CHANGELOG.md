@@ -2,6 +2,17 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.9.1 - 2026-11-27
+
+### Fixed
+
+- The `recall` and `setup` skills' frontmatter is valid YAML again: their
+  `description` had a `: ` inside a plain value, which strict YAML parsers
+  refuse (PyYAML: *mapping values are not allowed here*), so a host reading
+  the frontmatter that way could not load either skill. The `: ` became
+  `, such as` (`recall`) and `;` (`setup`); each description stays one plain
+  line.
+
 ## chief-of-staff 0.9.0 - 2026-11-24
 
 The dashboard keeps up with what happens elsewhere, and the plugin learns

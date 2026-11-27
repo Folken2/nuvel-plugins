@@ -1,6 +1,6 @@
 ---
 name: recall
-description: Answer questions from the chief-of-staff registry and pass instructions to the scheduled routines, from any conversation, including about a task by its ID ("what's T-42?", "T-42 is done"). Use when the user asks what their chief of staff saw or did — "what happened with Acme?", "¿me ha contestado Ana?", "what did radar find today?", "any news on the contract?", "what's on my plate?" — or wants the routines to do something on their next run: "tell radar to watch for X", "ignore that thread", "remind me when Y replies". Reads the registry's runs; writes only new handoff or config documents.
+description: Answer questions from the chief-of-staff registry and pass instructions to the scheduled routines, from any conversation, including about a task by its ID ("what's T-42?", "T-42 is done"). Use when the user asks what their chief of staff saw or did — "what happened with Acme?", "¿me ha contestado Ana?", "what did radar find today?", "any news on the contract?", "what's on my plate?" — or wants the routines to do something on their next run, such as "tell radar to watch for X", "ignore that thread", "remind me when Y replies". Reads the registry's runs; writes only new handoff or config documents.
 ---
 
 # Recall and handoff
