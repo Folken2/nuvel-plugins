@@ -8,6 +8,10 @@ skills tree with three manifests: `.claude-plugin/plugin.json`,
   both `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`.
 - Skills cite shared files with paths relative to the skill folder
   (`../../references/x.md`); tests fail if a cited file is missing.
+  `scripts/bundle.py` turns each skill into a self-contained folder for MCP
+  servers (Skills extension) and fails on a citation that would leave it:
+  cite shared files only from the plugin root, and never from a hidden
+  folder (`.claude-plugin/` is not in a bundle; use `plugin.json`).
 - Every skill needs `agents/openai.yaml` (Codex UI metadata).
 - Run `uvx --with pytest pytest tests -q` and `claude plugin validate --strict .`
   (CI also validates each `plugins/<name>/`) before committing.

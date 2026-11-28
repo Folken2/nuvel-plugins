@@ -2,6 +2,24 @@
 
 All notable changes to the plugins in this repo. Versions are per plugin.
 
+## chief-of-staff 0.9.2 - 2026-11-28
+
+### Added
+
+- **Skills hub bundle:** each release also ships
+  `chief-of-staff-v<version>-skills-hub.zip`, built by `scripts/bundle.py`:
+  every skill as a self-contained folder (the references, templates and
+  scripts it reaches copied in, its `../../` paths rewritten) plus an
+  `index.json`, so an MCP server can serve the skills through the Skills
+  extension, where a host reads only files inside a skill's own folder.
+
+### Changed
+
+- The telemetry reference and `build_dashboard.py` read the plugin version
+  from `plugin.json` instead of `.claude-plugin/plugin.json` (the same
+  version; the tests keep the manifests equal), so a bundled skill needs no
+  hidden folder.
+
 ## chief-of-staff 0.9.1 - 2026-11-27
 
 ### Fixed

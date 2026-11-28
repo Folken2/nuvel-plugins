@@ -35,10 +35,14 @@ jobs:
         run: |
           plugin="${GITHUB_REF_NAME%-v*}"
           git archive --format=zip --prefix="$plugin/" -o "$GITHUB_REF_NAME.zip" "HEAD:plugins/$plugin"
+          # Self-contained skills for MCP servers (Skills extension): scripts/bundle.py.
+          python scripts/bundle.py --out "dist/skills-hub" "$plugin"
+          (cd dist && zip -qr "../$GITHUB_REF_NAME-skills-hub.zip" skills-hub)
           python scripts/release.py notes "$GITHUB_REF_NAME" > notes.md
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" "$GITHUB_REF_NAME.zip" \
+            "$GITHUB_REF_NAME-skills-hub.zip" \
             --title "$GITHUB_REF_NAME" --notes-file notes.md --verify-tag

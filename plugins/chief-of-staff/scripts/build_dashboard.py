@@ -49,7 +49,9 @@ CRON_RE = re.compile(rf"(?<![\w:/-])({CRON_FIELD}(?:\s+{CRON_FIELD}){{4}})(?![\w
 
 
 def plugin_version() -> str:
-    return json.loads((PLUGIN / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))["version"]
+    # plugin.json, not .claude-plugin/plugin.json: the same version (the tests
+    # keep the manifests equal), and the one a skill bundle carries.
+    return json.loads((PLUGIN / "plugin.json").read_text(encoding="utf-8"))["version"]
 
 
 def parse_config(text: str) -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
