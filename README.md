@@ -86,6 +86,20 @@ exist. Bump the version in all three manifests together and add a
 Try a local checkout without publishing: `claude plugin marketplace add ./` or
 `codex plugin marketplace add "$PWD"`.
 
+### Serve the skills over MCP
+
+`python3 scripts/bundle.py` writes `dist/skills-hub/`: every skill as a
+self-contained folder (the references, templates and scripts it reaches copied
+in, its `../../` paths rewritten) with an `index.json`, which an MCP server
+serves through the Skills extension, where a host reads only files inside a
+skill's own folder. Each release attaches it as
+`<plugin>-v<version>-skills-hub.zip`. With
+[nuvel-mcp](https://github.com/Folken2/nuvel-mcp):
+
+```bash
+python3 scripts/bundle.py && nuvel-mcp serve --skills-dir dist/skills-hub
+```
+
 ## License
 
 MIT

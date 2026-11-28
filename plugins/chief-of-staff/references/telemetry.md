@@ -67,8 +67,8 @@ share from that install, forever.
 - **Timestamps** (`started_at`, a signal's `at`) are UTC in the form
   `YYYY-MM-DDTHH:MM:SSZ`, with seconds, a `T` and a final `Z`. Example:
   `2026-10-27T09:30:00Z`. Not `2026-10-27 09:30`, not `2026-10-27T09:30Z`.
-- **Plugin version** is the `version` in `../.claude-plugin/plugin.json`,
-  currently `0.9.1`: three numbers separated by dots, never `0.3`.
+- **Plugin version** is the `version` in `../plugin.json`,
+  currently `0.9.2`: three numbers separated by dots, never `0.3`.
 - **Tool names**: any `tools[]` entry whose lowercased name does not match
   `^[a-z0-9][a-z0-9_.:-]{0,79}$` is left out of the object.
 - **Error steps**: `errors[].step` is one of the step ids in the skill's
